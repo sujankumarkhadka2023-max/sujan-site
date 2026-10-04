@@ -1,11 +1,11 @@
-name = "content-platform-api"
+name = "sujankumarkhadka-com-np"
 main = "worker.js"
 compatibility_date = "2026-10-01"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "content_platform"
-database_id = "database_id = "6fdb563e-50d4-47a0-9f95-578ab5601124"
+database_id = "6fdb563e-50d4-47a0-9f95-578ab5601124"
 
 [vars]
 COOKIE_NAME = "developer_session"
@@ -14,8 +14,8 @@ MAX_IMAGE_BYTES = "950000"
 MAX_BODY_CHARS = "100000"
 MAX_TITLE_CHARS = "240"
 MAX_SLUG_CHARS = "120"
-GITHUB_OWNER = "REPLACE_WITH_GITHUB_OWNER"
-GITHUB_REPO = "REPLACE_WITH_GITHUB_REPOSITORY"
+GITHUB_OWNER = "sujankumarkhadka2023-max"
+GITHUB_REPO = "sujankumarkhadka.com.np"
 GITHUB_MEDIA_PATH = "uploads"
 GITHUB_BRANCH = "main"
-ALLOWED_ORIGINS = "REPLACE_WITH_PUBLIC_AND_DEVELOPER_FRONTEND_ORIGINS"
+ALLOWED_ORIGINS = "https://sujankumarkhadka.com.np"
