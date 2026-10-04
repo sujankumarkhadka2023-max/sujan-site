@@ -10,11 +10,11 @@
 
 ## Cloudflare resources
 
-Create a D1 database and an R2 bucket.
+Create a D1 database and an GitHub bucket.
 
 Set the D1 database ID in `wrangler.toml`.
 
-Set the R2 bucket name in `wrangler.toml`.
+Set the GitHub bucket name in `wrangler.toml`.
 
 Set these Worker secrets:
 
@@ -45,4 +45,17 @@ Set the deployed Worker URL in both frontend `config.js` files.
 Do not commit credentials, tokens, or private keys.
 
 ## Public header image
-The public website uses `frontend-public/assets/site-header.png` as the full-width top header image. The image keeps its original aspect ratio and scales to the full horizontal width of the application.
+The public website uses `frontend-public/assets/site-header.png` as the full-width top header image.
+
+## Image storage
+Uploaded images are stored directly in the configured GitHub repository under `GITHUB_MEDIA_PATH`.
+
+Set these Worker variables:
+- `GITHUB_OWNER`
+- `GITHUB_REPO`
+- `GITHUB_MEDIA_PATH`
+- `GITHUB_BRANCH`
+
+Create a Cloudflare Worker secret named `GITHUB_TOKEN`. Do not commit the token to GitHub.
+
+The GitHub repository must be publicly readable for the public website to load image URLs from `raw.githubusercontent.com`.
