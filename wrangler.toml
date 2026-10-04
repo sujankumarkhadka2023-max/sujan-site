@@ -1,0 +1,21 @@
+name = "content-platform-api"
+main = "backend/worker.js"
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "content_platform"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[vars]
+COOKIE_NAME = "developer_session"
+SESSION_TTL_SECONDS = "28800"
+MAX_IMAGE_BYTES = "950000"
+MAX_BODY_CHARS = "100000"
+MAX_TITLE_CHARS = "240"
+MAX_SLUG_CHARS = "120"
+GITHUB_OWNER = "REPLACE_WITH_GITHUB_OWNER"
+GITHUB_REPO = "REPLACE_WITH_GITHUB_REPOSITORY"
+GITHUB_MEDIA_PATH = "frontend-public/assets/uploads"
+GITHUB_BRANCH = "main"
+ALLOWED_ORIGINS = "REPLACE_WITH_PUBLIC_AND_DEVELOPER_FRONTEND_ORIGINS"
