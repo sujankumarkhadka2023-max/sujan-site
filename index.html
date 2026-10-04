@@ -1,16 +1,28 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Developer Login</title><link rel="stylesheet" href="./assets/styles.css"></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Home</title>
+<link rel="stylesheet" href="./assets/styles.css">
+</head>
 <body>
-<main class="auth-page">
-<form id="loginForm" class="panel">
-<h1>Developer Login</h1>
-<label>Email<input id="email" type="email" autocomplete="username" required></label>
-<label>Password<input id="password" type="password" autocomplete="current-password" required></label>
-<button type="submit">Login</button>
-<p id="message" class="error"></p>
-</form>
+<header class="site-header">
+<a class="site-header-image-link" href="./index.html" aria-label="Home">
+<img class="site-header-image" src="./assets/site-header.png" alt="">
+</a>
+<nav>
+<a href="./pages/opinion.html">Opinion</a>
+<a href="./pages/news.html">News</a>
+<a href="./pages/about.html">About</a>
+</nav>
+</header>
+<main class="container">
+<h1>Home</h1>
+<section id="latest" class="content-grid"></section>
 </main>
-<script src="./config.js"></script><script src="./components/auth.js"></script>
+<script src="./config.js"></script>
+<script src="./components/public.js"></script>
+<script>loadLatest("latest");</script>
 </body>
 </html>
