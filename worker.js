@@ -245,12 +245,34 @@ async function image(env, pathname) {
   return new Response(res.body, { headers: { 'Content-Type': type, 'Cache-Control': 'public, max-age=31536000, immutable' } });
 }
 
+
+async function sharePage(env, url) {
+  const parts = url.pathname.split('/').filter(Boolean);
+  const section = parts[1], id = parts[2];
+  if (!SECTIONS.includes(section) || !id) return Response.redirect(url.origin + '/', 302);
+  const list = await readJson(env, `data/${section}.json`, () => []);
+  const p = list.find(x => x.id === id);
+  if (!p) return Response.redirect(url.origin + '/', 302);
+  const e = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const target = url.origin + '/#/' + section + '/' + encodeURIComponent(p.id);
+  const desc = p.body.replace(/\s+/g, ' ').slice(0, 200);
+  const img = p.image ? url.origin + '/img/' + encodeURIComponent(p.image.split('/').pop()) : url.origin + '/header.png';
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${e(p.title)}</title>
+<meta property="og:type" content="article"><meta property="og:site_name" content="Sujan Kumar Khadka">
+<meta property="og:title" content="${e(p.title)}"><meta property="og:description" content="${e(desc)}">
+<meta property="og:image" content="${e(img)}"><meta property="og:url" content="${e(url.origin + '/share/' + section + '/' + p.id)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta http-equiv="refresh" content="0;url=${e(target)}"></head><body><script>location.replace(${JSON.stringify(target)})</script></body></html>`;
+  return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' } });
+}
+
 export default {
   async fetch(request, env) {
     const p = new URL(request.url).pathname;
     try {
       if (p.startsWith('/api/')) return await api(request, env, new URL(request.url));
       if (p.startsWith('/img/')) return await image(env, p);
+      if (p.startsWith('/share/')) return await sharePage(env, new URL(request.url));
     } catch (e) {
       if (e instanceof HttpError) return json({ error: e.message }, e.status);
       console.error(e);
