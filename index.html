@@ -26,6 +26,8 @@ footer{border-top:1px solid #000;text-align:center;padding:16px;font-size:14px}
 .meta{font-size:14px}
 .full img{display:block;width:100%;height:auto;margin:16px 0}
 .text{white-space:pre-wrap;overflow-wrap:anywhere}
+a.btn{display:inline-block;text-decoration:none}
+.sh{margin-top:28px;padding-top:16px;border-top:1px solid #000}
 .more{text-align:center;padding:24px 0 0}
 .btn{padding:12px 26px;border:1px solid #000;background:#000;color:#fff;font:700 16px Georgia,serif;cursor:pointer}
 .btn.alt{background:#fff;color:#000}
@@ -46,11 +48,36 @@ textarea.s{min-height:110px}
 .cl dd{margin:0}
 .box{max-width:420px;margin:30px auto}
 @media(max-width:600px){main{padding:18px 14px 30px}.full h1{font-size:26px}}
+
+:root{--accent:#b3001b;--grey:#666}
+.dateline{text-align:right;font:italic 13px Georgia,serif;color:var(--grey);padding:8px 20px}
+nav{border-top:3px solid #000}
+nav a,nav button{text-transform:uppercase;letter-spacing:.14em;font-size:13px;padding:15px 10px}
+nav a:hover,nav button:hover{color:var(--accent)}
+nav .on{border-bottom:3px solid var(--accent)}
+.meta{font-size:12px}
+.tag{color:var(--accent);font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-right:8px}
+.dt{color:var(--grey);font-size:13px}
+#list{display:grid;grid-template-columns:1fr 1fr;gap:8px 32px;align-items:start}
+.card{border-top:3px solid #000;border-bottom:0;padding:14px 0 22px}
+.card img{aspect-ratio:16/10;max-height:none}
+.card h2{font-size:23px;line-height:1.25}
+.card:hover h2{text-decoration:underline}
+.card .ex{color:#222;font-size:16px}
+.feat{grid-column:1/-1}
+.feat img{aspect-ratio:21/9}
+.feat h2{font-size:38px}
+.full{max-width:760px;margin:0 auto}
+.full h1{font-size:40px;line-height:1.2;border-bottom:1px solid #000;padding-bottom:14px}
+.full .text{font-size:19px;line-height:1.85}
+.full .text::first-letter{float:left;font-size:3.4em;line-height:.85;font-weight:700;padding:6px 10px 0 0}
+@media(max-width:700px){#list{grid-template-columns:1fr}.feat h2{font-size:28px}.feat img{aspect-ratio:16/10}.full h1{font-size:29px}.full .text{font-size:18px}}
 </style>
 </head>
 <body>
 <div class="site">
 <header><img src="/header.png" alt="Sujan Kumar Khadka"></header>
+<div class="dateline" id="dl"></div>
 <nav id="nav"></nav>
 <main id="view"></main>
 <footer>&copy; <span id="yr"></span> Sujan Kumar Khadka</footer>
@@ -61,6 +88,7 @@ const view = $('#view'), navEl = $('#nav');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL = {article:'Article', opinion:'Opinion'}, PAGE = 4, KEY = 'sk_token';
 $('#yr').textContent = new Date().getFullYear();
+$('#dl').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 const fmt = d => new Date(d).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 const imgUrl = p => '/img/' + encodeURIComponent(String(p).split('/').pop());
 
@@ -91,9 +119,9 @@ async function loadPosts(kind) {
   r.forEach((x, i) => { if (x.status === 'fulfilled') all = all.concat(x.value.map(p => ({...p, section: kinds[i]}))); });
   return all.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
-function card(p) {
+function card(p, feat) {
   const ex = p.body.replace(/\s+/g, ' ').slice(0, 220) + (p.body.length > 220 ? '…' : '');
-  return `<a class="card" href="#/${p.section}/${esc(p.id)}">${p.image ? `<img src="${imgUrl(p.image)}" alt="" loading="lazy">` : ''}<div class="meta">${LABEL[p.section]}, ${fmt(p.date)}</div><h2>${esc(p.title)}</h2><div>${esc(ex)}</div></a>`;
+  return `<a class="card${feat ? ' feat' : ''}" href="#/${p.section}/${esc(p.id)}">${p.image ? `<img src="${imgUrl(p.image)}" alt="" loading="lazy">` : ''}<div class="meta"><span class="tag">${LABEL[p.section]}</span><span class="dt">${fmt(p.date)}</span></div><h2>${esc(p.title)}</h2><div class="ex">${esc(ex)}</div></a>`;
 }
 async function showList(kind) {
   view.innerHTML = '<p class="note">Loading…</p>';
@@ -105,7 +133,7 @@ async function showList(kind) {
   let shown = 0;
   const list = $('#list'), btn = $('#more');
   const next = () => {
-    items.slice(shown, shown + PAGE).forEach(p => list.insertAdjacentHTML('beforeend', card(p)));
+    items.slice(shown, shown + PAGE).forEach((p, i) => list.insertAdjacentHTML('beforeend', card(p, shown + i === 0)));
     shown += PAGE;
     btn.parentElement.style.display = shown >= items.length ? 'none' : '';
   };
@@ -116,7 +144,8 @@ async function showPost(section, id) {
   try {
     const p = (await api('/api/data/' + section)).find(x => x.id === id);
     if (!p) { view.innerHTML = '<p class="note">This page was not found.</p>'; return; }
-    view.innerHTML = `<article class="full"><div class="meta">${LABEL[section]}, ${fmt(p.date)}</div><h1>${esc(p.title)}</h1>${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : ''}<div class="text">${esc(p.body)}</div></article>`;
+    view.innerHTML = `<article class="full"><div class="meta"><span class="tag">${LABEL[section]}</span><span class="dt">${fmt(p.date)}</span></div><h1>${esc(p.title)}</h1>${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : ''}<div class="text">${esc(p.body)}</div><div class="sh"><b>Share</b><div class="row" id="sh"></div></div></article>`;
+    shareButtons(section, p);
   } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
 }
 function linkValue(v) {
@@ -125,6 +154,18 @@ function linkValue(v) {
   if (/^https?:\/\//i.test(t)) return `<a href="${esc(t)}" target="_blank" rel="noopener">${esc(t)}</a>`;
   if (/^\+?[\d\s\-()]{7,}$/.test(t)) return `<a href="tel:${esc(t.replace(/[^\d+]/g, ''))}">${esc(t)}</a>`;
   return esc(t);
+}
+function shareButtons(section, p) {
+  const url = location.origin + '/share/' + section + '/' + encodeURIComponent(p.id);
+  const u = encodeURIComponent(url), t = encodeURIComponent(p.title);
+  const box = $('#sh');
+  box.innerHTML = `${navigator.share ? '<button class="btn" id="shn">Share</button>' : ''}<a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/?text=${t}%20${u}">WhatsApp</a><a class="btn alt" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">Facebook</a><a class="btn alt" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${t}&url=${u}">X</a><button class="btn alt" id="shc">Copy link</button>`;
+  const n = $('#shn');
+  if (n) n.onclick = () => navigator.share({title: p.title, url}).catch(() => {});
+  $('#shc').onclick = async ev => {
+    try { await navigator.clipboard.writeText(url); ev.target.textContent = 'Link copied'; }
+    catch (e) { prompt('Copy this link:', url); }
+  };
 }
 async function showContact() {
   view.innerHTML = '<p class="note">Loading…</p>';
