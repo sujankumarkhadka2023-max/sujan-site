@@ -49,7 +49,7 @@ textarea.s{min-height:110px}
 .box{max-width:420px;margin:30px auto}
 @media(max-width:600px){main{padding:18px 14px 30px}.full h1{font-size:26px}}
 
-:root{--accent:#b3001b;--grey:#666}
+:root{--accent:#d0121b;--grey:#666}
 .dateline{text-align:right;font:italic 13px Georgia,serif;color:var(--grey);padding:8px 20px}
 nav{border-top:3px solid #000}
 nav a,nav button{text-transform:uppercase;letter-spacing:.14em;font-size:13px;padding:15px 10px}
@@ -71,6 +71,14 @@ nav .on{border-bottom:3px solid var(--accent)}
 .full h1{font-size:40px;line-height:1.2;border-bottom:1px solid #000;padding-bottom:14px}
 .full .text{font-size:19px;line-height:1.85}
 .full .text::first-letter{float:left;font-size:3.4em;line-height:.85;font-weight:700;padding:6px 10px 0 0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.shw{position:relative}
+.ib{border:0;background:#fff;color:#000;padding:8px;cursor:pointer;line-height:0}
+.ib svg{width:26px;height:26px}
+.menu{position:absolute;right:0;top:100%;min-width:210px;background:#fff;border:1px solid #000;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:5}
+.menu a,.menu button{display:flex;align-items:center;gap:14px;width:100%;padding:13px 16px;border:0;background:#fff;color:#000;font:16px Georgia,serif;text-decoration:none;cursor:pointer;text-align:left}
+.menu a:hover,.menu button:hover{background:#f2f2f2}
+.menu svg{width:22px;height:22px;flex:none}
 @media(max-width:700px){#list{grid-template-columns:1fr}.feat h2{font-size:28px}.feat img{aspect-ratio:16/10}.full h1{font-size:29px}.full .text{font-size:18px}}
 </style>
 </head>
@@ -144,7 +152,7 @@ async function showPost(section, id) {
   try {
     const p = (await api('/api/data/' + section)).find(x => x.id === id);
     if (!p) { view.innerHTML = '<p class="note">This page was not found.</p>'; return; }
-    view.innerHTML = `<article class="full"><div class="meta"><span class="tag">${LABEL[section]}</span><span class="dt">${fmt(p.date)}</span></div><h1>${esc(p.title)}</h1>${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : ''}<div class="text">${esc(p.body)}</div><div class="sh"><b>Share</b><div class="row" id="sh"></div></div></article>`;
+    view.innerHTML = `<article class="full"><div class="top"><div class="meta"><span class="tag">${LABEL[section]}</span><span class="dt">${fmt(p.date)}</span></div><div class="shw"><button class="ib" id="shb" aria-label="Share" title="Share">${ICON.share}</button><div class="menu" id="mn" hidden></div></div></div><h1>${esc(p.title)}</h1>${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : ''}<div class="text">${esc(p.body)}</div></article>`;
     shareButtons(section, p);
   } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
 }
@@ -155,16 +163,26 @@ function linkValue(v) {
   if (/^\+?[\d\s\-()]{7,}$/.test(t)) return `<a href="tel:${esc(t.replace(/[^\d+]/g, ''))}">${esc(t)}</a>`;
   return esc(t);
 }
+const ICON = {
+  share:'<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" fill="currentColor"/><circle cx="6" cy="12" r="3" fill="currentColor"/><circle cx="18" cy="19" r="3" fill="currentColor"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  fb:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.9.1 2.1.1v2.4h-1.4c-1.1 0-1.4.5-1.4 1.3v1.8h2.7l-.4 2.7h-2.3v7H20a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z"/></svg>',
+  wa:'<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path fill="currentColor" d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-.9.9c-1-.4-2-1.4-2.4-2.4l.9-.9-1-2L9 8.5z"/></svg>'
+};
 function shareButtons(section, p) {
   const url = location.origin + '/share/' + section + '/' + encodeURIComponent(p.id);
   const u = encodeURIComponent(url), t = encodeURIComponent(p.title);
-  const box = $('#sh');
-  box.innerHTML = `${navigator.share ? '<button class="btn" id="shn">Share</button>' : ''}<a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/?text=${t}%20${u}">WhatsApp</a><a class="btn alt" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">Facebook</a><a class="btn alt" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${t}&url=${u}">X</a><button class="btn alt" id="shc">Copy link</button>`;
-  const n = $('#shn');
-  if (n) n.onclick = () => navigator.share({title: p.title, url}).catch(() => {});
-  $('#shc').onclick = async ev => {
-    try { await navigator.clipboard.writeText(url); ev.target.textContent = 'Link copied'; }
+  const btn = $('#shb'), mn = $('#mn');
+  mn.innerHTML = `<button id="shc">${ICON.link}<span>Copy link</span></button><a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">${ICON.fb}<span>Facebook</span></a><a target="_blank" rel="noopener" href="https://wa.me/?text=${t}%20${u}">${ICON.wa}<span>WhatsApp</span></a>`;
+  btn.onclick = ev => { ev.stopPropagation(); mn.hidden = !mn.hidden; };
+  mn.onclick = ev => ev.stopPropagation();
+  document.onclick = () => { mn.hidden = true; };
+  mn.querySelectorAll('a').forEach(a => a.onclick = () => setTimeout(() => { mn.hidden = true; }, 150));
+  $('#shc').onclick = async () => {
+    const s = $('#shc span');
+    try { await navigator.clipboard.writeText(url); s.textContent = 'Link copied'; }
     catch (e) { prompt('Copy this link:', url); }
+    setTimeout(() => { mn.hidden = true; s.textContent = 'Copy link'; }, 1200);
   };
 }
 async function showContact() {
