@@ -1,3 +1,6 @@
-worker.js
+_worker.js
 wrangler.jsonc
 .assetsignore
+.git
+.wrangler
+README.md
