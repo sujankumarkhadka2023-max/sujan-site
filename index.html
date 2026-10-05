@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sujan Kumar Khadka</title>
+<style>
+:root{--site-width:1200px}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:#000}
+body{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.7}
+a{color:#000}
+.site{max-width:var(--site-width);margin:0 auto;background:#fff}
+.site>header img{display:block;width:100%;height:auto}
+nav{display:flex;flex-wrap:wrap;justify-content:center;border-top:1px solid #000;border-bottom:1px solid #000}
+nav a,nav button{flex:1 1 auto;text-align:center;padding:14px 10px;border:0;background:#fff;color:#000;font:700 15px Georgia,serif;text-decoration:none;cursor:pointer}
+nav .on{border-bottom:3px solid #000}
+main{padding:24px 20px 40px;min-height:50vh}
+footer{border-top:1px solid #000;text-align:center;padding:16px;font-size:14px}
+.note{text-align:center;padding:40px 0}
+.card{display:block;text-decoration:none;padding:22px 0;border-bottom:1px solid #000}
+.card img{display:block;width:100%;max-height:420px;object-fit:cover;margin-bottom:12px}
+.card h2,.full h1{font-weight:700;margin:4px 0 6px;line-height:1.3}
+.card h2{font-size:24px}
+.full h1{font-size:32px}
+.meta{font-size:14px}
+.full img{display:block;width:100%;height:auto;margin:16px 0}
+.text{white-space:pre-wrap;overflow-wrap:anywhere}
+.more{text-align:center;padding:24px 0 0}
+.btn{padding:12px 26px;border:1px solid #000;background:#000;color:#fff;font:700 16px Georgia,serif;cursor:pointer}
+.btn.alt{background:#fff;color:#000}
+.btn:disabled{opacity:.5}
+label{display:block;margin:16px 0 4px;font-weight:700}
+input[type=text],input[type=password],textarea{width:100%;padding:10px;border:1px solid #000;border-radius:0;background:#fff;color:#000;font:16px Georgia,serif}
+textarea{min-height:260px;resize:vertical}
+textarea.s{min-height:110px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.cr{display:flex;gap:8px;margin-top:8px}
+.cr input{flex:1}
+.msg{min-height:1.4em;font-weight:700}
+.prev{max-width:320px;margin-top:10px}
+.prev img{display:block;width:100%}
+.dp{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #000;padding:12px 0;flex-wrap:wrap}
+.dp b{flex:1 1 200px;overflow-wrap:anywhere}
+.cl dt{font-weight:700;margin-top:14px}
+.cl dd{margin:0}
+.box{max-width:420px;margin:30px auto}
+@media(max-width:600px){main{padding:18px 14px 30px}.full h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="site">
+<header><img src="/header.png" alt="Sujan Kumar Khadka"></header>
+<nav id="nav"></nav>
+<main id="view"></main>
+<footer>&copy; <span id="yr"></span> Sujan Kumar Khadka</footer>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const view = $('#view'), navEl = $('#nav');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LABEL = {article:'Article', opinion:'Opinion'}, PAGE = 4, KEY = 'sk_token';
+$('#yr').textContent = new Date().getFullYear();
+const fmt = d => new Date(d).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+const imgUrl = p => '/img/' + encodeURIComponent(String(p).split('/').pop());
+
+async function api(path, opts = {}) {
+  const headers = {};
+  const t = localStorage.getItem(KEY);
+  if (t) headers.Authorization = 'Bearer ' + t;
+  if (opts.body) headers['Content-Type'] = 'application/json';
+  let res;
+  try { res = await fetch(path, {...opts, headers, cache:'no-store'}); }
+  catch (e) { throw new Error('Network error. Check your internet connection.'); }
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) { const err = new Error(data.error || 'Request failed (' + res.status + ').'); err.status = res.status; throw err; }
+  return data;
+}
+
+/* ---------- public site ---------- */
+function setNav(active) {
+  const l = [['home','Home','#/'],['opinion','Opinion','#/opinion'],['article','Article','#/article'],['contact','Contact','#/contact']];
+  navEl.innerHTML = l.map(x => `<a href="${x[2]}" class="${x[0]===active?'on':''}">${x[1]}</a>`).join('');
+}
+async function loadPosts(kind) {
+  const kinds = kind === 'home' ? ['article','opinion'] : [kind];
+  const r = await Promise.allSettled(kinds.map(k => api('/api/data/' + k)));
+  if (r.every(x => x.status === 'rejected')) throw new Error('unavailable');
+  let all = [];
+  r.forEach((x, i) => { if (x.status === 'fulfilled') all = all.concat(x.value.map(p => ({...p, section: kinds[i]}))); });
+  return all.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+function card(p) {
+  const ex = p.body.replace(/\s+/g, ' ').slice(0, 220) + (p.body.length > 220 ? '…' : '');
+  return `<a class="card" href="#/${p.section}/${esc(p.id)}">${p.image ? `<img src="${imgUrl(p.image)}" alt="" loading="lazy">` : ''}<div class="meta">${LABEL[p.section]}, ${fmt(p.date)}</div><h2>${esc(p.title)}</h2><div>${esc(ex)}</div></a>`;
+}
+async function showList(kind) {
+  view.innerHTML = '<p class="note">Loading…</p>';
+  let items;
+  try { items = await loadPosts(kind); }
+  catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; return; }
+  if (!items.length) { view.innerHTML = '<p class="note">Nothing has been published yet.</p>'; return; }
+  view.innerHTML = '<div id="list"></div><div class="more"><button class="btn" id="more">See more</button></div>';
+  let shown = 0;
+  const list = $('#list'), btn = $('#more');
+  const next = () => {
+    items.slice(shown, shown + PAGE).forEach(p => list.insertAdjacentHTML('beforeend', card(p)));
+    shown += PAGE;
+    btn.parentElement.style.display = shown >= items.length ? 'none' : '';
+  };
+  btn.onclick = next; next();
+}
+async function showPost(section, id) {
+  view.innerHTML = '<p class="note">Loading…</p>';
+  try {
+    const p = (await api('/api/data/' + section)).find(x => x.id === id);
+    if (!p) { view.innerHTML = '<p class="note">This page was not found.</p>'; return; }
+    view.innerHTML = `<article class="full"><div class="meta">${LABEL[section]}, ${fmt(p.date)}</div><h1>${esc(p.title)}</h1>${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : ''}<div class="text">${esc(p.body)}</div></article>`;
+  } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
+}
+function linkValue(v) {
+  const t = v.trim();
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return `<a href="mailto:${esc(t)}">${esc(t)}</a>`;
+  if (/^https?:\/\//i.test(t)) return `<a href="${esc(t)}" target="_blank" rel="noopener">${esc(t)}</a>`;
+  if (/^\+?[\d\s\-()]{7,}$/.test(t)) return `<a href="tel:${esc(t.replace(/[^\d+]/g, ''))}">${esc(t)}</a>`;
+  return esc(t);
+}
+async function showContact() {
+  view.innerHTML = '<p class="note">Loading…</p>';
+  try {
+    const c = await api('/api/data/contact');
+    const items = c.items || [];
+    if (!c.intro && !items.length) { view.innerHTML = '<p class="note">Contact details have not been added yet.</p>'; return; }
+    view.innerHTML = `<div class="full">${c.intro ? `<div class="text">${esc(c.intro)}</div>` : ''}<dl class="cl">${items.map(i => `<dt>${esc(i.label)}</dt><dd>${linkValue(i.value || '')}</dd>`).join('')}</dl></div>`;
+  } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
+}
+
+/* ---------- developer portal ---------- */
+function resizeImage(file, max = 1600) {
+  return new Promise((ok, bad) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => {
+      const s = Math.min(1, max / Math.max(im.width, im.height));
+      const w = Math.round(im.width * s), h = Math.round(im.height * s);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(im, 0, 0, w, h);
+      URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', 0.85));
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); bad(new Error('This file could not be read as an image.')); };
+    im.src = url;
+  });
+}
+function devFail(e, el) {
+  if (e.status === 401) { localStorage.removeItem(KEY); showLogin(e.message); return; }
+  el.textContent = e.message;
+}
+function showLogin(message) {
+  navEl.innerHTML = '';
+  view.innerHTML = `<form class="box" id="lf"><label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password" required><div class="row"><button class="btn" type="submit">Log in</button></div><p class="msg" id="lm"></p></form>`;
+  $('#lm').textContent = message || '';
+  $('#lf').onsubmit = async ev => {
+    ev.preventDefault();
+    const m = $('#lm'); m.textContent = '';
+    try {
+      const r = await api('/api/login', {method:'POST', body:JSON.stringify({password:$('#pw').value})});
+      localStorage.setItem(KEY, r.token); showDash('article');
+    } catch (e) { m.textContent = e.message; }
+  };
+}
+function showDash(tab) {
+  if (!localStorage.getItem(KEY)) return showLogin();
+  const tabs = [['article','Articles'],['opinion','Opinions'],['contact','Contact'],['setup','Check setup']];
+  navEl.innerHTML = tabs.map(t => `<button data-t="${t[0]}" class="${t[0]===tab?'on':''}">${t[1]}</button>`).join('') + '<button data-t="out">Log out</button>';
+  navEl.querySelectorAll('button').forEach(b => b.onclick = () => {
+    if (b.dataset.t === 'out') { localStorage.removeItem(KEY); showLogin(); } else showDash(b.dataset.t);
+  });
+  if (tab === 'contact') return devContact();
+  if (tab === 'setup') return devSetup();
+  devSection(tab);
+}
+async function devSection(section) {
+  view.innerHTML = `<h2>${LABEL[section]}</h2><div id="ed"></div><h2 style="margin-top:36px">Published</h2><div id="pl"><p class="note">Loading…</p></div>`;
+  editor(section, null);
+  try {
+    const list = await api('/api/data/' + section);
+    const pl = $('#pl');
+    if (!list.length) { pl.innerHTML = '<p>Nothing published yet.</p>'; return; }
+    pl.innerHTML = list.map(p => `<div class="dp"><b>${esc(p.title)}</b><span><button class="btn alt" data-e="${esc(p.id)}">Edit</button> <button class="btn alt" data-d="${esc(p.id)}">Delete</button></span></div>`).join('');
+    pl.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { editor(section, list.find(p => p.id === b.dataset.e)); window.scrollTo(0, 0); });
+    pl.querySelectorAll('[data-d]').forEach(b => b.onclick = async () => {
+      if (!confirm('Delete this post permanently?')) return;
+      try { await api(`/api/post/${section}/${b.dataset.d}`, {method:'DELETE'}); devSection(section); }
+      catch (e) { devFail(e, $('#pl')); }
+    });
+  } catch (e) { devFail(e, $('#pl')); }
+}
+function editor(section, post) {
+  const st = {image: post ? post.image || '' : '', pending: null};
+  $('#ed').innerHTML = `<form id="pf"><label for="t">Heading</label><input type="text" id="t" maxlength="200" style="font-weight:700" required><label for="b">Full News</label><textarea id="b" required></textarea><label for="f">Image (from phone or computer)</label><input type="file" id="f" accept="image/*"><div class="prev" id="pv"></div><div class="row"><button class="btn" type="submit" id="sv">${post ? 'Save changes' : 'Publish'}</button>${post ? '<button class="btn alt" type="button" id="cn">Cancel</button>' : ''}<button class="btn alt" type="button" id="rm" style="display:none">Remove image</button></div><p class="msg" id="mg"></p></form>`;
+  $('#t').value = post ? post.title : '';
+  $('#b').value = post ? post.body : '';
+  const paint = () => {
+    const src = st.pending || (st.image ? imgUrl(st.image) : '');
+    $('#pv').innerHTML = src ? `<img src="${esc(src)}" alt="">` : '';
+    $('#rm').style.display = src ? '' : 'none';
+  };
+  paint();
+  if (post) $('#cn').onclick = () => editor(section, null);
+  $('#rm').onclick = () => { st.pending = null; st.image = ''; $('#f').value = ''; paint(); };
+  $('#f').onchange = async ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    try { st.pending = await resizeImage(f); paint(); $('#mg').textContent = ''; }
+    catch (e) { $('#mg').textContent = e.message; }
+  };
+  $('#pf').onsubmit = async ev => {
+    ev.preventDefault();
+    const mg = $('#mg'), sv = $('#sv'); mg.textContent = 'Saving…'; sv.disabled = true;
+    try {
+      if (st.pending) {
+        const r = await api('/api/upload', {method:'POST', body:JSON.stringify({type:'image/jpeg', data:st.pending.split(',')[1]})});
+        st.image = r.image; st.pending = null;
+      }
+      await api('/api/post/' + section, {method:'POST', body:JSON.stringify({id: post ? post.id : undefined, title:$('#t').value, body:$('#b').value, image:st.image})});
+      devSection(section);
+    } catch (e) { sv.disabled = false; devFail(e, mg); }
+  };
+}
+async function devContact() {
+  view.innerHTML = '<h2>Contact</h2><p class="note">Loading…</p>';
+  let c;
+  try { c = await api('/api/data/contact'); } catch (e) { view.innerHTML = '<p class="msg" id="mg"></p>'; return devFail(e, $('#mg')); }
+  view.innerHTML = '<h2>Contact</h2><form id="cf"><label for="ci">Message</label><textarea class="s" id="ci"></textarea><label>Details</label><div id="ri"></div><div class="row"><button class="btn alt" type="button" id="ad">Add detail</button><button class="btn" type="submit">Save changes</button></div><p class="msg" id="mg"></p></form>';
+  $('#ci').value = c.intro || '';
+  const addRow = (l, v) => {
+    const r = document.createElement('div'); r.className = 'cr';
+    r.innerHTML = '<input type="text" placeholder="Label" class="l"><input type="text" placeholder="Value" class="v"><button type="button" class="btn alt">Remove</button>';
+    r.querySelector('.l').value = l || ''; r.querySelector('.v').value = v || '';
+    r.querySelector('button').onclick = () => r.remove();
+    $('#ri').appendChild(r);
+  };
+  (c.items || []).forEach(i => addRow(i.label, i.value));
+  $('#ad').onclick = () => addRow('', '');
+  $('#cf').onsubmit = async ev => {
+    ev.preventDefault();
+    const mg = $('#mg'); mg.textContent = 'Saving…';
+    const items = [...document.querySelectorAll('#ri .cr')].map(r => ({label:r.querySelector('.l').value, value:r.querySelector('.v').value}));
+    try { await api('/api/contact', {method:'POST', body:JSON.stringify({intro:$('#ci').value, items})}); mg.textContent = 'Saved.'; }
+    catch (e) { devFail(e, mg); }
+  };
+}
+async function devSetup() {
+  view.innerHTML = '<h2>Check setup</h2><div id="ck"><p class="note">Checking…</p></div>';
+  try {
+    const r = await api('/api/health');
+    $('#ck').innerHTML = r.checks.map(c => `<div class="dp"><b>${c.ok ? '✓' : '✗'} ${esc(c.name)}</b><span>${esc(c.message)}</span></div>`).join('');
+  } catch (e) { $('#ck').innerHTML = '<p class="msg" id="mg"></p>'; devFail(e, $('#mg')); }
+}
+
+/* ---------- router ---------- */
+function route() {
+  const seg = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  window.scrollTo(0, 0);
+  if (seg[0] === 'developer') return localStorage.getItem(KEY) ? showDash('article') : showLogin();
+  const s = seg[0];
+  if (s === 'opinion' || s === 'article') { setNav(s); return seg[1] ? showPost(s, seg[1]) : showList(s); }
+  if (s === 'contact') { setNav('contact'); return showContact(); }
+  setNav('home'); showList('home');
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
