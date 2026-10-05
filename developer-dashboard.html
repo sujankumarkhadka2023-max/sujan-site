@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Developer Dashboard</title><link rel="stylesheet" href="./developer-styles.css"></head>
+<body>
+<header class="topbar"><strong>Developer Dashboard</strong><button id="logout">Secure Logout</button></header>
+<main class="dashboard">
+<section class="panel"><h1>API / Project Management</h1><pre id="project">Loading...</pre></section>
+
+<section class="panel">
+<h2>Content</h2>
+<div class="toolbar"><select id="filter"><option value="">All</option><option value="opinion">Opinion</option><option value="news">News</option><option value="about">About</option></select><button id="newContent">New Content</button></div>
+<div id="contentList"></div>
+</section>
+
+<section id="editorPanel" class="panel hidden">
+<h2 id="editorTitle">New Content</h2>
+<form id="editor">
+<input type="hidden" id="contentId">
+<input type="hidden" id="imageKey">
+<input type="hidden" id="imageUrl">
+<label>Type<select id="type" required><option value="opinion">Opinion</option><option value="news">News</option><option value="about">About</option></select></label>
+<label>Title<input id="title"></label>
+<label>Slug<input id="slug"></label>
+<label>Body<textarea id="body" rows="14" required></textarea></label>
+<label>Image<input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif"></label>
+<div id="imagePreview"></div>
+<button type="button" id="removeImage" class="danger hidden">Remove Image</button>
+<label class="check"><input id="published" type="checkbox"> Publish</label>
+<div class="actions"><button type="submit">Save</button><button type="button" id="cancel">Cancel</button></div>
+<p id="editorMessage" class="error"></p>
+</form>
+</section>
+</main>
+<script src="./developer-config.js"></script><script src="./dashboard.js"></script>
+</body>
+</html>
