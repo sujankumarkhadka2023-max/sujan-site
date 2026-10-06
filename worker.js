@@ -180,14 +180,78 @@ async function deletePost(env, section, id) {
   for (const o of old) await removeImage(env, o);
   return json({ ok: true });
 }
+const SOCIAL = ['facebook', 'x', 'whatsapp', 'messenger', 'pinterest', 'viber', 'instagram', 'youtube', 'linkedin', 'telegram'];
 async function saveContact(env, body) {
   const intro = String(body.intro || '').slice(0, 5000);
   const items = (Array.isArray(body.items) ? body.items : []).slice(0, 50)
     .map(i => ({ label: String(i.label || '').trim().slice(0, 200), value: String(i.value || '').trim().slice(0, 500) }))
     .filter(i => i.label || i.value);
-  const data = { intro, items };
+  const social = (Array.isArray(body.social) ? body.social : []).slice(0, 12)
+    .map(s => ({ type: String(s.type || ''), url: String(s.url || '').trim().slice(0, 300) }))
+    .filter(s => SOCIAL.includes(s.type) && s.url);
+  const mapQuery = String(body.mapQuery || '').trim().slice(0, 300);
+  const about = String(body.about || '').slice(0, 2000);
+  const data = { intro, items, social, mapQuery, about, formOn: body.formOn === true };
   await mutateJson(env, 'data/contact.json', () => ({}), () => data, 'Update contact');
   return json(data);
+}
+
+/* ---------- contact form and messages ---------- */
+const clean = (v, n) => String(v || '').replace(/\s+/g, ' ').trim().slice(0, n);
+async function formToken(env) {
+  needPassword(env);
+  const payload = toUrl(enc.encode(JSON.stringify({ t: Date.now() })));
+  return json({ token: payload + '.' + toUrl(await hmac('form:' + env.ADMIN_PASSWORD, payload)) });
+}
+async function checkFormToken(env, token) {
+  needPassword(env);
+  const [p, s] = token.split('.');
+  let t = 0;
+  try {
+    if (!p || !s || !same(fromUrl(s), await hmac('form:' + env.ADMIN_PASSWORD, p))) throw new Error('bad');
+    t = JSON.parse(dec.decode(fromUrl(p))).t;
+  } catch (e) { throw new HttpError(400, 'This form expired. Please reload the page and try again.'); }
+  const age = Date.now() - t;
+  if (!(age <= 3600000)) throw new HttpError(400, 'This form expired. Please reload the page and try again.');
+  if (age < 3000) throw new HttpError(429, 'Please wait a few seconds and press Send again.');
+}
+let privateUntil = 0;
+async function requirePrivateRepo(env) {
+  if (Date.now() < privateUntil) return;
+  const r = await gh(env, `/repos/${cfg(env).repo}`);
+  if (!r.ok) throw ghError(r);
+  if ((await r.json()).private !== true) throw new HttpError(503, 'Messages are unavailable right now.');
+  privateUntil = Date.now() + 300000;
+}
+async function postMessage(env, body) {
+  if (body.website) return json({ ok: true });
+  const name = clean(body.name, 100), email = clean(body.email, 200), phone = clean(body.phone, 40);
+  const message = String(body.message || '').replace(/\r/g, '').trim().slice(0, 3000);
+  if (!name || !message) throw new HttpError(400, 'Name and message are required.');
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'Please check your email address.');
+  await checkFormToken(env, String(body.token || ''));
+  const contact = await readJson(env, 'data/contact.json', () => ({}));
+  if (contact.formOn !== true) throw new HttpError(403, 'Messages are turned off.');
+  await requirePrivateRepo(env);
+  await mutateJson(env, 'data/messages.json', () => [], (list) => {
+    if (list.slice(0, 50).some(m => m.name === name && m.message === message)) throw new HttpError(429, 'This message was already sent.');
+    list.unshift({ id: newId(), name, email, phone, message, date: new Date().toISOString(), read: false });
+    return list.slice(0, 500);
+  }, 'New message');
+  return json({ ok: true });
+}
+async function setRead(env, id, read) {
+  await mutateJson(env, 'data/messages.json', () => [], (list) => {
+    const m = list.find(x => x.id === id);
+    if (!m) throw new HttpError(404, 'Message not found.');
+    m.read = read;
+    return list;
+  }, 'Update message');
+  return json({ ok: true });
+}
+async function deleteMessage(env, id) {
+  await mutateJson(env, 'data/messages.json', () => [], (list) => list.filter(x => x.id !== id), 'Delete message');
+  return json({ ok: true });
 }
 async function upload(env, body) {
   const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[body.type];
@@ -214,6 +278,7 @@ async function health(env) {
       const j = await r.json();
       add('GitHub repo', true, 'Found ' + j.full_name + '.');
       add('Write access', !!(j.permissions && j.permissions.push), j.permissions && j.permissions.push ? 'Token can save content.' : 'Token cannot write. Give it Contents: Read and write.');
+      add('Repo is private', j.private === true, j.private === true ? 'Private. Contact messages are safe.' : 'Repo is PUBLIC. Contact messages are blocked until you make it Private (repo Settings, then Danger Zone, then Change visibility).');
       const b = await gh(env, `/repos/${c.repo}/branches/${encodeURIComponent(c.branch)}`);
       add('Branch ' + c.branch, b.ok, b.ok ? 'Found.' : 'Branch not found. Check GITHUB_BRANCH, or add a first file to the repo.');
     }
@@ -230,7 +295,14 @@ async function api(request, env, url) {
     if (SECTIONS.includes(parts[1])) return json(await readJson(env, `data/${parts[1]}.json`, () => []));
     throw new HttpError(404, 'Not found.');
   }
+  if (m === 'GET' && parts[0] === 'formtoken') return formToken(env);
+  if (m === 'POST' && parts[0] === 'message' && parts.length === 1) return postMessage(env, await readBody(request));
   await requireAuth(request, env);
+  if (m === 'GET' && parts[0] === 'messages') return json(await readJson(env, 'data/messages.json', () => []));
+  if (parts[0] === 'message' && parts.length >= 2) {
+    if (m === 'DELETE' && parts.length === 2) return deleteMessage(env, parts[1]);
+    if (m === 'POST' && parts[2] === 'read') return setRead(env, parts[1], (await readBody(request)).read !== false);
+  }
   if (m === 'GET' && parts[0] === 'health') return health(env);
   if (m === 'POST' && parts[0] === 'upload') return upload(env, await readBody(request));
   if (m === 'POST' && parts[0] === 'contact') return saveContact(env, await readBody(request));
