@@ -140,39 +140,44 @@ async function readBody(request) {
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const IMG_RE = /^uploads\/[A-Za-z0-9._-]+$/;
 
+function imgsOf(p) { return Array.isArray(p.images) ? p.images : (p.image ? [p.image] : []); }
 async function savePost(env, section, body) {
-  const title = String(body.title || '').trim(), text = String(body.body || '').trim(), image = String(body.image || '');
+  const title = String(body.title || '').trim(), text = String(body.body || '').trim();
+  const author = String(body.author || '').trim().slice(0, 100);
+  const images = (Array.isArray(body.images) ? body.images : []).map(String);
   if (!title) throw new HttpError(400, 'Heading is required.');
   if (!text) throw new HttpError(400, 'Full news is required.');
   if (title.length > 200 || text.length > 100000) throw new HttpError(400, 'Heading or text is too long.');
-  if (image && !IMG_RE.test(image)) throw new HttpError(400, 'Invalid image.');
-  let oldImage = '', post;
+  if (images.length > 10) throw new HttpError(400, 'Maximum 10 images.');
+  if (images.some(i => !IMG_RE.test(i))) throw new HttpError(400, 'Invalid image.');
+  let oldImages = [], post;
   await mutateJson(env, `data/${section}.json`, () => [], (list) => {
-    oldImage = '';
+    oldImages = [];
     if (!Array.isArray(list)) throw new HttpError(500, 'Data file is damaged.');
     const now = new Date().toISOString();
     if (body.id) {
       post = list.find(x => x.id === body.id);
       if (!post) throw new HttpError(404, 'Post not found.');
-      oldImage = post.image || '';
-      Object.assign(post, { title, body: text, image, updated: now });
+      oldImages = imgsOf(post);
+      Object.assign(post, { title, body: text, author, images, updated: now });
+      delete post.image;
     } else {
-      post = { id: newId(), title, body: text, image, date: now };
+      post = { id: newId(), title, body: text, author, images, date: now };
       list.unshift(post);
     }
     return list;
   }, `Save ${section}`);
-  if (oldImage && oldImage !== image) await removeImage(env, oldImage);
+  for (const o of oldImages) if (!images.includes(o)) await removeImage(env, o);
   return json(post);
 }
 async function deletePost(env, section, id) {
-  let image = '';
+  let old = [];
   await mutateJson(env, `data/${section}.json`, () => [], (list) => {
     const p = list.find(x => x.id === id);
-    image = p ? (p.image || '') : '';
+    old = p ? imgsOf(p) : [];
     return list.filter(x => x.id !== id);
   }, `Delete ${section}`);
-  if (image) await removeImage(env, image);
+  for (const o of old) await removeImage(env, o);
   return json({ ok: true });
 }
 async function saveContact(env, body) {
@@ -256,7 +261,8 @@ async function sharePage(env, url) {
   const e = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const target = url.origin + '/#/' + section + '/' + encodeURIComponent(p.id);
   const desc = p.body.replace(/\s+/g, ' ').slice(0, 200);
-  const img = p.image ? url.origin + '/img/' + encodeURIComponent(p.image.split('/').pop()) : url.origin + '/header.png';
+  const first = imgsOf(p)[0];
+  const img = first ? url.origin + '/img/' + encodeURIComponent(first.split('/').pop()) : url.origin + '/header.png';
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${e(p.title)}</title>
 <meta property="og:type" content="article"><meta property="og:site_name" content="Sujan Kumar Khadka">
 <meta property="og:title" content="${e(p.title)}"><meta property="og:description" content="${e(desc)}">
