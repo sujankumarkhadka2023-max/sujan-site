@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Developer Dashboard</title><link rel="stylesheet" href="css/dev.css"></head>
+<body><div class="wide">
+<div style="display:flex;justify-content:space-between;align-items:center"><h1>Developer Dashboard</h1><button class="sec" id="out">Log out</button></div>
+<div class="tabs"><button class="on" data-t="st">Stories</button><button data-t="se">Site &amp; Footer</button><button data-t="ex">Import / Export</button></div>
+<div id="st">
+<div id="list"></div>
+<h2 id="ft">New story</h2>
+<div class="row"><div><label>Section</label><select id="category"><option value="article">Article</option><option value="history">History</option><option value="travel">Travel</option></select></div>
+<div><label>Type (optional)</label><input id="tag" placeholder="History: Event / Period / Story. Travel: Destination / Guide / Story / Tip"></div></div>
+<label>Headline</label><input id="title"><label>Subtitle</label><input id="subtitle">
+<div class="row"><div><label>Author</label><input id="author"></div><div><label>Date</label><input id="date" type="date"></div><div><label>Read time (min)</label><input id="readTime" type="number"></div></div>
+<label>Image (from phone or computer)</label><input id="img" type="file" accept="image/*"><img id="pv" alt="">
+<label>Full story (blank line = new paragraph)</label><textarea id="body" rows="10"></textarea>
+<label><input type="checkbox" id="featured" style="width:auto"> Featured story</label>
+<label><input type="checkbox" id="mostRead" style="width:auto"> Show in Most Read</label>
+<button id="save">Save story</button><button class="sec" id="clr">Clear</button>
+</div>
+<div id="se" hidden><p style="font-size:.85rem;color:#5F5F5F">Edit text values only (names, links, texts). Keep the quotes and commas.</p>
+<label>Site settings (JSON)</label><textarea id="siteJ" rows="14"></textarea>
+<label>Footer settings (JSON)</label><textarea id="footJ" rows="20"></textarea>
+<button id="saveS">Save settings</button><p class="err" id="se_e"></p></div>
+<div id="ex" hidden>
+<p>1. Import your current <b>content.json</b> from GitHub first (public/data/content.json).<br>2. Make changes.<br>3. Download the new file and replace it in GitHub. The public site updates automatically.</p>
+<label>Import content.json</label><input type="file" id="imp" accept=".json">
+<button id="dl">Download content.json</button><button class="sec" id="rst">Reset local data</button><p class="err" id="ex_e"></p></div>
+</div>
+<script>
+if(!sessionStorage.getItem('skk_dev'))location.replace('index.html');
+const $=id=>document.getElementById(id),K='skk_content';
+let D=JSON.parse(localStorage.getItem(K)||'null')||{site:{name:"SUJAN KUMAR KHADKA",social:{}},footer:{},stories:[]};
+let img='',editId=null;
+const persist=()=>localStorage.setItem(K,JSON.stringify(D));
+$('out').onclick=()=>{sessionStorage.removeItem('skk_dev');location.href='index.html'};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');['st','se','ex'].forEach(i=>$(i).hidden=i!==b.dataset.t)});
+function render(){
+ $('list').innerHTML=D.stories.length?D.stories.map(s=>`<div class="item"><span><b>${s.title.replace(/</g,'&lt;')}</b><br><small>${s.category} · ${s.date||''}</small></span><span><button class="sec" onclick="ed('${s.id}')">Edit</button><button onclick="del('${s.id}')">Delete</button></span></div>`).join(''):'<p>No stories yet.</p>';
+ $('siteJ').value=JSON.stringify(D.site,null,2);$('footJ').value=JSON.stringify(D.footer,null,2);
+}
+const F=['category','tag','title','subtitle','author','date','readTime','body'];
+function clr(){editId=null;img='';F.forEach(f=>$(f).value='');$('category').value='article';$('featured').checked=$('mostRead').checked=false;$('pv').removeAttribute('src');$('img').value='';$('ft').textContent='New story'}
+$('clr').onclick=clr;
+window.ed=id=>{const s=D.stories.find(x=>x.id===id);editId=id;F.forEach(f=>$(f).value=s[f]||'');$('featured').checked=!!s.featured;$('mostRead').checked=!!s.mostRead;img=s.image||'';if(img)$('pv').src=img;$('ft').textContent='Edit story';scrollTo(0,document.body.scrollHeight)};
+window.del=id=>{if(confirm('Delete this story?')){D.stories=D.stories.filter(x=>x.id!==id);persist();render()}};
+$('img').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1400/i.width),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);img=c.toDataURL('image/jpeg',.8);$('pv').src=img};i.src=r.result};r.readAsDataURL(f)};
+$('save').onclick=()=>{
+ if(!$('title').value.trim())return alert('Headline is required');
+ const s={id:editId||Date.now().toString(36),image:img,featured:$('featured').checked,mostRead:$('mostRead').checked};
+ F.forEach(f=>s[f]=$(f).value.trim());if(!s.date)s.date=new Date().toISOString().slice(0,10);
+ if(editId)D.stories=D.stories.map(x=>x.id===editId?s:x);else D.stories.unshift(s);
+ persist();clr();render();alert('Saved. Go to Import / Export and download content.json to publish.');
+};
+$('saveS').onclick=()=>{try{D.site=JSON.parse($('siteJ').value);D.footer=JSON.parse($('footJ').value);persist();$('se_e').textContent='Saved ✓'}catch(e){$('se_e').textContent='Invalid format: '+e.message}};
+$('imp').onchange=e=>{const r=new FileReader();r.onload=()=>{try{D=JSON.parse(r.result);D.stories=D.stories||[];persist();render();$('ex_e').textContent='Imported ✓'}catch(x){$('ex_e').textContent='Invalid file'}};r.readAsText(e.target.files[0])};
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));a.download='content.json';a.click()};
+$('rst').onclick=()=>{if(confirm('Erase local data?')){localStorage.removeItem(K);location.reload()}};
+render();
+</script></body></html>
