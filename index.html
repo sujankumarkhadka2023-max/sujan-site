@@ -93,6 +93,32 @@ nav .on{border-bottom:3px solid var(--accent)}
 .menu .ig a:hover{opacity:.85}
 .ig svg{width:32px;height:32px}
 .menu .cp{border-top:1px solid #000;justify-content:center;font-weight:700;padding:14px 16px}
+select{padding:10px;border:1px solid #000;border-radius:0;background:#fff;color:#000;font:16px Georgia,serif}
+.cr select{flex:0 0 132px}
+.ck{display:flex;align-items:center;gap:10px;font-weight:700}
+.ck input{width:22px;height:22px;accent-color:#000}
+.ch{font-size:14px;letter-spacing:.14em;text-transform:uppercase;border-top:3px solid #000;padding-top:10px;margin:34px 0 14px}
+.soc{display:flex;flex-wrap:wrap;gap:12px}
+.soc a{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.soc svg{width:28px;height:28px}
+.map iframe{display:block;width:100%;height:320px;border:1px solid #000}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.dm{border-top:3px solid #000;padding:14px 0 18px}
+.pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0}
+.hint{font-size:14px;color:#555;margin:6px 0 0}
+footer{padding:0;border-top:3px solid #000;text-align:left}
+.fa{padding:22px 20px 10px;max-width:760px;margin:0 auto}
+.fa h3{font-size:14px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px}
+.fa .text{font-size:16px;line-height:1.7;text-align:justify;-webkit-hyphens:auto;hyphens:auto}
+.fa .text p{margin:0 0 12px}
+.soc.fs{justify-content:center;padding:14px 20px}
+.fs a{width:42px;height:42px}
+.fs svg{width:24px;height:24px}
+.fb{border-top:1px solid #000;padding:14px 20px;font-size:14px;text-align:center}
+.ub{display:flex;justify-content:center;padding:6px 20px 22px}
+.fw{border-top:1px solid #000}
+.up{display:inline-flex;align-items:center;gap:8px;border:1px solid #000;background:#000;color:#fff;font:700 14px Georgia,serif;padding:9px 16px;cursor:pointer}
+.up svg{width:18px;height:18px}
 @media(max-width:700px){#list{grid-template-columns:1fr}.feat h2{font-size:28px}.feat img{aspect-ratio:16/10}.full h1{font-size:29px}.full .text{font-size:18px}}
 </style>
 </head>
@@ -102,14 +128,13 @@ nav .on{border-bottom:3px solid var(--accent)}
 <div class="dateline" id="dl"></div>
 <nav id="nav"></nav>
 <main id="view"></main>
-<footer>&copy; <span id="yr"></span> Sujan Kumar Khadka</footer>
+<footer id="ft"></footer>
 </div>
 <script>
 const $ = s => document.querySelector(s);
 const view = $('#view'), navEl = $('#nav');
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABEL = {article:'Article', opinion:'Opinion'}, PAGE = 4, KEY = 'sk_token';
-$('#yr').textContent = new Date().getFullYear();
 $('#dl').textContent = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 const fmt = d => new Date(d).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 const imgUrl = p => '/img/' + encodeURIComponent(String(p).split('/').pop());
@@ -190,7 +215,28 @@ const ICON = {
   ms:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M12 3C7 3 3.200 6.700 3.200 11.300c0 2.600 1.200 4.900 3.200 6.400V21l3-1.700c.8.200 1.600.3 2.600.3 5 0 8.800-3.700 8.800-8.300S17 3 12 3z"/><path fill="#1c8bf2" d="M6.700 14l3.300-5.100 2.600 2.600 3.100-2.600-3.300 5.100-2.600-2.600L6.700 14z"/></svg>',
   pin:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M12.100 3.200c-4.900 0-7.400 3.300-7.400 6.200 0 1.700.7 3.200 2 3.700.2.100.4 0 .5-.2l.2-.8c.1-.2 0-.3-.1-.5-.4-.5-.7-1.100-.7-2 0-2.600 1.900-4.900 5.100-4.900 2.800 0 4.300 1.700 4.300 4 0 3-1.300 5.500-3.300 5.500-1.100 0-1.900-.9-1.600-2 .3-1.300.9-2.700.9-3.600 0-.8-.4-1.500-1.400-1.500-1.100 0-2 1.200-2 2.700 0 1 .3 1.600.3 1.600l-1.300 5.500c-.3 1.300-.2 3 0 4.100.1.100.3.200.4 0 .5-.7 1.600-2.100 2-3.700l.7-2.800c.4.700 1.400 1.200 2.500 1.200 3.300 0 5.600-3 5.600-6.800 0-2.900-2.400-5.700-6.700-5.700z"/></svg>',
   vb:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M5.200 4.200C4 5.200 3.800 6.900 4.600 9c1.500 4.100 5.400 8.200 9.800 10 1.800.7 3.100.4 4-.5l.7-.9c.3-.4.3-.9 0-1.200l-2-1.600c-.4-.3-.9-.3-1.200.1l-.8.9c-1.900-.8-3.700-2.600-4.500-4.500l.9-.8c.4-.3.4-.8.1-1.200l-1.600-2c-.3-.4-.8-.5-1.200-.2l-.6.100z"/><path d="M13.200 6.500a4.500 4.500 0 0 1 4 4M13.200 3.500a7.500 7.500 0 0 1 7.300 7.200" stroke="#fff" stroke-width="1.700" fill="none" stroke-linecap="round"/></svg>'
+,
+  ig:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4.500" y="4.500" width="15" height="15" rx="4.500"/><circle cx="12" cy="12" r="3.500"/><circle cx="16.800" cy="7.200" r="1" fill="#fff" stroke="none"/></svg>',
+  yt:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.500" fill="#fff"/><path d="M10 9.200v5.600l5-2.800z" fill="#ff0000"/></svg>',
+  li:'<svg viewBox="0 0 24 24"><text x="12" y="16.500" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="12.500" fill="#fff">in</text></svg>',
+  tg:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M20.700 4.200L3.400 10.900c-.9.300-.9 1.100 0 1.400l4.200 1.300 1.600 5c.2.600.8.800 1.300.400l2.300-1.900 4.200 3.100c.5.300 1.100.1 1.200-.5L21.900 5.500c.2-.8-.5-1.500-1.200-1.300zM9 13.300l8.300-5.200-6.500 6.200-.3 2.600L9 13.300z"/></svg>'
 };
+ICON.up = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+const SOC = {
+  facebook:['Facebook','#4f6fa6','fb'], x:['X','#000','x'], whatsapp:['WhatsApp','#2fb67b','wa'], messenger:['Messenger','#1c8bf2','ms'],
+  pinterest:['Pinterest','#e60000','pin'], viber:['Viber','#8b6aa6','vb'], instagram:['Instagram','linear-gradient(45deg,#f09433,#dc2743,#bc1888)','ig'],
+  youtube:['YouTube','#ff0000','yt'], linkedin:['LinkedIn','#0a66c2','li'], telegram:['Telegram','#2aa3dd','tg']
+};
+function socialHref(type, v) {
+  v = String(v || '').trim();
+  if (/^(https?:\/\/|viber:\/\/)/i.test(v)) return v;
+  const d = v.replace(/\D/g, ''), u = v.replace(/^@/, '');
+  if (type === 'whatsapp') return d ? 'https://wa.me/' + d : '';
+  if (type === 'viber') return d ? 'viber://chat?number=%2B' + d : '';
+  if (type === 'youtube') return /^@?[\w.\-]+$/.test(v) ? 'https://youtube.com/' + (v[0] === '@' ? v : '@' + v) : '';
+  const base = {facebook:'https://facebook.com/', x:'https://x.com/', messenger:'https://m.me/', pinterest:'https://pinterest.com/', instagram:'https://instagram.com/', linkedin:'https://linkedin.com/in/', telegram:'https://t.me/'}[type];
+  return base && /^[\w.\-\/]+$/.test(u) ? base + u : '';
+}
 function shareButtons(section, p) {
   const url = location.origin + '/share/' + section + '/' + encodeURIComponent(p.id);
   const u = encodeURIComponent(url), t = encodeURIComponent(p.title);
@@ -218,14 +264,49 @@ function shareButtons(section, p) {
     setTimeout(() => { mn.hidden = true; s.textContent = 'Copy link'; }, 1200);
   };
 }
+const formHtml = `<h2 class="ch">Send a message</h2><form id="mf"><label for="fn">Name</label><input type="text" id="fn" maxlength="100" autocomplete="name" required><label for="fe">Email (optional)</label><input type="text" id="fe" maxlength="200" inputmode="email" autocomplete="email"><label for="fp">Phone (optional)</label><input type="text" id="fp" maxlength="40" inputmode="tel" autocomplete="tel"><label for="fm">Message</label><textarea id="fm" maxlength="3000" style="min-height:160px" required></textarea><div class="hp" aria-hidden="true"><label>Website<input type="text" id="fw" tabindex="-1" autocomplete="off"></label></div><div class="row"><button class="btn" type="submit" id="fs">Send message</button></div><p class="msg" id="fg"></p></form>`;
+function initForm() {
+  let token = '';
+  api('/api/formtoken').then(r => { token = r.token; }).catch(() => {});
+  $('#mf').onsubmit = async ev => {
+    ev.preventDefault();
+    const mg = $('#fg'), bt = $('#fs'); mg.textContent = 'Sending…'; bt.disabled = true;
+    try {
+      await api('/api/message', {method:'POST', body:JSON.stringify({name:$('#fn').value, email:$('#fe').value, phone:$('#fp').value, message:$('#fm').value, website:$('#fw').value, token})});
+      $('#mf').outerHTML = '<p class="msg">Thank you. Your message has been sent.</p>';
+    } catch (e) { bt.disabled = false; mg.textContent = e.message; }
+  };
+}
+function renderFooter(c) {
+  c = c || {};
+  const social = (c.social || []).filter(s => SOC[s.type] && socialHref(s.type, s.url));
+  let out = '';
+  if (social.length) out += `<div class="soc fs">${social.map(s => `<a href="${esc(socialHref(s.type, s.url))}" target="_blank" rel="noopener" aria-label="${SOC[s.type][0]}" title="${SOC[s.type][0]}" style="background:${SOC[s.type][1]}">${ICON[SOC[s.type][2]]}</a>`).join('')}</div>`;
+  out += `<div class="ub"><button class="up" id="up" type="button" aria-label="Back to top">${ICON.up}<span>Back to top</span></button></div>`;
+  if (c.about) out += `<div class="fw"><div class="fa"><h3>About</h3><div class="text">${paras(c.about)}</div></div></div>`;
+  out += `<div class="fb">&copy; ${new Date().getFullYear()} Sujan Kumar Khadka</div>`;
+  $('#ft').innerHTML = out;
+  $('#up').onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+}
+const loadFooter = () => api('/api/data/contact').then(renderFooter).catch(() => renderFooter({}));
 async function showContact() {
   view.innerHTML = '<p class="note">Loading…</p>';
-  try {
-    const c = await api('/api/data/contact');
-    const items = c.items || [];
-    if (!c.intro && !items.length) { view.innerHTML = '<p class="note">Contact details have not been added yet.</p>'; return; }
-    view.innerHTML = `<div class="full">${c.intro ? `<div class="text">${paras(c.intro)}</div>` : ''}<dl class="cl">${items.map(i => `<dt>${esc(i.label)}</dt><dd>${linkValue(i.value || '')}</dd>`).join('')}</dl></div>`;
-  } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
+  let c;
+  try { c = await api('/api/data/contact'); }
+  catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; return; }
+  const items = c.items || [], social = (c.social || []).filter(s => SOC[s.type] && socialHref(s.type, s.url));
+  if (!c.intro && !items.length && !social.length && !c.mapQuery && !c.formOn) { view.innerHTML = '<p class="note">Contact details have not been added yet.</p>'; return; }
+  let out = '<div class="full">';
+  if (c.intro) out += `<div class="text">${paras(c.intro)}</div>`;
+  if (items.length) out += `<dl class="cl">${items.map(i => `<dt>${esc(i.label)}</dt><dd>${linkValue(i.value || '')}</dd>`).join('')}</dl>`;
+  if (social.length) out += `<h2 class="ch">Follow</h2><div class="soc">${social.map(s => `<a href="${esc(socialHref(s.type, s.url))}" target="_blank" rel="noopener" aria-label="${SOC[s.type][0]}" title="${SOC[s.type][0]}" style="background:${SOC[s.type][1]}">${ICON[SOC[s.type][2]]}</a>`).join('')}</div>`;
+  if (c.mapQuery) {
+    const q = encodeURIComponent(c.mapQuery);
+    out += `<h2 class="ch">Find us</h2><div class="map"><iframe src="https://www.google.com/maps?q=${q}&amp;output=embed" loading="lazy" title="Map"></iframe></div><p><a href="https://www.google.com/maps/search/?api=1&amp;query=${q}" target="_blank" rel="noopener">Open in Google Maps</a></p>`;
+  }
+  if (c.formOn) out += formHtml;
+  view.innerHTML = out + '</div>';
+  if (c.formOn) initForm();
 }
 
 /* ---------- developer portal ---------- */
@@ -262,11 +343,13 @@ function showLogin(message) {
 }
 function showDash(tab) {
   if (!localStorage.getItem(KEY)) return showLogin();
-  const tabs = [['article','Articles'],['opinion','Opinions'],['contact','Contact'],['setup','Check setup']];
+  const tabs = [['article','Articles'],['opinion','Opinions'],['contact','Contact'],['messages','Messages'],['setup','Check setup']];
   navEl.innerHTML = tabs.map(t => `<button data-t="${t[0]}" class="${t[0]===tab?'on':''}">${t[1]}</button>`).join('') + '<button data-t="out">Log out</button>';
   navEl.querySelectorAll('button').forEach(b => b.onclick = () => {
     if (b.dataset.t === 'out') { localStorage.removeItem(KEY); showLogin(); } else showDash(b.dataset.t);
   });
+  api('/api/messages').then(l => { const n = l.filter(m => !m.read).length, b = navEl.querySelector('[data-t="messages"]'); if (n && b) b.textContent = 'Messages (' + n + ')'; }).catch(() => {});
+  if (tab === 'messages') return devMessages();
   if (tab === 'contact') return devContact();
   if (tab === 'setup') return devSetup();
   devSection(tab);
@@ -329,8 +412,9 @@ async function devContact() {
   view.innerHTML = '<h2>Contact</h2><p class="note">Loading…</p>';
   let c;
   try { c = await api('/api/data/contact'); } catch (e) { view.innerHTML = '<p class="msg" id="mg"></p>'; return devFail(e, $('#mg')); }
-  view.innerHTML = '<h2>Contact</h2><form id="cf"><label for="ci">Message</label><textarea class="s" id="ci"></textarea><label>Details</label><div id="ri"></div><div class="row"><button class="btn alt" type="button" id="ad">Add detail</button><button class="btn" type="submit">Save changes</button></div><p class="msg" id="mg"></p></form>';
-  $('#ci').value = c.intro || '';
+  const opts = Object.keys(SOC).map(k => `<option value="${k}">${SOC[k][0]}</option>`).join('');
+  view.innerHTML = `<h2>Contact</h2><form id="cf"><label for="ci">Message at the top</label><textarea class="s" id="ci"></textarea><label>Details (email, phone, address, opening hours…)</label><div id="ri"></div><div class="row"><button class="btn alt" type="button" id="ad">Add detail</button></div><label for="ab">About (shown at the bottom of every page)</label><textarea class="s" id="ab"></textarea><label>Social links (also shown at the bottom of every page)</label><div id="si"></div><div class="row"><button class="btn alt" type="button" id="as">Add social link</button></div><label for="mq">Map location (address or coordinates, optional)</label><input type="text" id="mq" maxlength="300"><label class="ck"><input type="checkbox" id="fo"> Show the message form on the website</label><p class="hint">Messages are saved privately in your GitHub data repo, which must be Private. Use Check setup to confirm.</p><div class="row"><button class="btn" type="submit">Save changes</button></div><p class="msg" id="mg"></p></form>`;
+  $('#ci').value = c.intro || ''; $('#ab').value = c.about || ''; $('#mq').value = c.mapQuery || ''; $('#fo').checked = c.formOn === true;
   const addRow = (l, v) => {
     const r = document.createElement('div'); r.className = 'cr';
     r.innerHTML = '<input type="text" placeholder="Label" class="l"><input type="text" placeholder="Value" class="v"><button type="button" class="btn alt">Remove</button>';
@@ -338,15 +422,42 @@ async function devContact() {
     r.querySelector('button').onclick = () => r.remove();
     $('#ri').appendChild(r);
   };
+  const addSoc = (t, u) => {
+    const r = document.createElement('div'); r.className = 'cr';
+    r.innerHTML = `<select class="st">${opts}</select><input type="text" class="su" placeholder="Link, username or number"><button type="button" class="btn alt">Remove</button>`;
+    r.querySelector('.st').value = t || 'facebook'; r.querySelector('.su').value = u || '';
+    r.querySelector('button').onclick = () => r.remove();
+    $('#si').appendChild(r);
+  };
   (c.items || []).forEach(i => addRow(i.label, i.value));
+  (c.social || []).forEach(s => addSoc(s.type, s.url));
   $('#ad').onclick = () => addRow('', '');
+  $('#as').onclick = () => addSoc('', '');
   $('#cf').onsubmit = async ev => {
     ev.preventDefault();
     const mg = $('#mg'); mg.textContent = 'Saving…';
     const items = [...document.querySelectorAll('#ri .cr')].map(r => ({label:r.querySelector('.l').value, value:r.querySelector('.v').value}));
-    try { await api('/api/contact', {method:'POST', body:JSON.stringify({intro:$('#ci').value, items})}); mg.textContent = 'Saved.'; }
+    const social = [...document.querySelectorAll('#si .cr')].map(r => ({type:r.querySelector('.st').value, url:r.querySelector('.su').value}));
+    try { await api('/api/contact', {method:'POST', body:JSON.stringify({intro:$('#ci').value, about:$('#ab').value, items, social, mapQuery:$('#mq').value, formOn:$('#fo').checked})}); mg.textContent = 'Saved.'; loadFooter(); }
     catch (e) { devFail(e, mg); }
   };
+}
+async function devMessages() {
+  view.innerHTML = '<h2>Messages</h2><div id="ml"><p class="note">Loading…</p></div>';
+  const draw = async () => {
+    let list;
+    try { list = await api('/api/messages'); } catch (e) { $('#ml').innerHTML = '<p class="msg" id="mg"></p>'; return devFail(e, $('#mg')); }
+    if (!list.length) { $('#ml').innerHTML = '<p>No messages yet.</p>'; return; }
+    $('#ml').innerHTML = list.map(m => `<div class="dm"><div class="meta">${m.read ? '' : '<span class="tag">New</span>'}<span class="dt">${fmt(m.date)}</span></div><b>${esc(m.name)}</b><div class="pre">${esc(m.message)}</div>${m.email ? `<div>${linkValue(m.email)}</div>` : ''}${m.phone ? `<div>${linkValue(m.phone)}</div>` : ''}<div class="row"><button class="btn alt" data-r="${esc(m.id)}" data-v="${m.read ? 0 : 1}">${m.read ? 'Mark unread' : 'Mark read'}</button><button class="btn alt" data-d="${esc(m.id)}">Delete</button></div></div>`).join('');
+    $('#ml').querySelectorAll('[data-r]').forEach(b => b.onclick = async () => {
+      try { await api('/api/message/' + b.dataset.r + '/read', {method:'POST', body:JSON.stringify({read:b.dataset.v === '1'})}); draw(); } catch (e) { devFail(e, b); }
+    });
+    $('#ml').querySelectorAll('[data-d]').forEach(b => b.onclick = async () => {
+      if (!confirm('Delete this message permanently?')) return;
+      try { await api('/api/message/' + b.dataset.d, {method:'DELETE'}); draw(); } catch (e) { devFail(e, b); }
+    });
+  };
+  draw();
 }
 async function devSetup() {
   view.innerHTML = '<h2>Check setup</h2><div id="ck"><p class="note">Checking…</p></div>';
@@ -367,6 +478,8 @@ function route() {
   setNav('home'); showList('home');
 }
 window.addEventListener('hashchange', route);
+renderFooter({});
+loadFooter();
 route();
 </script>
 </body>
