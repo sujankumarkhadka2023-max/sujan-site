@@ -69,8 +69,16 @@ nav .on{border-bottom:3px solid var(--accent)}
 .feat h2{font-size:38px}
 .full{max-width:760px;margin:0 auto}
 .full h1{font-size:40px;line-height:1.2;border-bottom:1px solid #000;padding-bottom:14px}
-.full .text{font-size:19px;line-height:1.85}
-.full .text::first-letter{float:left;font-size:3.4em;line-height:.85;font-weight:700;padding:6px 10px 0 0}
+.full .text{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.6;letter-spacing:normal;word-spacing:normal}
+.full .text{white-space:normal;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto;line-height:1.6;overflow-wrap:break-word}
+.full .text p{margin:0 0 20px}
+.by{font-weight:700;font-size:15px;margin:10px 0 0}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
+.pi{position:relative}
+.pi img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.pi button{position:absolute;top:4px;right:4px;width:28px;height:28px;padding:0;border:0;background:#000;color:#fff;font:700 18px/28px Georgia,serif;cursor:pointer}
+.sm{font-weight:700;color:var(--accent);white-space:nowrap}
+.card .ex{text-align:justify;hyphens:auto;-webkit-hyphens:auto;line-height:1.7}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .shw{position:relative}
 .ib{border:0;background:#fff;color:#000;padding:8px;cursor:pointer;line-height:0}
@@ -79,6 +87,12 @@ nav .on{border-bottom:3px solid var(--accent)}
 .menu a,.menu button{display:flex;align-items:center;gap:14px;width:100%;padding:13px 16px;border:0;background:#fff;color:#000;font:16px Georgia,serif;text-decoration:none;cursor:pointer;text-align:left}
 .menu a:hover,.menu button:hover{background:#f2f2f2}
 .menu svg{width:22px;height:22px;flex:none}
+.menu{width:240px;min-width:0}
+.ig{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;padding:18px 14px 16px}
+.menu .ig a{width:52px;height:52px;padding:0;border-radius:50%;justify-content:center;color:#fff}
+.menu .ig a:hover{opacity:.85}
+.ig svg{width:32px;height:32px}
+.menu .cp{border-top:1px solid #000;justify-content:center;font-weight:700;padding:14px 16px}
 @media(max-width:700px){#list{grid-template-columns:1fr}.feat h2{font-size:28px}.feat img{aspect-ratio:16/10}.full h1{font-size:29px}.full .text{font-size:18px}}
 </style>
 </head>
@@ -127,9 +141,12 @@ async function loadPosts(kind) {
   r.forEach((x, i) => { if (x.status === 'fulfilled') all = all.concat(x.value.map(p => ({...p, section: kinds[i]}))); });
   return all.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
+const paras = b => String(b || '').split(/\n+/).map(s => s.trim()).filter(Boolean).map(s => `<p>${esc(s)}</p>`).join('');
 function card(p, feat) {
-  const ex = p.body.replace(/\s+/g, ' ').slice(0, 220) + (p.body.length > 220 ? '…' : '');
-  return `<a class="card${feat ? ' feat' : ''}" href="#/${p.section}/${esc(p.id)}">${p.image ? `<img src="${imgUrl(p.image)}" alt="" loading="lazy">` : ''}<div class="meta"><span class="tag">${LABEL[p.section]}</span><span class="dt">${fmt(p.date)}</span></div><h2>${esc(p.title)}</h2><div class="ex">${esc(ex)}</div></a>`;
+  const im = (p.images && p.images[0]) || p.image;
+  const flat = p.body.replace(/\s+/g, ' ').trim(), cut = flat.length > 260;
+  const ex = cut ? flat.slice(0, 260).replace(/\s+\S*$/, '') + '…' : flat;
+  return `<a class="card${feat ? ' feat' : ''}" href="#/${p.section}/${esc(p.id)}">${im ? `<img src="${imgUrl(im)}" alt="" loading="lazy">` : ''}<div class="meta"><span class="tag">${LABEL[p.section]}</span><span class="dt">${fmt(p.date)}${p.author ? ' · ' + esc(p.author) : ''}</span></div><h2>${esc(p.title)}</h2><div class="ex">${esc(ex)}${cut ? ' <span class="sm">See more</span>' : ''}</div></a>`;
 }
 async function showList(kind) {
   view.innerHTML = '<p class="note">Loading…</p>';
@@ -152,7 +169,8 @@ async function showPost(section, id) {
   try {
     const p = (await api('/api/data/' + section)).find(x => x.id === id);
     if (!p) { view.innerHTML = '<p class="note">This page was not found.</p>'; return; }
-    view.innerHTML = `<article class="full"><div class="top"><div class="meta"><span class="tag">${LABEL[section]}</span><span class="dt">${fmt(p.date)}</span></div><div class="shw"><button class="ib" id="shb" aria-label="Share" title="Share">${ICON.share}</button><div class="menu" id="mn" hidden></div></div></div><h1>${esc(p.title)}</h1>${p.image ? `<img src="${imgUrl(p.image)}" alt="">` : ''}<div class="text">${esc(p.body)}</div></article>`;
+    const imgs = p.images && p.images.length ? p.images : (p.image ? [p.image] : []);
+    view.innerHTML = `<article class="full"><div class="top"><div class="meta"><span class="tag">${LABEL[section]}</span><span class="dt">${fmt(p.date)}</span></div><div class="shw"><button class="ib" id="shb" aria-label="Share" title="Share">${ICON.share}</button><div class="menu" id="mn" hidden></div></div></div><h1>${esc(p.title)}</h1>${p.author ? `<div class="by">By ${esc(p.author)}</div>` : ''}${imgs[0] ? `<img src="${imgUrl(imgs[0])}" alt="">` : ''}<div class="text">${paras(p.body)}</div>${imgs.slice(1).map(i => `<img src="${imgUrl(i)}" alt="" loading="lazy">`).join('')}</article>`;
     shareButtons(section, p);
   } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
 }
@@ -166,14 +184,29 @@ function linkValue(v) {
 const ICON = {
   share:'<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" fill="currentColor"/><circle cx="6" cy="12" r="3" fill="currentColor"/><circle cx="18" cy="19" r="3" fill="currentColor"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
   link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
-  fb:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h8.6v-7h-2.3v-2.7h2.3v-2c0-2.3 1.4-3.6 3.5-3.6 1 0 1.9.1 2.1.1v2.4h-1.4c-1.1 0-1.4.5-1.4 1.3v1.8h2.7l-.4 2.7h-2.3v7H20a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z"/></svg>',
-  wa:'<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path fill="currentColor" d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-.9.9c-1-.4-2-1.4-2.4-2.4l.9-.9-1-2L9 8.5z"/></svg>'
+  fb:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M13.5 21v-7.5h2.6l.4-3h-3V8.7c0-.9.3-1.5 1.6-1.5h1.6V4.5c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.1H8v3h2.6V21h2.9z"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M17.5 3.5h3l-6.6 7.600L21.700 20.500h-6.100l-4.800-6.200-5.500 6.200H2.300l7.100-8.100L2 3.500h6.200l4.300 5.700 5-5.700zm-1.100 15.300h1.700L7.400 5.200H5.600l10.800 13.600z"/></svg>',
+  wa:'<svg viewBox="0 0 24 24"><path d="M12 3.200a8.800 8.800 0 0 0-7.600 13.200L3.200 20.800l4.500-1.200A8.800 8.800 0 1 0 12 3.200z" fill="none" stroke="#fff" stroke-width="1.900" stroke-linejoin="round"/><path fill="#fff" d="M8.800 8.300c0 3.500 2.900 6.400 6.400 6.400l1-1.500-1.900-1-.9.800c-1-.4-1.900-1.300-2.300-2.300l.8-.9-1-1.900-2.100 1.400z"/></svg>',
+  ms:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M12 3C7 3 3.200 6.700 3.200 11.300c0 2.600 1.200 4.900 3.200 6.400V21l3-1.700c.8.200 1.600.3 2.600.3 5 0 8.800-3.700 8.800-8.300S17 3 12 3z"/><path fill="#1c8bf2" d="M6.700 14l3.300-5.100 2.600 2.600 3.100-2.600-3.300 5.100-2.600-2.600L6.700 14z"/></svg>',
+  pin:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M12.100 3.200c-4.900 0-7.400 3.300-7.400 6.200 0 1.700.7 3.200 2 3.700.2.100.4 0 .5-.2l.2-.8c.1-.2 0-.3-.1-.5-.4-.5-.7-1.100-.7-2 0-2.600 1.900-4.900 5.100-4.900 2.800 0 4.300 1.700 4.300 4 0 3-1.300 5.500-3.300 5.500-1.100 0-1.900-.9-1.600-2 .3-1.300.9-2.700.9-3.600 0-.8-.4-1.500-1.400-1.500-1.100 0-2 1.200-2 2.700 0 1 .3 1.600.3 1.600l-1.300 5.500c-.3 1.300-.2 3 0 4.100.1.100.3.200.4 0 .5-.7 1.600-2.100 2-3.700l.7-2.800c.4.700 1.400 1.200 2.500 1.200 3.300 0 5.600-3 5.600-6.800 0-2.900-2.400-5.700-6.700-5.700z"/></svg>',
+  vb:'<svg viewBox="0 0 24 24"><path fill="#fff" d="M5.200 4.200C4 5.200 3.800 6.900 4.600 9c1.500 4.100 5.400 8.200 9.800 10 1.800.7 3.100.4 4-.5l.7-.9c.3-.4.3-.9 0-1.200l-2-1.600c-.4-.3-.9-.3-1.200.1l-.8.9c-1.900-.8-3.700-2.600-4.500-4.500l.9-.8c.4-.3.4-.8.1-1.200l-1.600-2c-.3-.4-.8-.5-1.200-.2l-.6.100z"/><path d="M13.200 6.500a4.500 4.500 0 0 1 4 4M13.200 3.500a7.500 7.500 0 0 1 7.300 7.200" stroke="#fff" stroke-width="1.700" fill="none" stroke-linecap="round"/></svg>'
 };
 function shareButtons(section, p) {
   const url = location.origin + '/share/' + section + '/' + encodeURIComponent(p.id);
   const u = encodeURIComponent(url), t = encodeURIComponent(p.title);
+  const first = (p.images && p.images[0]) || p.image;
+  const media = encodeURIComponent(location.origin + (first ? imgUrl(first) : '/header.png'));
+  const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const L = [
+    ['Facebook', '#4f6fa6', ICON.fb, 'https://www.facebook.com/sharer/sharer.php?u=' + u, 1],
+    ['X', '#000', ICON.x, 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u, 1],
+    ['WhatsApp', '#2fb67b', ICON.wa, 'https://wa.me/?text=' + t + '%20' + u, 1],
+    ['Messenger', '#1c8bf2', ICON.ms, 'fb-messenger://share/?link=' + u, 0],
+    ['Pinterest', '#e60000', ICON.pin, 'https://pinterest.com/pin/create/button/?url=' + u + '&media=' + media + '&description=' + t, 1],
+    ['Viber', '#8b6aa6', ICON.vb, 'viber://forward?text=' + t + '%20' + u, 0]
+  ].filter(x => mobile || x[0] !== 'Messenger');
   const btn = $('#shb'), mn = $('#mn');
-  mn.innerHTML = `<button id="shc">${ICON.link}<span>Copy link</span></button><a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${u}">${ICON.fb}<span>Facebook</span></a><a target="_blank" rel="noopener" href="https://wa.me/?text=${t}%20${u}">${ICON.wa}<span>WhatsApp</span></a>`;
+  mn.innerHTML = `<div class="ig">${L.map(x => `<a href="${x[3].replace(/&/g, '&amp;')}"${x[4] ? ' target="_blank" rel="noopener"' : ''} aria-label="${x[0]}" title="${x[0]}" style="background:${x[1]}">${x[2]}</a>`).join('')}</div><button class="cp" id="shc">${ICON.link}<span>Copy link</span></button>`;
   btn.onclick = ev => { ev.stopPropagation(); mn.hidden = !mn.hidden; };
   mn.onclick = ev => ev.stopPropagation();
   document.onclick = () => { mn.hidden = true; };
@@ -191,7 +224,7 @@ async function showContact() {
     const c = await api('/api/data/contact');
     const items = c.items || [];
     if (!c.intro && !items.length) { view.innerHTML = '<p class="note">Contact details have not been added yet.</p>'; return; }
-    view.innerHTML = `<div class="full">${c.intro ? `<div class="text">${esc(c.intro)}</div>` : ''}<dl class="cl">${items.map(i => `<dt>${esc(i.label)}</dt><dd>${linkValue(i.value || '')}</dd>`).join('')}</dl></div>`;
+    view.innerHTML = `<div class="full">${c.intro ? `<div class="text">${paras(c.intro)}</div>` : ''}<dl class="cl">${items.map(i => `<dt>${esc(i.label)}</dt><dd>${linkValue(i.value || '')}</dd>`).join('')}</dl></div>`;
   } catch (e) { view.innerHTML = '<p class="note">Content is unavailable right now. Please try again later.</p>'; }
 }
 
@@ -255,32 +288,39 @@ async function devSection(section) {
   } catch (e) { devFail(e, $('#pl')); }
 }
 function editor(section, post) {
-  const st = {image: post ? post.image || '' : '', pending: null};
-  $('#ed').innerHTML = `<form id="pf"><label for="t">Heading</label><input type="text" id="t" maxlength="200" style="font-weight:700" required><label for="b">Full News</label><textarea id="b" required></textarea><label for="f">Image (from phone or computer)</label><input type="file" id="f" accept="image/*"><div class="prev" id="pv"></div><div class="row"><button class="btn" type="submit" id="sv">${post ? 'Save changes' : 'Publish'}</button>${post ? '<button class="btn alt" type="button" id="cn">Cancel</button>' : ''}<button class="btn alt" type="button" id="rm" style="display:none">Remove image</button></div><p class="msg" id="mg"></p></form>`;
+  const MAX = 10;
+  const items = (post ? (post.images && post.images.length ? post.images : (post.image ? [post.image] : [])) : []).map(p => ({path: p}));
+  $('#ed').innerHTML = `<form id="pf"><label for="t">Heading</label><input type="text" id="t" maxlength="200" style="font-weight:700" required><label for="au">Author name (optional)</label><input type="text" id="au" maxlength="100"><label for="b">Full News</label><textarea id="b" required></textarea><label for="f">Images (optional, up to 10, from phone or computer)</label><input type="file" id="f" accept="image/*" multiple><div class="pg" id="pv"></div><div class="row"><button class="btn" type="submit" id="sv">${post ? 'Save changes' : 'Publish'}</button>${post ? '<button class="btn alt" type="button" id="cn">Cancel</button>' : ''}</div><p class="msg" id="mg"></p></form>`;
   $('#t').value = post ? post.title : '';
+  $('#au').value = post ? post.author || '' : '';
   $('#b').value = post ? post.body : '';
   const paint = () => {
-    const src = st.pending || (st.image ? imgUrl(st.image) : '');
-    $('#pv').innerHTML = src ? `<img src="${esc(src)}" alt="">` : '';
-    $('#rm').style.display = src ? '' : 'none';
+    $('#pv').innerHTML = items.map((it, i) => `<div class="pi"><img src="${esc(it.data || imgUrl(it.path))}" alt=""><button type="button" data-i="${i}" aria-label="Remove image">×</button></div>`).join('');
+    $('#pv').querySelectorAll('button').forEach(b => b.onclick = () => { items.splice(+b.dataset.i, 1); paint(); });
   };
   paint();
   if (post) $('#cn').onclick = () => editor(section, null);
-  $('#rm').onclick = () => { st.pending = null; st.image = ''; $('#f').value = ''; paint(); };
   $('#f').onchange = async ev => {
-    const f = ev.target.files[0]; if (!f) return;
-    try { st.pending = await resizeImage(f); paint(); $('#mg').textContent = ''; }
-    catch (e) { $('#mg').textContent = e.message; }
+    const files = [...ev.target.files]; ev.target.value = '';
+    const mg = $('#mg'); mg.textContent = '';
+    for (const f of files) {
+      if (items.length >= MAX) { mg.textContent = 'Maximum ' + MAX + ' images.'; break; }
+      try { items.push({data: await resizeImage(f)}); } catch (e) { mg.textContent = e.message; }
+    }
+    paint();
   };
   $('#pf').onsubmit = async ev => {
     ev.preventDefault();
-    const mg = $('#mg'), sv = $('#sv'); mg.textContent = 'Saving…'; sv.disabled = true;
+    const mg = $('#mg'), sv = $('#sv'); sv.disabled = true; mg.textContent = 'Saving…';
     try {
-      if (st.pending) {
-        const r = await api('/api/upload', {method:'POST', body:JSON.stringify({type:'image/jpeg', data:st.pending.split(',')[1]})});
-        st.image = r.image; st.pending = null;
+      const todo = items.filter(i => !i.path); let n = 0;
+      for (const it of todo) {
+        mg.textContent = `Uploading image ${++n} of ${todo.length}…`;
+        const r = await api('/api/upload', {method:'POST', body:JSON.stringify({type:'image/jpeg', data: it.data.split(',')[1]})});
+        it.path = r.image; delete it.data;
       }
-      await api('/api/post/' + section, {method:'POST', body:JSON.stringify({id: post ? post.id : undefined, title:$('#t').value, body:$('#b').value, image:st.image})});
+      mg.textContent = 'Saving…';
+      await api('/api/post/' + section, {method:'POST', body:JSON.stringify({id: post ? post.id : undefined, title:$('#t').value, author:$('#au').value, body:$('#b').value, images: items.map(i => i.path)})});
       devSection(section);
     } catch (e) { sv.disabled = false; devFail(e, mg); }
   };
