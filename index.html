@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Sujan Khadka</title>
+<meta name="theme-color" content="#052f6b">
+<link rel="preload" as="image" href="/header.webp" type="image/webp">
+<link rel="preload" as="fetch" href="/api/data" crossorigin="anonymous">
+<meta name="description" content="The Sujan Khadka — fewer sections, better stories.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23052f6b'/><text x='50' y='70' font-size='56' text-anchor='middle' fill='white' font-family='Georgia' font-weight='bold'>SK</text></svg>">
+<style>
+:root{--bg:#F7F4ED;--tx:#171717;--mu:#666;--ac:#8B1E2D;--ln:#d9d4c7;--nv:#052f6b;--sh:#b83b7d}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--tx:#eee;--mu:#a8a8a8;--ac:#e5808d;--ln:#333;--sh:#e58bb9}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.6 Georgia,'Times New Roman',serif}
+a{color:inherit;text-decoration:none}a:hover{color:var(--ac)}:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.sans,nav,.meta,button,input,select,label,.util,footer,.sm{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.w{max-width:1100px;margin:0 auto;padding:0 16px}
+.util{background:var(--bg);padding-top:env(safe-area-inset-top,0)}
+.util .w{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--mu);padding-top:6px;padding-bottom:6px;flex-wrap:wrap}
+.util a,.util select{font-size:12px;color:var(--mu);background:none;border:0;margin-left:10px}
+.hd{display:block;background:var(--nv)}.hd img{display:block;width:100%;height:clamp(64px,15vw,170px);object-fit:cover;object-position:right center}
+.nb{background:var(--nv);border-bottom:1px solid #2b4f86}
+.nb .w{display:flex;align-items:center;gap:12px;position:relative}
+nav{display:flex;flex:1;overflow-x:auto;scrollbar-width:none}nav::-webkit-scrollbar{display:none}
+nav a{position:relative;white-space:nowrap;color:#fff;font:700 clamp(17px,2.4vw,24px)/1 Georgia,'Times New Roman',serif;padding:20px 16px 18px;border-left:1px solid #3a5f96}
+nav a:first-child{border-left:0;padding-left:0}nav a:hover{color:#ffe500}
+nav a.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:6px;background:#ffe500}
+#mb{flex:none;width:52px;height:52px;border-radius:50%;border:0;background:#ffe500;cursor:pointer;display:grid;place-content:center;gap:5px;padding:0;margin:8px 0}
+#mb i{display:block;width:24px;height:3px;background:#052f6b}
+#mp{display:none;position:absolute;right:16px;top:100%;z-index:20;background:var(--bg);color:var(--tx);border:1px solid var(--ln);min-width:240px;padding:8px 16px 12px;font-family:system-ui,sans-serif}
+#mp.open{display:block}#mp h4{margin:10px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--ac)}#mp a{display:block;padding:6px 0}
+h1,h2,h3{line-height:1.15;margin:0}
+.sec{margin:34px 0 0;border-top:2px solid var(--tx);padding-top:8px}
+.sec>h2{font:700 13px system-ui,sans-serif;text-transform:uppercase;letter-spacing:1px;color:var(--ac);margin-bottom:14px}
+.cat{font:700 12px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.8px;color:var(--ac)}
+.meta{font-size:12.5px;color:var(--mu)}
+.sm{display:inline-block;margin-top:6px;font-size:13px;font-weight:600;color:var(--ac)}
+.lead{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-top:22px;align-items:start}
+.lead h1{font-size:clamp(28px,4.4vw,44px);margin:6px 0 10px}.lead p{color:var(--mu);margin:0 0 10px}
+img{max-width:100%;height:auto}.ph{display:block;aspect-ratio:3/2;width:100%;object-fit:cover;background:var(--ln)}
+.g{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.card{border-top:1px solid var(--ln);padding-top:10px}.card h3{font-size:19px;margin:6px 0}.card p{font-size:15px;color:var(--mu);margin:0 0 6px}
+.empty{color:var(--mu);font-style:italic;padding:10px 0}
+article{max-width:700px;margin:30px auto}article h1{font-size:clamp(30px,5vw,48px);margin:8px 0}
+.sub{font-size:21px;color:var(--mu);margin:0 0 14px}article .by{border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);padding:8px 0;margin:14px 0}
+figcaption{font:13px system-ui,sans-serif;color:var(--mu);padding:6px 0 18px}
+article p{margin:0 0 1.15em;font-size:19px;line-height:1.7;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto}article h2{font-size:26px;margin:1.4em 0 .5em}
+blockquote{border-left:4px solid var(--ac);margin:1.5em 0;padding:0 0 0 18px;font-size:24px;font-style:italic;line-height:1.35}
+article p a,.pg a{color:var(--ac);text-decoration:underline}
+.pg{max-width:700px;margin:30px auto}.pg h1{margin-bottom:14px}.pg p{white-space:pre-wrap}
+.more{display:block;margin:18px auto 0;padding:8px 20px;border:1px solid var(--tx);background:none;color:var(--tx);cursor:pointer}
+footer{margin-top:50px;background:var(--nv);color:#fff;padding:28px 0 calc(36px + env(safe-area-inset-bottom,0px));font-size:14px}footer .meta{color:#c9d6ec;margin:22px 0 0;border-top:2px solid #8fa9d4;padding-top:14px}footer .fb{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}footer .fb a{display:inline-block;padding:0;color:#ffe500;font-weight:600}
+footer .g{grid-template-columns:repeat(3,1fr);gap:16px}footer h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ffe500}footer a{display:block;padding:3px 0;color:#dbe5f5}footer a:hover{color:#ffe500}
+.ad{max-width:900px;margin:24px auto;padding:0 16px;font-family:system-ui,sans-serif}.ad h1{font:700 24px system-ui}
+.ad input,.ad select,.ad textarea{width:100%;padding:9px;margin:4px 0 12px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);font:16px system-ui}
+.ad textarea{min-height:260px;font-family:Georgia,serif}.ad label{font-size:13px;font-weight:600;color:var(--mu)}
+.bt{padding:8px 14px;border:1px solid var(--tx);background:var(--tx);color:var(--bg);cursor:pointer;margin:2px;font-size:14px}.bt.o{background:none;color:var(--tx)}.bt.d{background:var(--ac);border-color:var(--ac);color:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--ln);flex-wrap:wrap}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.ck{display:flex;gap:8px;align-items:center}.ck input{width:auto;margin:0}
+@media(max-width:760px){nav a{padding:16px 12px 14px}
+.lead,.g{grid-template-columns:1fr}footer{font-size:13px}footer .g{gap:10px}.lead{gap:12px}}
+.shr{display:inline-flex;align-items:center;gap:12px;margin:14px 0 20px;padding:10px 24px;border:1px solid var(--ln);border-radius:999px;background:none;color:var(--sh);font:700 19px system-ui,sans-serif;cursor:pointer}
+.shr:hover{color:var(--sh);border-color:var(--sh)}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style></head><body>
+<div id="app"></div>
+<script>
+const MULTI=['History','Culture & Lifestyle'];const CATS=['World','Opinion','History','Culture & Lifestyle'],SL={World:'world',Opinion:'opinion',History:'history','Culture & Lifestyle':'culture'};
+const SUBS={'World':['News','Analysis','Explainer'],'Culture & Lifestyle':['Culture','Lifestyle']};
+const PG={about:'About',aboutus:'About us',contact:'Contact',standards:'Editorial standards',corrections:'Corrections',support:'Support',privacy:'Privacy',cookies:'Cookies',terms:'Terms'};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let D={articles:[],home:[],pages:{},views:{}},ready=false,A=null,adm=null,ed=null,tab='articles',limit={};
+const fd=d=>new Date(d).toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const rt=b=>Math.max(1,Math.round((b||'').split(/\s+/).length/220));
+const live=()=>D.articles.filter(a=>a.status==='published'&&new Date(a.date)<=new Date()).sort((a,b)=>new Date(b.date)-new Date(a.date));
+const url=a=>'/'+SL[a.category]+'/'+a.slug,safeImg=s=>s&&s.startsWith('/img/')?esc(s):'';
+const slugify=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)||'story';
+const api=(p,o={})=>fetch(p,o);
+
+/* ---------- public ---------- */
+function card(a){const im=safeImg(a.thumb||a.image);return `<div class="card">${im?`<a href="${url(a)}"><img class="ph" loading="lazy" src="${im}" alt="${esc(a.imageCaption||a.title)}"></a>`:''}<div class="cat">${esc(a.subcategory||a.category)}</div><h3><a href="${url(a)}">${esc(a.title)}</a></h3>${a.subtitle?`<p>${esc(a.subtitle)}</p>`:''}<div class="meta">${esc(a.author)} · ${fd(a.date)}</div><a class="sm" href="${url(a)}">See more →</a></div>`}
+function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2><div class="empty">No stories published yet.</div></div>`;const n=limit[key+t]||4;
+ return `<div class="sec"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
+function shell(inner,cur){
+ const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]])];
+ return `<div class="util"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span><a href="/p/support">Support</a></span></div></div>
+ <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
+ <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
+ <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<h4>About</h4><a href="/p/about">About</a><a href="/p/aboutus">About us</a><a href="/p/contact">Contact</a><a href="/p/standards">Editorial standards</a><a href="/p/corrections">Corrections</a><h4>Support</h4><a href="/p/support">Support us</a></div></div></div>
+ <div class="w"><main id="main">${inner}</main></div>
+ <footer><div class="w"><div class="g"><div><h4>Sections</h4>${CATS.map(c=>`<a href="/${SL[c]}">${c}</a>`).join('')}</div><div><h4>About</h4><a href="/p/about">About</a><a href="/p/contact">Contact</a><a href="/p/support">Support us</a></div><div><h4>Legal</h4><a href="/p/privacy">Privacy</a><a href="/p/cookies">Cookies</a><a href="/p/terms">Terms</a></div></div><div class="meta fb"><span>© ${new Date().getFullYear()} The Sujan Khadka. All rights reserved.</span><a href="#top" onclick="scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});return false">Back to top ↑</a></div></div></footer>`}
+function home(){const L=live();if(!L.length)return `<div class="empty" style="padding:60px 0;text-align:center">No stories have been published yet.</div>`;
+ let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
+ const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
+ let h=`<section class="lead"><div><div class="cat">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div><a class="sm" href="${url(lead)}">See more →</a></div>${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:''}</section>`;
+ if(sec.length)h+=`<div class="sec"><div class="g">${sec.map(card).join('')}</div></div>`;
+ CATS.forEach(c=>h+=block(c,L.filter(a=>a.category===c),SL[c]));return h}
+function section(c){const L=live().filter(a=>a.category===c),k=SL[c];let h=`<h1 style="margin:24px 0 0">${c}</h1>`;
+ if(!L.length)return h+`<div class="empty">No stories published yet.</div>`;
+ const fe=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean)[0]||L[0],im=safeImg(fe.image),rest=L.filter(a=>a!==fe);
+ h+=`<section class="lead"><div><h1 style="font-size:34px"><a href="${url(fe)}">${esc(fe.title)}</a></h1><p>${esc(fe.subtitle)}</p><div class="meta">${esc(fe.author)} · ${fd(fe.date)}</div><a class="sm" href="${url(fe)}">See more →</a></div>${im?`<img class="ph" src="${im}" alt="${esc(fe.imageCaption||fe.title)}">`:''}</section>`;
+ if(c==='World'){const mr=[...L].sort((a,b)=>(D.views[b.id]||0)-(D.views[a.id]||0)).slice(0,5);
+  h+=block('Latest World News',rest.filter(a=>a.subcategory==='News'||!a.subcategory),k)+block('Analysis',L.filter(a=>a.subcategory==='Analysis'),k)+block('Explainers',L.filter(a=>a.subcategory==='Explainer'),k)+`<div class="sec"><h2>More from World</h2><ol>${mr.map(a=>`<li><a href="${url(a)}">${esc(a.title)}</a></li>`).join('')}</ol></div>`}
+ else if(c==='Culture & Lifestyle')h+=block('Culture',L.filter(a=>a.subcategory==='Culture'),k)+block('Lifestyle',L.filter(a=>a.subcategory==='Lifestyle'),k);
+ else h+=block('Latest',rest,k);return h}
+function body(t,ex=[]){const fig=x=>`<figure style="margin:1.5em 0"><img style="display:block" loading="lazy" decoding="async" src="${safeImg(x.url)}" alt="${esc(x.caption||'Photo')}">${x.caption?`<figcaption>${esc(x.caption)}</figcaption>`:''}</figure>`;let k=0;
+ const out=esc(t).split(/\n{2,}/).map((p,i)=>{let h=p.startsWith('## ')?`<h2>${p.slice(3)}</h2>`:p.startsWith('&gt; ')?`<blockquote>${p.slice(5)}</blockquote>`:`<p>${p.replace(/\n/g,'<br>').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" rel="noopener">$1</a>')}</p>`;if(i%2===1&&k<ex.length)h+=fig(ex[k++]);return h});
+ while(k<ex.length)out.push(fig(ex[k++]));return out.join('')}
+function articlePg(slug){const L=live(),a=L.find(x=>x.slug===slug);if(!a)return '<div class="empty" style="padding:60px 0">Story not found.</div>';
+ document.title=(a.seoTitle||a.title)+' — The Sujan Khadka';$('meta[name=description]').content=a.seoDesc||a.subtitle||'';
+ let l=$('link[rel=canonical]')||document.head.appendChild(Object.assign(document.createElement('link'),{rel:'canonical'}));l.href=location.origin+url(a);
+ let s=$('#ld')||document.head.appendChild(Object.assign(document.createElement('script'),{id:'ld',type:'application/ld+json'}));
+ s.textContent=JSON.stringify({'@context':'https://schema.org','@type':'NewsArticle',headline:a.title,author:{'@type':'Person',name:a.author},datePublished:a.date,dateModified:a.updated||a.date,image:a.image?[location.origin+a.image]:undefined,mainEntityOfPage:location.origin+url(a)});
+ if(!window._v||window._v!==a.id){window._v=a.id;api('/api/view',{method:'POST',body:JSON.stringify({id:a.id})}).catch(()=>{})}
+ const tags=a.tags||[],more=L.filter(x=>x.id!==a.id&&x.category===a.category).slice(0,3),
+ like=L.filter(x=>x.id!==a.id&&!more.includes(x)).map(x=>({x,s:(x.tags||[]).filter(t=>tags.includes(t)).length})).sort((p,q)=>q.s-p.s).slice(0,3).map(o=>o.x),im=safeImg(a.image);
+ return `<article><div class="cat"><a href="/${SL[a.category]}">${esc(a.category)}</a>${a.subcategory?' · '+esc(a.subcategory):''}</div><h1>${esc(a.title)}</h1>${a.subtitle?`<p class="sub">${esc(a.subtitle)}</p>`:''}
+ <div class="by meta">By <strong>${esc(a.author)}</strong> · ${fd(a.date)}${a.updated?` · Updated ${fd(a.updated)}`:''} · ${rt(a.body)} min read</div>
+ <button class="shr" onclick="share()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.6" fill="currentColor"/><circle cx="19" cy="5" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M7 11 17 6M7 13l10 5"/></svg>Share</button>
+ ${im?`<figure style="margin:0"><img style="display:block" src="${im}" alt="${esc(a.imageCaption||a.title)}"><figcaption>${esc(a.imageCaption)}</figcaption></figure>`:''}
+ ${body(a.body,(a.images||[]).slice(1))}${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}
+</article>
+ ${more.length?`<div class="sec"><h2>More on this story</h2><div class="g">${more.map(card).join('')}</div></div>`:''}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}`}
+const pagePg=k=>`<div class="pg"><h1>${esc(PG[k]||'')}</h1><p>${D.pages[k]?esc(D.pages[k]):'<span class="empty">This page has not been written yet.</span>'}</p></div>`;
+
+/* ---------- developer portal (/admin) ---------- */
+function loginView(){return `<div class="ad" style="max-width:380px"><h1>Editor sign in</h1><label>Password</label><input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"><button class="bt" onclick="doLogin()">Sign in</button><p class="meta" id="le"></p></div>`}
+async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:$('#pw').value})});
+ if(r.ok){adm=null;go()}else $('#le').textContent=(await r.json().catch(()=>({}))).error||'Sign in failed'}
+async function persist(){const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(A)});if(!r.ok){alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
+function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
+ let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
+ if(tab==='articles')h+=ed?editor():list();
+ if(tab==='home')h+=`<p class="meta">Featured stories in order: first is the lead, next four are secondary.</p>`+(A.home.length?A.home.map((id,i)=>{const a=A.articles.find(x=>x.id===id);return a?`<div class="row"><span>${i+1}. ${esc(a.title)}</span><span><button class="bt o" onclick="mv(${i},-1)">↑</button><button class="bt o" onclick="mv(${i},1)">↓</button><button class="bt o" onclick="feat('${id}')">Remove</button></span></div>`:''}).join(''):'<div class="empty">Nothing featured. Latest stories are used.</div>');
+ if(tab==='pages')h+=Object.keys(PG).map(k=>`<label>${PG[k]}</label><textarea style="min-height:110px" id="pg_${k}">${esc(A.pages[k]||'')}</textarea>`).join('')+`<button class="bt" onclick="savePages()">Save pages</button>`;
+ return h+'</div>'}
+async function savePages(){Object.keys(PG).forEach(k=>A.pages[k]=$('#pg_'+k).value);if(await persist())alert('Saved')}
+async function logout(){await api('/api/logout',{method:'POST'});adm='out';A=null;history.pushState(null,'','/');go()}
+function list(){return `<button class="bt" onclick="ed={};go()">New article</button>`+(A.articles.length?[...A.articles].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(a=>{const sc=a.status==='published'&&new Date(a.date)>new Date();return `<div class="row"><span><strong>${esc(a.title)}</strong><br><span class="meta">${esc(a.category)} · ${sc?'Scheduled':a.status} · ${fd(a.date)}${a.featured?' · Featured':''}</span></span><span><button class="bt o" onclick="ed=A.articles.find(x=>x.id==='${a.id}');go()">Edit</button><button class="bt o" onclick="pub('${a.id}')">${a.status==='published'?'Unpublish':'Publish'}</button><button class="bt o" onclick="feat('${a.id}')">${a.featured?'Unfeature':'Feature'}</button><button class="bt d" onclick="del('${a.id}')">Delete</button></span></div>`}).join(''):'<div class="empty">No articles yet.</div>')}
+function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=multi?5:1,imgs=a.images||(a.images=a.image?[{url:a.image,caption:a.imageCaption||''}]:[]),o=(arr,v)=>arr.map(x=>`<option ${x===v?'selected':''}>${x}</option>`).join('');
+ const dt=a.date?new Date(new Date(a.date)-new Date(a.date).getTimezoneOffset()*6e4).toISOString().slice(0,16):'';
+ return `<label>Headline</label><input id="e_t" value="${esc(a.title)}"><label>Subheadline (optional)</label><input id="e_s" value="${esc(a.subtitle)}">
+ <label>Category</label><select id="e_c" onchange="sync();ed.category=this.value;ed.subcategory='';if(!MULTI.includes(this.value))ed.images=(ed.images||[]).slice(0,1);go()">${o(CATS,c)}</select>
+ ${SUBS[c]?`<label>Subcategory</label><select id="e_sc">${o(SUBS[c],a.subcategory)}</select>`:''}
+ <label>Author</label><input id="e_a" value="${esc(a.author)}"><label>Tags (comma separated)</label><input id="e_g" value="${esc((a.tags||[]).join(', '))}">
+ <label>Images ${imgs.length}/${max}${multi?' — first is the main image':''}</label>
+ ${imgs.map((m,i)=>`<div class="row"><img src="${safeImg(m.thumb||m.url)}" style="width:90px;height:60px;object-fit:cover" alt=""><input class="ic" data-i="${i}" style="flex:1;margin:0" placeholder="Caption (optional)" value="${esc(m.caption)}"><button class="bt d" onclick="rmImg(${i})">Remove</button></div>`).join('')}
+ ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs(this.files)">`:'<p class="meta">Maximum reached.</p>'}
+ <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link)</label><textarea id="e_b">${esc(a.body)}</textarea>
+ <label>Publication date/time (future = scheduled)</label><input id="e_d" type="datetime-local" value="${dt}">
+ <label>SEO title</label><input id="e_st" value="${esc(a.seoTitle)}"><label>SEO description</label><input id="e_sd" value="${esc(a.seoDesc)}">
+ <label class="ck"><input type="checkbox" id="e_f" ${a.featured?'checked':''}> Feature on homepage</label>
+ <button class="bt o" onclick="sv('draft')">Save draft</button><button class="bt" onclick="sv('published')">Publish</button><button class="bt o" onclick="ed=null;go()">Cancel</button>`}
+function sync(){if(!$('#e_t'))return;Object.assign(ed,{title:$('#e_t').value,subtitle:$('#e_s').value,author:$('#e_a').value,body:$('#e_b').value,seoTitle:$('#e_st').value,seoDesc:$('#e_sd').value,tags:$('#e_g').value.split(',').map(s=>s.trim()).filter(Boolean),featured:$('#e_f').checked});if($('#e_sc'))ed.subcategory=$('#e_sc').value;document.querySelectorAll('.ic').forEach(x=>{if(ed.images&&ed.images[+x.dataset.i])ed.images[+x.dataset.i].caption=x.value});if($('#e_d').value)ed.date=new Date($('#e_d').value).toISOString()}
+async function sv(st){sync();const a=ed;if(!a.title||!a.body)return alert('Headline and body are required.');
+ a.category=a.category||'World';a.images=(a.images||[]).slice(0,MULTI.includes(a.category)?5:1);a.image=a.images[0]?a.images[0].url:'';a.thumb=a.images[0]?a.images[0].thumb||'':'';a.imageCaption=a.images[0]?a.images[0].caption:'';a.status=st;a.date=a.date||new Date().toISOString();a.readingTime=rt(a.body);
+ if(!a.id){a.id='a'+Date.now();const b=slugify(a.title);let s=b,i=2;while(A.articles.some(x=>x.slug===s))s=b+'-'+i++;a.slug=s;A.articles.push(a)}else a.updated=new Date().toISOString();
+ const i=A.home.indexOf(a.id);if(a.featured&&i<0)A.home.push(a.id);if(!a.featured&&i>=0)A.home.splice(i,1);
+ if(await persist()){ed=null;go()}}
+const jpg=(i,w,q)=>new Promise(ok=>{const s=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',q)});
+const put=async b=>{const x=await api('/api/admin/upload',{method:'POST',headers:{'content-type':'image/jpeg'},body:b});if(!x.ok)throw 0;return (await x.json()).url};
+const up=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=async()=>{try{const a=await jpg(i,1280,.8),b=await jpg(i,520,.75),url=await put(a);ok({url,thumb:await put(b)})}catch(e){no(e)}};i.onerror=no;i.src=r.result};r.readAsDataURL(f)});
+async function addImgs(files){sync();const max=MULTI.includes(ed.category||'World')?5:1;ed.images=ed.images||[];const left=max-ed.images.length;if(left<1)return;
+ if(files.length>left)alert('Only '+left+' more allowed.');
+ for(const f of [...files].slice(0,left)){try{ed.images.push({...await up(f),caption:''})}catch(e){alert('Upload failed')}}go()}
+function rmImg(i){sync();ed.images.splice(i,1);go()}
+async function pub(id){const a=A.articles.find(x=>x.id===id);a.status=a.status==='published'?'draft':'published';await persist();go()}
+async function feat(id){const a=A.articles.find(x=>x.id===id);a.featured=!a.featured;const i=A.home.indexOf(id);if(a.featured&&i<0)A.home.push(id);if(!a.featured&&i>=0)A.home.splice(i,1);await persist();go()}
+async function mv(i,d){const j=i+d;if(j<0||j>=A.home.length)return;[A.home[i],A.home[j]]=[A.home[j],A.home[i]];await persist();go()}
+async function del(id){if(!confirm('Delete permanently?'))return;A.articles=A.articles.filter(a=>a.id!==id);A.home=A.home.filter(x=>x!==id);await persist();go()}
+
+/* ---------- router ---------- */
+function go(){const p=location.pathname.split('/').filter(Boolean);
+ let r=$('meta[name=robots]');
+ if(p[0]==='developer'){if(!r)document.head.appendChild(Object.assign(document.createElement('meta'),{name:'robots',content:'noindex,nofollow'}));document.title='Newsroom';
+  if(adm===null){adm='loading';$('#app').innerHTML='<div class="ad">Loading…</div>';api('/api/admin/db').then(async x=>{if(x.ok){A=await x.json();adm='in'}else adm='out';go()}).catch(()=>{adm='out';go()});return}
+  if(adm==='loading')return;$('#app').innerHTML=adm==='in'?adminView():loginView();return}
+ if(r)r.remove();document.title='The Sujan Khadka';
+ if(!ready){$('#app').innerHTML=shell(`<div class="empty" style="padding:60px 0;text-align:center">${ready==='err'?'Could not load stories. Please refresh.':'Loading…'}</div>`,'/');return}
+ let out,cur='/'+(p[0]||'');
+ if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);
+ else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
+ $('#app').innerHTML=shell(out,cur);if(p.length<2)scrollTo(0,0)}
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href')))return;e.preventDefault();history.pushState(null,'',a.getAttribute('href'));go();scrollTo(0,0)});
+function share(){const d={title:document.title,url:location.href};if(navigator.share)navigator.share(d).catch(()=>{});else navigator.clipboard.writeText(d.url).then(()=>alert('Link copied'))}
+addEventListener('popstate',go);
+if(location.hash.startsWith('#/'))history.replaceState(null,'',location.hash.slice(1));
+try{const c=JSON.parse(localStorage.getItem('sk_d'));if(c&&c.articles){D=c;ready=true}}catch(e){}
+go();
+const pub_=()=>location.pathname.split('/')[1]!=='developer';
+fetch('/api/data').then(r=>r.json()).then(x=>{const t=JSON.stringify(x);let o=null;try{o=localStorage.getItem('sk_d')}catch(e){}
+ if(!ready||t!==o){D=x;ready=true;if(pub_())go()}try{localStorage.setItem('sk_d',t)}catch(e){}}).catch(()=>{if(!ready){ready='err';if(pub_())go()}});
+</script></body></html>
