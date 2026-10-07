@@ -1,0 +1,5 @@
+worker.js
+wrangler.json
+.assetsignore
+functions
+_routes.json
