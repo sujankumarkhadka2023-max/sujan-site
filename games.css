@@ -1,29 +1,29 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:#fff;color:#000;font-family:system-ui,Arial,sans-serif}
+body{margin:0;background:#052f6b;color:#fff;font-family:system-ui,Arial,sans-serif}
 .wrap{max-width:520px;margin:0 auto;padding:12px}
-button{font:inherit;cursor:pointer;color:inherit}
-.btn{border:1.5px solid #000;background:#fff;border-radius:8px;padding:9px 12px}
+button{font:inherit;cursor:pointer;color:#000}
+.btn{border:1.5px solid #000;background:#fff;color:#000;border-radius:8px;padding:9px 12px}
 .btn.dark{background:#000;color:#fff}
-.btn.on{background:#000;color:#fff}
+.btn.on{background:#ffe500;color:#000}
 .btn:disabled{opacity:.35}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
 h1{font-size:20px;margin:0}
-.sub{font-size:13px;color:#555}
+.sub{font-size:13px;color:#c9d6ec}
 .hide{display:none!important}
 .tabs{display:flex;gap:6px;margin:10px 0}
 .tab{flex:1;padding:8px 2px;border:1.5px solid #000;background:#fff;border-radius:8px;font-size:13px}
-.tab.on{background:#000;color:#fff}
+.tab.on{background:#ffe500;color:#000}
 .lv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .l{aspect-ratio:1;border:1.5px solid #000;border-radius:10px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:17px;padding:0}
 .l small{font-size:10px;font-weight:400;letter-spacing:1px}
 .l.done{background:#eaf7ea}
 .l:disabled{border-color:#bbb;color:#bbb;background:#f7f7f7}
-.l.cur{background:#000;color:#fff}
+.l.cur{background:#ffe500;color:#000}
 .bar{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;gap:6px}
 .acts{display:flex;gap:8px;margin-top:12px}
 .acts .btn{flex:1;padding:10px 4px;font-size:14px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
-.box{background:#fff;border-radius:14px;padding:22px;max-width:340px;width:100%;text-align:center}
+.box{background:#fff;color:#000;border-radius:14px;padding:22px;max-width:340px;width:100%;text-align:center}
 .box h2{margin:0 0 6px}
 .stars{font-size:34px;letter-spacing:4px;margin:6px 0}
 .row{display:flex;gap:8px;margin-top:14px}.row .btn{flex:1}
