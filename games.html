@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Games | Sujan Kumar Khadka</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#000;font-family:system-ui,Arial,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+h1{margin:6px 0 4px}
+p{margin:0 0 14px;color:#555}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{border:1.5px solid #000;border-radius:12px;padding:18px 10px;text-align:center;text-decoration:none;color:#000;display:block}
+.card:active{background:#000;color:#fff}
+.card .i{font-size:36px}
+.card b{display:block;margin-top:6px}
+.card small{color:#777}
+.back{display:inline-block;margin-bottom:6px;color:#000}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Back to site</a>
+  <h1>Games</h1>
+  <p>Pick a game. Every game has 100 levels.</p>
+  <div class="grid">
+    <a class="card" href="sudoku.html"><div class="i">🔢</div><b>Sudoku</b><small>100 levels</small></a>
+    <a class="card" href="slide.html"><div class="i">🧩</div><b>Sliding Puzzle</b><small>100 levels</small></a>
+    <a class="card" href="2048.html"><div class="i">🎯</div><b>2048</b><small>100 levels</small></a>
+    <a class="card" href="memory.html"><div class="i">🃏</div><b>Memory</b><small>100 levels</small></a>
+    <a class="card" href="word.html"><div class="i">🔤</div><b>Word Puzzle</b><small>100 levels</small></a>
+  </div>
+</div>
+</body>
+</html>
