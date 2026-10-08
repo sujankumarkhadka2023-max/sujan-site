@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Memory | Sujan Kumar Khadka</title>
+<link rel="stylesheet" href="games.css">
+<style>
+
+#b{display:grid;gap:8px;width:100%}
+.c{aspect-ratio:1;border:1.5px solid #000;border-radius:10px;background:#000;color:#fff;font-size:clamp(20px,9vw,40px);padding:0;display:flex;align-items:center;justify-content:center}
+.c.up{background:#fff;color:#000}
+.c.ok{background:#d6f0d6;color:#000;border-color:#2a8a2a}
+.c.e{visibility:hidden}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="home"></div>
+<div id="game" class="hide">
+  <div class="top"><button class="btn" id="back">← Levels</button><div style="text-align:right"><h1 id="ttl"></h1><div class="sub" id="tier"></div></div></div>
+  <div class="bar" id="info"></div>
+  <div id="stage"></div>
+  <div id="ctrl"></div>
+</div>
+</div>
+<div class="modal hide" id="modal"><div class="box" id="mbox"></div></div>
+<script src="common.js"></script>
+<script>
+
+(function(){
+var $=function(s){return document.querySelector(s)};
+var EM=["🍎","🍌","🍇","🍒","🍉","🍍","🥝","🍓","🚗","✈️","🚀","⚽","🏀","🎸","🎲","🔑","⭐","🌙"];
+function pairs(l){return 3+Math.floor((l-1)*15/99)}
+function limit(l){return Math.ceil(pairs(l)*(3.4-1.5*(l-1)/99))}
+function cols(N){var o=[4,5,3,6];for(var i=0;i<o.length;i++)if(N%o[i]===0&&N/o[i]<=6)return o[i];return N<=16?4:5}
+var deck,open,matched,moves,lock,P,L,done;
+SKG.init({key:"sk_memory",title:"Memory",sub:function(l){return pairs(l)+" pairs · "+limit(l)+" moves"},start:start});
+function start(l){
+  P=pairs(l);L=limit(l);var r=SKG.rng(l*31+7);
+  var sy=SKG.shuffle(EM.slice(),r).slice(0,P);deck=SKG.shuffle(sy.concat(sy),r);
+  open=[];matched=0;moves=0;lock=false;done=false;
+  $("#info").innerHTML='<span>⏱ <b id="tm">00:00</b></span><span>Moves: <b id="mv"></b></span><span>Pairs: <b id="pr"></b></span>';
+  $("#stage").innerHTML='<div id="b"></div>';
+  $("#ctrl").innerHTML='<div class="acts"><button class="btn" id="rs">Restart</button></div>';
+  $("#rs").onclick=function(){SKG.restart()};
+  var bd=$("#b");bd.style.gridTemplateColumns="repeat("+cols(deck.length)+",1fr)";
+  deck.forEach(function(s,i){var c=document.createElement("button");c.className="c";c.textContent="?";c.onclick=function(){flip(i)};bd.appendChild(c)});
+  SKG.startT();info()}
+function info(){$("#mv").textContent=moves+" / "+L;$("#pr").textContent=matched+" / "+P}
+function flip(i){
+  var c=$("#b").children[i];
+  if(lock||done||c.classList.contains("up")||c.classList.contains("ok"))return;
+  c.classList.add("up");c.textContent=deck[i];open.push(i);
+  if(open.length<2)return;
+  moves++;var a=open[0],b=open[1];open=[];lock=true;
+  if(deck[a]===deck[b]){
+    matched++;var cs=$("#b").children;[a,b].forEach(function(k){cs[k].className="c ok"});lock=false;info();after()}
+  else{info();setTimeout(function(){var cs=$("#b").children;[a,b].forEach(function(k){cs[k].className="c";cs[k].textContent="?"});lock=false;after()},750)}}
+function after(){
+  if(matched===P){done=true;var st=moves<=P*1.6?3:moves<=P*2.3?2:1;setTimeout(function(){SKG.win(st,"Moves: <b>"+moves+"</b> / "+L)},300)}
+  else if(moves>=L){done=true;SKG.lose("Out of moves! You found "+matched+" of "+P+" pairs.")}}
+})();
+
+</script>
+</body>
+</html>
