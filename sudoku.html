@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Sudoku | Sujan Kumar Khadka</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#fff;color:#000;font-family:system-ui,Arial,sans-serif}
+.wrap{max-width:520px;margin:0 auto;padding:12px}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{border:1.5px solid #000;background:#fff;border-radius:8px;padding:9px 12px}
+.btn.dark{background:#000;color:#fff}
+.btn:disabled{opacity:.35}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+h1{font-size:20px;margin:0}
+.sub{font-size:13px;color:#555}
+.hide{display:none!important}
+/* level screen */
+.tabs{display:flex;gap:6px;margin:10px 0}
+.tab{flex:1;padding:8px 2px;border:1.5px solid #000;background:#fff;border-radius:8px;font-size:13px}
+.tab.on{background:#000;color:#fff}
+.lv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.l{aspect-ratio:1;border:1.5px solid #000;border-radius:10px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:17px;padding:0}
+.l small{font-size:10px;font-weight:400;letter-spacing:1px}
+.l.done{background:#eaf7ea}
+.l:disabled{border-color:#bbb;color:#bbb;background:#f7f7f7}
+.l.cur{background:#000;color:#fff}
+/* game */
+.bar{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
+#board{display:grid;grid-template-columns:repeat(9,1fr);width:100%;aspect-ratio:1;border:2px solid #000;touch-action:manipulation}
+.c{border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,6vw,28px);background:#fff;padding:0;color:#1a4fd6;border-radius:0;min-width:0}
+.c.g{color:#000;font-weight:700}
+.c.h{color:#0a7a2f;font-weight:700}
+.c.bx{border-right:2px solid #000}
+.c.by{border-bottom:2px solid #000}
+.c.pe{background:#f1f1f1}
+.c.same{background:#cfe3ff}
+.c.sel{background:#ffe08a}
+.c.err{color:#d00;background:#ffd9d9}
+.nt{display:grid;grid-template-columns:repeat(3,1fr);width:100%;height:100%;font-size:clamp(7px,2.3vw,11px);color:#555;line-height:1;font-weight:400;place-items:center}
+.pad{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:12px}
+.pad button{border:1.5px solid #000;background:#fff;border-radius:8px;padding:8px 0 4px;font-size:22px;font-weight:600;display:flex;flex-direction:column;align-items:center;line-height:1}
+.pad button small{font-size:10px;font-weight:400;color:#666;margin-top:3px}
+.pad button:disabled{opacity:.25}
+.acts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.acts .btn{padding:10px 2px;font-size:14px}
+.acts .btn.on{background:#000;color:#fff}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
+.box{background:#fff;border-radius:14px;padding:22px;max-width:340px;width:100%;text-align:center}
+.box h2{margin:0 0 6px}
+.stars{font-size:34px;letter-spacing:4px;margin:6px 0}
+.row{display:flex;gap:8px;margin-top:14px}.row .btn{flex:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- LEVEL SELECT -->
+<div id="home">
+  <div class="top">
+    <a href="/games.html" class="btn" style="text-decoration:none">← Games</a>
+    <div style="text-align:right"><h1>Sudoku</h1><div class="sub" id="prog"></div></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="lv" id="lv"></div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="hide">
+  <div class="top">
+    <button class="btn" id="back">← Levels</button>
+    <div style="text-align:right"><h1 id="ttl"></h1><div class="sub" id="tier"></div></div>
+  </div>
+  <div class="bar"><span>⏱ <b id="tm">00:00</b></span><span>Mistakes: <b id="ms">0</b></span><span>Hints: <b id="hs">3</b></span></div>
+  <div id="board"></div>
+  <div class="pad" id="pad"></div>
+  <div class="acts">
+    <button class="btn" id="undo">Erase</button>
+    <button class="btn" id="notes">Notes: Off</button>
+    <button class="btn" id="hint">Hint</button>
+    <button class="btn" id="reset">Reset</button>
+  </div>
+</div>
+</div>
+
+<div class="modal hide" id="modal"><div class="box" id="mbox"></div></div>
+
+<script>
+(function(){
+var TOTAL=100, TIERS=[["Easy",1,25],["Medium",26,50],["Hard",51,75],["Expert",76,100]];
+var $=function(s){return document.querySelector(s)};
+
+/* ---------- storage ---------- */
+function load(){try{return JSON.parse(localStorage.getItem("sk_sudoku"))||{done:{}}}catch(e){return{done:{}}}}
+function save(){try{localStorage.setItem("sk_sudoku",JSON.stringify(S))}catch(e){}}
+var S=load();
+function nextLevel(){var n=1;while(S.done[n]&&n<TOTAL)n++;return n}
+function tierOf(l){for(var i=0;i<TIERS.length;i++)if(l>=TIERS[i][1]&&l<=TIERS[i][2])return i;return 0}
+
+/* ---------- generator (same level = same puzzle) ---------- */
+function rngFn(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pop(m){var c=0;while(m){c+=m&1;m>>=1}return c}
+function cand(g,i){var r=(i/9)|0,c=i%9,u=0,k,br=r-r%3,bc=c-c%3;
+  for(k=0;k<9;k++){u|=1<<g[r*9+k];u|=1<<g[k*9+c]}
+  for(var y=0;y<3;y++)for(var x=0;x<3;x++)u|=1<<g[(br+y)*9+bc+x];
+  return ~u&0x3FE}
+function countSol(g,limit){var n=0;
+  (function rec(){var b=-1,bc=10,bm=0,i,m,c;
+    for(i=0;i<81;i++)if(!g[i]){m=cand(g,i);c=pop(m);if(c<bc){bc=c;b=i;bm=m;if(!c)return}}
+    if(b<0){n++;return}
+    for(var d=1;d<=9;d++)if(bm&(1<<d)){g[b]=d;rec();g[b]=0;if(n>=limit)return}
+  })();return n}
+function shuffle(a,r){for(var i=a.length-1;i>0;i--){var j=(r()*(i+1))|0,t=a[i];a[i]=a[j];a[j]=t}return a}
+function fullGrid(r){var g=new Array(81).fill(0);
+  (function rec(){var b=-1,bc=10,bm=0,i,m,c;
+    for(i=0;i<81;i++)if(!g[i]){m=cand(g,i);c=pop(m);if(c<bc){bc=c;b=i;bm=m;if(!c)return false}}
+    if(b<0)return true;
+    var ds=[];for(var d=1;d<=9;d++)if(bm&(1<<d))ds.push(d);
+    shuffle(ds,r);
+    for(var k=0;k<ds.length;k++){g[b]=ds[k];if(rec())return true;g[b]=0}
+    return false})();
+  return g}
+function cluesFor(l){return Math.round(46-(l-1)*22/99)}
+function makeLevel(l){
+  var r=rngFn(l*7919+13),sol=fullGrid(r),p=sol.slice(),clues=81,target=cluesFor(l);
+  var order=shuffle(Array.apply(null,{length:81}).map(function(_,i){return i}),r);
+  for(var k=0;k<81&&clues>target;k++){var i=order[k],v=p[i];p[i]=0;
+    if(countSol(p.slice(),2)!==1)p[i]=v;else clues--}
+  return{sol:sol,puz:p}}
+
+/* ---------- level screen ---------- */
+var tab=0;
+function drawHome(){
+  $("#home").classList.remove("hide");$("#game").classList.add("hide");stopT();
+  var nl=nextLevel(),done=Object.keys(S.done).length;
+  $("#prog").textContent=done+" / "+TOTAL+" levels completed";
+  var t=$("#tabs");t.innerHTML="";
+  TIERS.forEach(function(x,i){var b=document.createElement("button");b.className="tab"+(i===tab?" on":"");b.textContent=x[0];b.onclick=function(){tab=i;drawHome()};t.appendChild(b)});
+  var box=$("#lv");box.innerHTML="";
+  for(var l=TIERS[tab][1];l<=TIERS[tab][2];l++){(function(l){
+    var b=document.createElement("button"),d=S.done[l];
+    b.className="l"+(d?" done":"")+(l===nl?" cur":"");
+    b.disabled=l>nl;
+    b.innerHTML=l+"<small>"+(d?"★".repeat(d.stars)+"☆".repeat(3-d.stars):(l>nl?"🔒":"PLAY"))+"</small>";
+    b.onclick=function(){start(l)};box.appendChild(b)})(l)}
+}
+
+/* ---------- game ---------- */
+var G=null,timer=null,board=$("#board");
+for(var i=0;i<81;i++){(function(i){var b=document.createElement("button");b.className="c"+(i%9%3==2&&i%9<8?" bx":"")+((i/9|0)%3==2&&(i/9|0)<8?" by":"");b.onclick=function(){G&&!G.over&&(G.sel=i,draw())};board.appendChild(b)})(i)}
+var pad=$("#pad");
+for(var d=1;d<=9;d++){(function(d){var b=document.createElement("button");b.id="p"+d;b.onclick=function(){put(d)};pad.appendChild(b)})(d)}
+
+function start(l){
+  var m=makeLevel(l);
+  G={lvl:l,sol:m.sol,given:m.puz.map(function(v){return v>0}),cur:m.puz.slice(),init:m.puz.slice(),
+     notes:new Array(81).fill(0),hint:new Array(81).fill(false),sel:-1,time:0,hints:3,usedHint:0,miss:0,nm:false,over:false};
+  $("#home").classList.add("hide");$("#game").classList.remove("hide");
+  $("#ttl").textContent="Level "+l;$("#tier").textContent=TIERS[tierOf(l)][0]+" · "+cluesFor(l)+" clues";
+  $("#modal").classList.add("hide");
+  startT();draw()}
+function fmt(s){return(s/60|0).toString().padStart(2,"0")+":"+(s%60).toString().padStart(2,"0")}
+function startT(){stopT();timer=setInterval(function(){if(G&&!G.over&&!document.hidden){G.time++;$("#tm").textContent=fmt(G.time)}},1000)}
+function stopT(){clearInterval(timer)}
+
+function draw(){
+  var cells=board.children,sv=G.sel>=0?G.cur[G.sel]:0;
+  for(var i=0;i<81;i++){var c=cells[i],v=G.cur[i],cl=c.className.replace(/ ?(pe|same|sel|err|g|h)\b/g,"");
+    if(G.given[i])cl+=" g";else if(G.hint[i])cl+=" h";
+    if(G.sel>=0){var r=i/9|0,cc=i%9,sr=G.sel/9|0,sc=G.sel%9;
+      if(r===sr||cc===sc||((r/3|0)===(sr/3|0)&&(cc/3|0)===(sc/3|0)))cl+=" pe";
+      if(sv&&v===sv)cl+=" same";if(i===G.sel)cl+=" sel"}
+    if(v&&!G.given[i]&&!G.hint[i]&&v!==G.sol[i])cl+=" err";
+    c.className=cl.trim();
+    if(v)c.textContent=v;
+    else if(G.notes[i]){var h='<div class="nt">';for(var d=1;d<=9;d++)h+="<span>"+((G.notes[i]>>d)&1?d:"")+"</span>";c.innerHTML=h+"</div>"}
+    else c.textContent=""}
+  for(var d=1;d<=9;d++){var n=0;for(var k=0;k<81;k++)if(G.cur[k]===d&&G.sol[k]===d)n++;
+    var b=$("#p"+d);b.innerHTML=d+"<small>"+(9-n)+"</small>";b.disabled=n>=9}
+  $("#ms").textContent=G.miss;$("#hs").textContent=G.hints;$("#tm").textContent=fmt(G.time);
+  $("#notes").textContent="Notes: "+(G.nm?"On":"Off");$("#notes").classList.toggle("on",G.nm);
+  $("#hint").disabled=G.hints<=0}
+
+function put(d){
+  if(!G||G.over||G.sel<0||G.given[G.sel]||G.hint[G.sel])return;
+  var i=G.sel;
+  if(G.nm){if(G.cur[i])return;G.notes[i]^=1<<d}
+  else{if(G.cur[i]===d){draw();return}
+    G.cur[i]=d;G.notes[i]=0;
+    if(d!==G.sol[i])G.miss++;
+    else{var r=i/9|0,c=i%9;for(var k=0;k<81;k++){var kr=k/9|0,kc=k%9;
+      if(kr===r||kc===c||((kr/3|0)===(r/3|0)&&(kc/3|0)===(c/3|0)))G.notes[k]&=~(1<<d)}}}
+  draw();check()}
+$("#undo").onclick=function(){if(!G||G.over||G.sel<0||G.given[G.sel]||G.hint[G.sel])return;G.cur[G.sel]=0;G.notes[G.sel]=0;draw()};
+$("#notes").onclick=function(){G.nm=!G.nm;draw()};
+$("#hint").onclick=function(){
+  if(!G||G.over||G.hints<=0)return;
+  var i=G.sel;
+  if(i<0||G.given[i]||G.hint[i]||G.cur[i]===G.sol[i]){
+    var bad=[];for(var k=0;k<81;k++)if(G.cur[k]!==G.sol[k])bad.push(k);
+    if(!bad.length)return;i=bad[(Math.random()*bad.length)|0]}
+  G.cur[i]=G.sol[i];G.hint[i]=true;G.notes[i]=0;G.sel=i;G.hints--;G.usedHint++;draw();check()};
+$("#reset").onclick=function(){if(!G||G.over)return;if(!confirm("Reset this level?"))return;
+  G.cur=G.init.slice();G.notes.fill(0);G.hint.fill(false);G.hints=3;G.usedHint=0;G.miss=0;G.time=0;G.sel=-1;draw()};
+$("#back").onclick=function(){drawHome()};
+
+function check(){
+  for(var i=0;i<81;i++)if(G.cur[i]!==G.sol[i])return;
+  G.over=true;stopT();
+  var stars=3-(G.usedHint>0?1:0)-(G.miss>=3?1:0);if(stars<1)stars=1;
+  var old=S.done[G.lvl];
+  if(!old||stars>old.stars||(stars===old.stars&&G.time<old.time))S.done[G.lvl]={stars:stars,time:G.time};
+  save();
+  var last=G.lvl>=TOTAL;
+  $("#mbox").innerHTML='<h2>Level '+G.lvl+' complete!</h2><div class="stars">'+"★".repeat(stars)+"☆".repeat(3-stars)+
+    '</div><div>Time: <b>'+fmt(G.time)+'</b> · Mistakes: <b>'+G.miss+'</b> · Hints: <b>'+G.usedHint+'</b></div>'+
+    '<div class="row"><button class="btn" id="mL">Levels</button>'+(last?'':'<button class="btn dark" id="mN">Next level</button>')+'</div>';
+  $("#modal").classList.remove("hide");
+  $("#mL").onclick=function(){$("#modal").classList.add("hide");tab=tierOf(G.lvl);drawHome()};
+  if(!last)$("#mN").onclick=function(){start(G.lvl+1)}}
+
+document.addEventListener("keydown",function(e){
+  if(!G||G.over||$("#game").classList.contains("hide"))return;
+  if(e.key>="1"&&e.key<="9")put(+e.key);
+  else if(e.key==="Backspace"||e.key==="Delete"||e.key==="0")$("#undo").onclick();
+  else if(e.key==="n"||e.key==="N"){G.nm=!G.nm;draw()}
+  else{var s=G.sel<0?40:G.sel;
+    if(e.key==="ArrowUp"&&s>8)G.sel=s-9;else if(e.key==="ArrowDown"&&s<72)G.sel=s+9;
+    else if(e.key==="ArrowLeft"&&s%9)G.sel=s-1;else if(e.key==="ArrowRight"&&s%9<8)G.sel=s+1;else return;
+    draw()}});
+
+tab=tierOf(nextLevel());drawHome();
+})();
+</script>
+</body>
+</html>
