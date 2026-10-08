@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>2048 | Sujan Kumar Khadka</title>
+<link rel="stylesheet" href="games.css">
+<style>
+
+#b{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;aspect-ratio:1;background:#222;padding:8px;border-radius:12px;touch-action:none;user-select:none}
+.t{border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;background:#3a3a3a;color:#000;font-size:clamp(20px,8vw,38px)}
+.t.s3{font-size:clamp(17px,6.5vw,32px)}.t.s4{font-size:clamp(14px,5.2vw,26px)}
+.hintx{font-size:12px;color:#666;text-align:center;margin-top:8px}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="home"></div>
+<div id="game" class="hide">
+  <div class="top"><button class="btn" id="back">← Levels</button><div style="text-align:right"><h1 id="ttl"></h1><div class="sub" id="tier"></div></div></div>
+  <div class="bar" id="info"></div>
+  <div id="stage"></div>
+  <div id="ctrl"></div>
+</div>
+</div>
+<div class="modal hide" id="modal"><div class="box" id="mbox"></div></div>
+<script src="common.js"></script>
+<script>
+
+(function(){
+var $=function(s){return document.querySelector(s)};
+var COL={2:"#eee4da",4:"#ede0c8",8:"#f2b179",16:"#f59563",32:"#f67c5f",64:"#f65e3b",128:"#edcf72",256:"#edcc61",512:"#edc850",1024:"#edc53f",2048:"#edc22e",4096:"#3c3a32"};
+var LINES=[[],[],[],[]],i,j;
+for(i=0;i<4;i++){var a=[],b=[],c=[],d=[];for(j=0;j<4;j++){a.push(i*4+j);b.push(i*4+3-j);c.push(j*4+i);d.push((3-j)*4+i)}
+  LINES[0].push(a);LINES[1].push(b);LINES[2].push(c);LINES[3].push(d)}
+function goal(l){return 32*Math.pow(2,Math.min(6,Math.floor((l-1)/15)))}
+function limit(l){var idx=(l-1)%15;return Math.ceil(goal(l)/2.2*(3.6-1.7*idx/14))}
+var g,score,moves,L,G,hist,undo,over;
+SKG.init({key:"sk_2048",title:"2048",sub:function(l){return "Reach "+goal(l)+" in "+limit(l)+" moves"},start:start});
+function spawn(){var e=[];for(var i=0;i<16;i++)if(!g[i])e.push(i);if(!e.length)return;g[e[(Math.random()*e.length)|0]]=Math.random()<.9?2:4}
+function move(d){var nb=g.slice(),moved=false,gain=0;
+  LINES[d].forEach(function(ln){var v=ln.map(function(i){return g[i]}).filter(Boolean),o=[];
+    for(var k=0;k<v.length;k++){if(v[k]===v[k+1]){o.push(v[k]*2);gain+=v[k]*2;k++}else o.push(v[k])}
+    while(o.length<4)o.push(0);
+    ln.forEach(function(i,k){if(nb[i]!==o[k])moved=true;nb[i]=o[k]})});
+  return moved?{g:nb,gain:gain}:null}
+function canMove(){for(var d=0;d<4;d++)if(move(d))return true;return false}
+function start(l){
+  L=limit(l);G=goal(l);g=new Array(16).fill(0);score=0;moves=0;hist=[];undo=3;over=false;spawn();spawn();
+  $("#info").innerHTML='<span>⏱ <b id="tm">00:00</b></span><span>Moves: <b id="mv"></b></span><span>Score: <b id="sc"></b></span>';
+  $("#stage").innerHTML='<div id="b"></div><div class="hintx">Swipe (or use arrow keys) to move tiles</div>';
+  $("#ctrl").innerHTML='<div class="acts"><button class="btn" id="un"></button><button class="btn" id="rs">Restart</button></div>';
+  $("#un").onclick=function(){if(over||!hist.length||undo<=0)return;var h=hist.pop();g=h.g;score=h.s;moves=h.m;undo--;draw()};
+  $("#rs").onclick=function(){SKG.restart()};
+  var bd=$("#b"),x0,y0;
+  for(var i=0;i<16;i++){var t=document.createElement("div");t.className="t";bd.appendChild(t)}
+  bd.ontouchstart=function(e){x0=e.touches[0].clientX;y0=e.touches[0].clientY};
+  bd.ontouchend=function(e){var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;
+    go(Math.abs(dx)>Math.abs(dy)?(dx>0?1:0):(dy>0?3:2))};
+  SKG.startT();draw()}
+function go(d){
+  if(over)return;var r=move(d);if(!r)return;
+  hist.push({g:g.slice(),s:score,m:moves});if(hist.length>3)hist.shift();
+  g=r.g;score+=r.gain;moves++;spawn();draw();
+  if(Math.max.apply(null,g)>=G){over=true;var f=(L-moves)/L,st=f>=.35?3:f>=.15?2:1;
+    setTimeout(function(){SKG.win(st,"Moves: <b>"+moves+" / "+L+"</b> · Score: <b>"+score+"</b>")},400)}
+  else if(moves>=L){over=true;setTimeout(function(){SKG.lose("Out of moves! Goal was <b>"+G+"</b>.")},400)}
+  else if(!canMove()){over=true;setTimeout(function(){SKG.lose("No moves left. Goal was <b>"+G+"</b>.")},400)}}
+document.addEventListener("keydown",function(e){
+  if($("#game").classList.contains("hide"))return;
+  var m={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3}[e.key];if(m===undefined)return;e.preventDefault();go(m)});
+function draw(){
+  var cs=$("#b").children;
+  for(var i=0;i<16;i++){var v=g[i],c=cs[i];c.textContent=v||"";
+    c.className="t"+(v>=1000?" s4":v>=100?" s3":"");
+    c.style.background=v?(COL[v]||"#3c3a32"):"#3a3a3a";c.style.color=v>=8?"#fff":"#000"}
+  $("#mv").textContent=moves+" / "+L;$("#sc").textContent=score;
+  $("#un").textContent="Undo ("+undo+")";$("#un").disabled=undo<=0||!hist.length}
+})();
+
+</script>
+</body>
+</html>
