@@ -50,7 +50,7 @@ article p a,.pg a{color:var(--ac);text-decoration:underline}
 .pg{max-width:700px;margin:30px auto}.pg h1{margin-bottom:14px}.pg p{white-space:pre-wrap}
 .more{display:block;margin:18px auto 0;padding:8px 20px;border:1px solid var(--tx);background:none;color:var(--tx);cursor:pointer}
 footer{margin-top:50px;background:var(--nv);color:#fff;padding:28px 0 calc(36px + env(safe-area-inset-bottom,0px));font-size:14px}footer .meta{color:#c9d6ec;margin:22px 0 0;border-top:2px solid #8fa9d4;padding-top:14px}footer .fb{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}footer .fb a{display:inline-block;padding:0;color:#ffe500;font-weight:600}
-footer .g{grid-template-columns:repeat(3,1fr);gap:16px}footer h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ffe500}footer a{display:block;padding:3px 0;color:#dbe5f5}footer a:hover{color:#ffe500}
+footer .g{grid-template-columns:repeat(4,1fr);gap:16px}footer h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ffe500}footer a{display:block;padding:3px 0;color:#dbe5f5}footer a:hover{color:#ffe500}
 .ad{max-width:900px;margin:24px auto;padding:0 16px;font-family:system-ui,sans-serif}.ad h1{font:700 24px system-ui}
 .ad input,.ad select,.ad textarea{width:100%;padding:9px;margin:4px 0 12px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);font:16px system-ui}
 .ad textarea{min-height:260px;font-family:Georgia,serif}.ad label{font-size:13px;font-weight:600;color:var(--mu)}
@@ -58,7 +58,7 @@ footer .g{grid-template-columns:repeat(3,1fr);gap:16px}footer h4{margin:0 0 8px;
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--ln);flex-wrap:wrap}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.ck{display:flex;gap:8px;align-items:center}.ck input{width:auto;margin:0}
 @media(max-width:760px){nav a{padding:16px 12px 14px}
-.lead,.g{grid-template-columns:1fr}footer{font-size:13px}footer .g{gap:10px}article p{font-size:16px;line-height:1.65;margin-bottom:1em}.lead{gap:12px}}
+.lead,.g{grid-template-columns:1fr}footer{font-size:13px}footer .g{gap:10px;grid-template-columns:repeat(2,1fr)}article p{font-size:16px;line-height:1.65;margin-bottom:1em}.lead{gap:12px}}
 .shr{display:inline-flex;align-items:center;gap:12px;margin:14px 0 20px;padding:10px 24px;border:1px solid var(--ln);border-radius:999px;background:none;color:var(--sh);font:700 19px system-ui,sans-serif;cursor:pointer}
 .shr:hover{color:var(--sh);border-color:var(--sh)}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
@@ -86,9 +86,9 @@ function shell(inner,cur){
  return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span><a href="/p/support">Support</a></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
- <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<h4>About</h4><a href="/p/about">About</a><a href="/p/contact">Contact</a><h4>Support</h4><a href="/p/support">Support us</a></div></div></div>
+ <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<h4>About</h4><a href="/p/about">About</a><a href="/p/contact">Contact</a><h4>Support</h4><a href="/p/support">Support us</a><h4>Games</h4><a href="/games.html">Games</a></div></div></div>
  <div class="w"><main id="main">${inner}</main></div>
- <footer><div class="w"><div class="g"><div><h4>Sections</h4>${CATS.map(c=>`<a href="/${SL[c]}">${c}</a>`).join('')}</div><div><h4>About</h4><a href="/p/about">About</a><a href="/p/contact">Contact</a><a href="/p/support">Support us</a></div><div><h4>Legal</h4><a href="/p/privacy">Privacy</a><a href="/p/cookies">Cookies</a><a href="/p/terms">Terms</a></div></div><div class="meta fb"><span>© ${new Date().getFullYear()} The Sujan Khadka. All rights reserved.</span><a href="#top" onclick="event.preventDefault();document.getElementById('top').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})">Back to top ↑</a></div></div></footer>`}
+ <footer><div class="w"><div class="g"><div><h4>Sections</h4>${CATS.map(c=>`<a href="/${SL[c]}">${c}</a>`).join('')}</div><div><h4>About</h4><a href="/p/about">About</a><a href="/p/contact">Contact</a><a href="/p/support">Support us</a></div><div><h4>Games</h4><a href="/games.html">All games</a><a href="/sudoku.html">Sudoku</a><a href="/slide.html">Sliding Puzzle</a><a href="/2048.html">2048</a><a href="/memory.html">Memory</a><a href="/word.html">Word Puzzle</a></div><div><h4>Legal</h4><a href="/p/privacy">Privacy</a><a href="/p/cookies">Cookies</a><a href="/p/terms">Terms</a></div></div><div class="meta fb"><span>© ${new Date().getFullYear()} The Sujan Khadka. All rights reserved.</span><a href="#top" onclick="event.preventDefault();document.getElementById('top').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})">Back to top ↑</a></div></div></footer>`}
 function home(){const L=live();if(!L.length)return `<div class="empty" style="padding:60px 0;text-align:center">No stories have been published yet.</div>`;
  let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
  const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
@@ -183,7 +183,7 @@ function go(){const p=location.pathname.split('/').filter(Boolean);
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
  $('#app').innerHTML=shell(out,cur);if(p.length<2)scrollTo(0,0)}
-document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href')))return;e.preventDefault();history.pushState(null,'',a.getAttribute('href'));go();scrollTo(0,0)});
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)|\.html/.test(a.getAttribute('href')))return;e.preventDefault();history.pushState(null,'',a.getAttribute('href'));go();scrollTo(0,0)});
 function share(){const d={title:document.title,url:location.href};if(navigator.share)navigator.share(d).catch(()=>{});else navigator.clipboard.writeText(d.url).then(()=>alert('Link copied'))}
 addEventListener('popstate',go);
 if(location.hash.startsWith('#/'))history.replaceState(null,'',location.hash.slice(1));
