@@ -27,6 +27,7 @@
 </div>
 <div class="modal hide" id="modal"><div class="box" id="mbox"></div></div>
 <script src="common.js"></script>
+<script src="games-fx.js"></script>
 <script>
 
 (function(){
@@ -36,6 +37,8 @@ function pairs(l){return 3+Math.floor((l-1)*15/99)}
 function limit(l){return Math.ceil(pairs(l)*(3.4-1.5*(l-1)/99))}
 function cols(N){var o=[4,5,3,6];for(var i=0;i<o.length;i++)if(N%o[i]===0&&N/o[i]<=6)return o[i];return N<=16?4:5}
 var deck,open,matched,moves,lock,P,L,done;
+function fl(c){if(c&&c.animate&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))c.animate([{transform:"perspective(500px) rotateY(90deg) scale(.96)"},{transform:"perspective(500px) rotateY(0deg) scale(1)"}],{duration:280,easing:"ease-out"})}
+function pop(c){if(c&&c.animate)c.animate([{transform:"scale(1)"},{transform:"scale(1.14)"},{transform:"scale(1)"}],{duration:300,delay:180,easing:"ease-out"})}
 SKG.init({key:"sk_memory",title:"Memory",sub:function(l){return pairs(l)+" pairs · "+limit(l)+" moves"},start:start});
 function start(l){
   P=pairs(l);L=limit(l);var r=SKG.rng(l*31+7);
@@ -52,12 +55,12 @@ function info(){$("#mv").textContent=moves+" / "+L;$("#pr").textContent=matched+
 function flip(i){
   var c=$("#b").children[i];
   if(lock||done||c.classList.contains("up")||c.classList.contains("ok"))return;
-  c.classList.add("up");c.textContent=deck[i];open.push(i);
+  c.classList.add("up");c.textContent=deck[i];fl(c);open.push(i);
   if(open.length<2)return;
   moves++;var a=open[0],b=open[1];open=[];lock=true;
   if(deck[a]===deck[b]){
-    matched++;var cs=$("#b").children;[a,b].forEach(function(k){cs[k].className="c ok"});lock=false;info();after()}
-  else{info();setTimeout(function(){var cs=$("#b").children;[a,b].forEach(function(k){cs[k].className="c";cs[k].textContent="?"});lock=false;after()},750)}}
+    matched++;var cs=$("#b").children;[a,b].forEach(function(k){cs[k].className="c ok";pop(cs[k])});lock=false;info();after()}
+  else{info();setTimeout(function(){var cs=$("#b").children;[a,b].forEach(function(k){cs[k].className="c";cs[k].textContent="?";fl(cs[k])});lock=false;after()},750)}}
 function after(){
   if(matched===P){done=true;var st=moves<=P*1.6?3:moves<=P*2.3?2:1;setTimeout(function(){SKG.win(st,"Moves: <b>"+moves+"</b> / "+L)},300)}
   else if(moves>=L){done=true;SKG.lose("Out of moves! You found "+matched+" of "+P+" pairs.")}}
