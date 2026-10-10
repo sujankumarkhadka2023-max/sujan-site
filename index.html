@@ -150,7 +150,6 @@ function home(){const L=live();if(!L.length)return `<div class="empty" style="pa
  const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
  let h=`<section class="lead"><div><div class="cat">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div><a class="sm" href="${url(lead)}">Read more <span class="ar">→</span></a></div>${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:''}</section>`;
  if(sec.length)h+=`<div class="sec"><div class="g">${sec.map(card).join('')}</div></div>`;
- h+=stats(L);
  CATS.forEach(c=>h+=block(c,L.filter(a=>a.category===c),SL[c]));return h}
 function stats(L){let v=0;for(const k in (D.views||{}))v+=+D.views[k]||0;let g=0;try{g=+localStorage.getItem('sk_games_played')||0}catch(e){}
  const c=(n,l)=>`<div class="st"><b data-n="${n}">${n.toLocaleString()}</b><span>${l}</span></div>`;
@@ -194,6 +193,7 @@ async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{
 async function persist(){const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(A)});if(!r.ok){alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
 function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
  let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
+ h+=stats(A.articles.filter(a=>a.status==='published'));
  if(tab==='articles')h+=ed?editor():list();
  if(tab==='home')h+=`<p class="meta">Featured stories in order: first is the lead, next four are secondary.</p>`+(A.home.length?A.home.map((id,i)=>{const a=A.articles.find(x=>x.id===id);return a?`<div class="row"><span>${i+1}. ${esc(a.title)}</span><span><button class="bt o" onclick="mv(${i},-1)">↑</button><button class="bt o" onclick="mv(${i},1)">↓</button><button class="bt o" onclick="feat('${id}')">Remove</button></span></div>`:''}).join(''):'<div class="empty">Nothing featured. Latest stories are used.</div>');
  if(tab==='pages')h+=Object.keys(PG).map(k=>`<label>${PG[k]}</label><textarea style="min-height:110px" id="pg_${k}">${esc(A.pages[k]||DEF[k]||'')}</textarea>`).join('')+`<button class="bt" onclick="savePages()">Save pages</button>`;
