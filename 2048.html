@@ -8,7 +8,7 @@
 <style>
 
 #b{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;aspect-ratio:1;background:#222;padding:8px;border-radius:12px;touch-action:none;user-select:none}
-.t{border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;background:#3a3a3a;color:#000;font-size:clamp(20px,8vw,38px)}
+.t{position:relative;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;background:#3a3a3a;color:#000;font-size:clamp(20px,8vw,38px)}
 .t.s3{font-size:clamp(17px,6.5vw,32px)}.t.s4{font-size:clamp(14px,5.2vw,26px)}
 .hintx{font-size:12px;color:#c9d6ec;text-align:center;margin-top:8px}
 
@@ -26,6 +26,7 @@
 </div>
 <div class="modal hide" id="modal"><div class="box" id="mbox"></div></div>
 <script src="common.js"></script>
+<script src="games-fx.js"></script>
 <script>
 
 (function(){
@@ -38,13 +39,13 @@ function goal(l){return 32*Math.pow(2,Math.min(6,Math.floor((l-1)/15)))}
 function limit(l){var idx=(l-1)%15;return Math.ceil(goal(l)/2.2*(3.6-1.7*idx/14))}
 var g,score,moves,L,G,hist,undo,over;
 SKG.init({key:"sk_2048",title:"2048",sub:function(l){return "Reach "+goal(l)+" in "+limit(l)+" moves"},start:start});
-function spawn(){var e=[];for(var i=0;i<16;i++)if(!g[i])e.push(i);if(!e.length)return;g[e[(Math.random()*e.length)|0]]=Math.random()<.9?2:4}
-function move(d){var nb=g.slice(),moved=false,gain=0;
-  LINES[d].forEach(function(ln){var v=ln.map(function(i){return g[i]}).filter(Boolean),o=[];
-    for(var k=0;k<v.length;k++){if(v[k]===v[k+1]){o.push(v[k]*2);gain+=v[k]*2;k++}else o.push(v[k])}
+function spawn(){var e=[];for(var i=0;i<16;i++)if(!g[i])e.push(i);if(!e.length)return;var p=e[(Math.random()*e.length)|0];g[p]=Math.random()<.9?2:4;return p}
+function move(d){var nb=g.slice(),moved=false,gain=0,tr=[];
+  LINES[d].forEach(function(ln){var v=[],o=[];ln.forEach(function(i){if(g[i])v.push({i:i,v:g[i]})});
+    for(var k=0;k<v.length;k++){var dst=ln[o.length];if(v[k+1]&&v[k].v===v[k+1].v){o.push(v[k].v*2);gain+=v[k].v*2;tr.push({f:v[k].i,t:dst},{f:v[k+1].i,t:dst,m:1});k++}else{o.push(v[k].v);tr.push({f:v[k].i,t:dst})}}
     while(o.length<4)o.push(0);
     ln.forEach(function(i,k){if(nb[i]!==o[k])moved=true;nb[i]=o[k]})});
-  return moved?{g:nb,gain:gain}:null}
+  return moved?{g:nb,gain:gain,tr:tr}:null}
 function canMove(){for(var d=0;d<4;d++)if(move(d))return true;return false}
 function start(l){
   L=limit(l);G=goal(l);g=new Array(16).fill(0);score=0;moves=0;hist=[];undo=3;over=false;spawn();spawn();
@@ -63,7 +64,7 @@ function start(l){
 function go(d){
   if(over)return;var r=move(d);if(!r)return;
   hist.push({g:g.slice(),s:score,m:moves});if(hist.length>3)hist.shift();
-  g=r.g;score+=r.gain;moves++;spawn();draw();
+  g=r.g;score+=r.gain;moves++;var sp=spawn();draw();slide(r.tr,sp);
   if(Math.max.apply(null,g)>=G){over=true;var f=(L-moves)/L,st=f>=.35?3:f>=.15?2:1;
     setTimeout(function(){SKG.win(st,"Moves: <b>"+moves+" / "+L+"</b> · Score: <b>"+score+"</b>")},400)}
   else if(moves>=L){over=true;setTimeout(function(){SKG.lose("Out of moves! Goal was <b>"+G+"</b>.")},400)}
@@ -71,6 +72,13 @@ function go(d){
 document.addEventListener("keydown",function(e){
   if($("#game").classList.contains("hide"))return;
   var m={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3}[e.key];if(m===undefined)return;e.preventDefault();go(m)});
+function slide(tr,sp){
+  if(!tr||(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches))return;
+  var cs=$("#b").children;if(!cs[0]||!cs[0].animate)return;
+  tr.forEach(function(x){var a=cs[x.f].getBoundingClientRect(),b=cs[x.t].getBoundingClientRect();
+    if(x.f!==x.t)cs[x.t].animate([{transform:"translate("+(a.left-b.left)+"px,"+(a.top-b.top)+"px)",zIndex:5},{transform:"none",zIndex:5}],{duration:120,easing:"ease-out"});
+    if(x.m)cs[x.t].animate([{transform:"scale(1)",zIndex:6},{transform:"scale(1.2)",zIndex:6},{transform:"scale(1)",zIndex:6}],{duration:200,delay:110,easing:"ease-out"})});
+  if(sp!=null&&cs[sp])cs[sp].animate([{transform:"scale(0)",opacity:0},{transform:"scale(1)",opacity:1}],{duration:190,delay:120,fill:"backwards",easing:"ease-out"})}
 function draw(){
   var cs=$("#b").children;
   for(var i=0;i<16;i++){var v=g[i],c=cs[i];c.textContent=v||"";
