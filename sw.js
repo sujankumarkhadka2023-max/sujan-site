@@ -1,4 +1,4 @@
-const V='sk-v1',SHELL=['/','/games.html','/sudoku.html','/slide.html','/2048.html','/memory.html','/word.html','/games.css','/header.webp','/icon-192.png'];
+const V='sk-v3',SHELL=['/','/games.html','/sudoku.html','/slide.html','/2048.html','/memory.html','/word.html','/games.css','/games-fx.js','/common.js','/header.webp','/icon-192.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>Promise.allSettled(SHELL.map(u=>c.add(u)))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 const put=(r,res)=>{if(res&&res.ok)caches.open(V).then(c=>c.put(r,res.clone()));return res};
