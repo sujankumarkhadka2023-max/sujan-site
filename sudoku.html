@@ -86,6 +86,7 @@ h1{font-size:20px;margin:0}
 
 <div class="modal hide" id="modal"><div class="box" id="mbox"></div></div>
 
+<script src="games-fx.js"></script>
 <script>
 (function(){
 var TOTAL=100, TIERS=[["Easy",1,25],["Medium",26,50],["Hard",51,75],["Expert",76,100]];
@@ -153,6 +154,7 @@ var pad=$("#pad");
 for(var d=1;d<=9;d++){(function(d){var b=document.createElement("button");b.id="p"+d;b.onclick=function(){put(d)};pad.appendChild(b)})(d)}
 
 function start(l){
+  if(window.SKFX)SKFX.bump();
   var m=makeLevel(l);
   G={lvl:l,sol:m.sol,given:m.puz.map(function(v){return v>0}),cur:m.puz.slice(),init:m.puz.slice(),
      notes:new Array(81).fill(0),hint:new Array(81).fill(false),sel:-1,time:0,hints:3,usedHint:0,miss:0,nm:false,over:false};
@@ -216,7 +218,7 @@ function check(){
   $("#mbox").innerHTML='<h2>Level '+G.lvl+' complete!</h2><div class="stars">'+"★".repeat(stars)+"☆".repeat(3-stars)+
     '</div><div>Time: <b>'+fmt(G.time)+'</b> · Mistakes: <b>'+G.miss+'</b> · Hints: <b>'+G.usedHint+'</b></div>'+
     '<div class="row"><button class="btn" id="mL">Levels</button>'+(last?'':'<button class="btn dark" id="mN">Next level</button>')+'</div>';
-  $("#modal").classList.remove("hide");
+  $("#modal").classList.remove("hide");if(window.SKFX)SKFX.confetti();
   $("#mL").onclick=function(){$("#modal").classList.add("hide");tab=tierOf(G.lvl);drawHome()};
   if(!last)$("#mN").onclick=function(){start(G.lvl+1)}}
 
