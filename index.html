@@ -216,10 +216,10 @@ function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=m
  <label class="ck"><input type="checkbox" id="e_f" ${a.featured?'checked':''}> Feature on homepage</label>
  <button class="bt o" onclick="sv('draft')">Save draft</button><button class="bt" onclick="sv('published')">Publish</button><button class="bt o" onclick="ed=null;go()">Cancel</button>`}
 function sync(){if(!$('#e_t'))return;Object.assign(ed,{title:$('#e_t').value,subtitle:$('#e_s').value,author:$('#e_a').value,body:$('#e_b').value,seoTitle:$('#e_st').value,seoDesc:$('#e_sd').value,tags:$('#e_g').value.split(',').map(s=>s.trim()).filter(Boolean),featured:$('#e_f').checked});if($('#e_sc'))ed.subcategory=$('#e_sc').value;document.querySelectorAll('.ic').forEach(x=>{if(ed.images&&ed.images[+x.dataset.i])ed.images[+x.dataset.i].caption=x.value});if($('#e_d').value)ed.date=new Date($('#e_d').value).toISOString()}
-async function sv(st){sync();const a=ed;if(!a.title||!a.body)return alert('Headline and body are required.');
- a.category=a.category||'World';a.images=(a.images||[]).slice(0,MULTI.includes(a.category)?5:1);a.image=a.images[0]?a.images[0].url:'';a.thumb=a.images[0]?a.images[0].thumb||'':'';a.imageCaption=a.images[0]?a.images[0].caption:'';a.status=st;a.date=a.date||new Date().toISOString();a.readingTime=rt(a.body);
+async function sv(st){sync();const a=ed,prev=a.status;if(!a.title||!a.body)return alert('Headline and body are required.');
+ a.category=a.category||'World';a.images=(a.images||[]).slice(0,MULTI.includes(a.category)?5:1);a.image=a.images[0]?a.images[0].url:'';a.thumb=a.images[0]?a.images[0].thumb||'':'';a.imageCaption=a.images[0]?a.images[0].caption:'';a.date=a.date||new Date().toISOString();if(st==='published'&&prev!=='published'&&new Date(a.date)<=new Date())a.date=new Date().toISOString();a.status=st;a.readingTime=rt(a.body);
  if(!a.id){a.id='a'+Date.now();const b=slugify(a.title);let s=b,i=2;while(A.articles.some(x=>x.slug===s))s=b+'-'+i++;a.slug=s;A.articles.push(a)}else a.updated=new Date().toISOString();
- const i=A.home.indexOf(a.id);if(a.featured&&i<0)A.home.push(a.id);if(!a.featured&&i>=0)A.home.splice(i,1);
+ const i=A.home.indexOf(a.id);if(a.featured&&i<0)A.home.unshift(a.id);if(!a.featured&&i>=0)A.home.splice(i,1);
  if(await persist()){ed=null;go()}}
 const jpg=(i,w,q)=>new Promise(ok=>{const s=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',q)});
 const put=async b=>{const x=await api('/api/admin/upload',{method:'POST',headers:{'content-type':'image/jpeg'},body:b});if(!x.ok)throw 0;return (await x.json()).url};
