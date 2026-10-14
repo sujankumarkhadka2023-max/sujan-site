@@ -1,6 +1,6 @@
 // Backend for The Sujan Khadka — Cloudflare Worker (static assets + API)
 // Variables needed: ADMIN_PASSWORD, GITHUB_TOKEN, GITHUB_REPO ("owner/repo")
-// Data lives in the GitHub repo: db.json and img/<id>.jpg
+// Data lives in the GitHub repo: db.json, img/<id>.jpg and audio/<id>.<ext>
 const enc = new TextEncoder(), dec = new TextDecoder();
 const J = (o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...h } });
 const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -42,10 +42,36 @@ const RL = ip => 'https://rl.local/' + encodeURIComponent(ip);
 async function fails(ip) { const c = await caches.default.match(RL(ip)); return c ? +(await c.text()) : 0; }
 const addFail = (ip, n) => caches.default.put(RL(ip), new Response(String(n), { headers: { 'cache-control': 'max-age=900' } }));
 
+// ---- audio helpers ----
+const AUDIO_MAX = 10e6; // 10 MB per audio file (GitHub + Worker limits)
+const AUDIO_MIME = { mp3: 'audio/mpeg', m4a: 'audio/mp4', wav: 'audio/wav', ogg: 'audio/ogg', flac: 'audio/flac', webm: 'audio/webm' };
+function sniffAudio(u) {
+  const s = (a, b) => String.fromCharCode(...u.subarray(a, b));
+  if (s(0, 3) === 'ID3' || (u[0] === 0xFF && (u[1] & 0xE0) === 0xE0)) return 'mp3';
+  if (s(4, 8) === 'ftyp') return 'm4a';
+  if (s(0, 4) === 'RIFF' && s(8, 12) === 'WAVE') return 'wav';
+  if (s(0, 4) === 'OggS') return 'ogg';
+  if (s(0, 4) === 'fLaC') return 'flac';
+  if (u[0] === 0x1A && u[1] === 0x45 && u[2] === 0xDF && u[3] === 0xA3) return 'webm';
+  return null;
+}
+// Serve a full buffer with HTTP Range support (needed for seeking / iPhone Safari)
+function sendAudio(req, buf, type) {
+  const size = buf.byteLength, h = { 'content-type': type, 'accept-ranges': 'bytes', 'cache-control': 'public,max-age=31536000,immutable' };
+  const m = (req.headers.get('range') || '').match(/^bytes=(\d*)-(\d*)$/);
+  if (m && (m[1] || m[2])) {
+    const s = m[1] ? +m[1] : Math.max(0, size - +m[2]);
+    const e = m[1] && m[2] ? Math.min(+m[2], size - 1) : size - 1;
+    if (s >= size || s > e) return new Response(null, { status: 416, headers: { 'content-range': `bytes */${size}` } });
+    return new Response(buf.slice(s, e + 1), { status: 206, headers: { ...h, 'content-range': `bytes ${s}-${e}/${size}`, 'content-length': String(e - s + 1) } });
+  }
+  return new Response(buf, { headers: { ...h, 'content-length': String(size) } });
+}
+
 async function handle({ request: req, env, next }) {
   const p = new URL(req.url).pathname, r = req.method;
-  const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/');
-  if (!isApi && !isImg) return next();
+  const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/');
+  if (!isApi && !isImg && !isAud) return next();
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
   try {
     if (isImg) {
@@ -59,12 +85,31 @@ async function handle({ request: req, env, next }) {
       await caches.default.put(ck, res.clone());
       return res;
     }
+    if (isAud) {
+      const m = p.match(/^\/audio\/([a-f0-9-]{36})\.(mp3|m4a|wav|ogg|flac|webm)$/);
+      if (!m || (r !== 'GET' && r !== 'HEAD')) return new Response('Not found', { status: 404 });
+      const type = AUDIO_MIME[m[2]], ck = new Request(new URL(req.url).origin + p);
+      let buf;
+      const hit = await caches.default.match(ck);
+      if (hit) buf = await hit.arrayBuffer();
+      else {
+        const o = await gh(env, `audio/${m[1]}.${m[2]}`, { headers: { Accept: 'application/vnd.github.raw+json' } });
+        if (!o.ok) return new Response('Not found', { status: 404 });
+        buf = await o.arrayBuffer();
+        await caches.default.put(ck, new Response(buf, { headers: { 'content-type': type, 'cache-control': 'public,max-age=31536000,immutable' } }));
+      }
+      return sendAudio(req, buf, type);
+    }
     if (p === '/api/data' && r === 'GET') {
       const ck = new Request(new URL(req.url).origin + '/api/data');
       const hit = await caches.default.match(ck);
       if (hit) return hit;
       const { db } = await readDb(env), now = Date.now();
-      const res = J({ articles: (db.articles || []).filter(a => a.status === 'published' && Date.parse(a.date) <= now), home: db.home || [], pages: db.pages || {}, views: {} }, 200, { 'cache-control': 'public,max-age=60' });
+      const res = J({
+        articles: (db.articles || []).filter(a => a.status === 'published' && Date.parse(a.date) <= now),
+        home: db.home || [], pages: db.pages || {}, views: {},
+        audios: (db.audios || []).filter(a => a.status === 'published' && Date.parse(a.date) <= now)
+      }, 200, { 'cache-control': 'public,max-age=60' });
       await caches.default.put(ck, res.clone());
       return res;
     }
@@ -83,7 +128,7 @@ async function handle({ request: req, env, next }) {
 
     if (p === '/api/admin/db' && r === 'GET') {
       const { db } = await readDb(env);
-      return J({ articles: db.articles || [], home: db.home || [], pages: db.pages || {} });
+      return J({ articles: db.articles || [], home: db.home || [], pages: db.pages || {}, audios: db.audios || [] });
     }
     if (p === '/api/admin/db' && r === 'PUT') {
       const t = await req.text();
@@ -92,13 +137,24 @@ async function handle({ request: req, env, next }) {
       await writeDb(env, {
         articles: Array.isArray(b.articles) ? b.articles : [],
         home: Array.isArray(b.home) ? b.home : [],
-        pages: b.pages && typeof b.pages === 'object' ? b.pages : {}
+        pages: b.pages && typeof b.pages === 'object' ? b.pages : {},
+        audios: Array.isArray(b.audios) ? b.audios : []
       });
       await caches.default.delete(new Request(new URL(req.url).origin + '/api/data'));
       return J({ ok: 1 });
     }
     if (p === '/api/admin/upload' && r === 'POST') {
       const buf = await req.arrayBuffer(), u = new Uint8Array(buf);
+      const ct = (req.headers.get('content-type') || '').toLowerCase();
+      if (ct.startsWith('audio/')) {
+        if (buf.byteLength > AUDIO_MAX) return J({ error: 'Audio over 10 MB' }, 413);
+        const ext = sniffAudio(u);
+        if (!ext) return J({ error: 'Unsupported audio format (use MP3, M4A, WAV, OGG, FLAC or WebM)' }, 400);
+        const id = crypto.randomUUID();
+        const w = await gh(env, `audio/${id}.${ext}`, { method: 'PUT', body: JSON.stringify({ message: 'Add audio', content: b64(buf) }) });
+        if (!w.ok) return J({ error: 'GitHub upload ' + w.status }, 502);
+        return J({ url: `/audio/${id}.${ext}` });
+      }
       if (buf.byteLength > 5e6) return J({ error: 'Image over 5 MB' }, 413);
       if (u[0] !== 0xFF || u[1] !== 0xD8) return J({ error: 'JPEG only' }, 400);
       const id = crypto.randomUUID();
