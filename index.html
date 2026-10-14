@@ -152,6 +152,20 @@ html.noi #intro{display:none}
 @keyframes meP{0%{opacity:.9;transform:scale(.95)}100%{opacity:0;transform:scale(1.22)}}@keyframes meI{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
 .pg.abt p:last-child{text-align:center;font:italic 700 clamp(18px,4.6vw,22px)/1.4 Georgia,'Times New Roman',serif;color:var(--ac);margin-top:26px}
 @media(prefers-reduced-motion:reduce){.me:before,.me:after,.me img{animation:none!important}.me:after{display:none}}
+
+/* ---------- audio ---------- */
+.ac{display:flex;gap:14px;align-items:flex-start;margin:16px 0;padding:16px;border:1px solid var(--ln);border-radius:12px;transition:border-color .3s,box-shadow .3s}
+.ac.aon{border-color:var(--ac);box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.apl{flex:none;width:54px;height:54px;border-radius:50%;border:0;background:var(--ac);cursor:pointer;display:grid;place-items:center;transition:transform .2s}.apl:hover{transform:scale(1.07)}
+.apl span{width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
+.ac.aplay .apl span{width:16px;height:18px;border:0;margin:0;background:linear-gradient(90deg,#fff 0 36%,transparent 36% 64%,#fff 64%)}
+.ai{flex:1;min-width:0;font-family:system-ui,sans-serif}.ai h3{margin:0 0 4px;font:700 18px/1.3 Georgia,serif}.ad1{margin:0 0 8px;font-size:14px;color:var(--mu)}
+.abars{display:flex;align-items:flex-end;gap:3px;height:22px;margin:4px 0 6px}.abars i{width:4px;height:6px;border-radius:2px;background:var(--ac);opacity:.55;transition:height .3s}
+.ac.aplay .abars i{opacity:1;animation:abr .9s ease-in-out infinite}.ac.aplay .abars i:nth-child(2){animation-delay:.12s}.ac.aplay .abars i:nth-child(3){animation-delay:.28s}.ac.aplay .abars i:nth-child(4){animation-delay:.05s}.ac.aplay .abars i:nth-child(5){animation-delay:.36s}.ac.aplay .abars i:nth-child(6){animation-delay:.2s}.ac.aplay .abars i:nth-child(7){animation-delay:.44s}
+@keyframes abr{0%,100%{height:5px}50%{height:22px}}
+.asr{width:100%;accent-color:var(--ac);margin:2px 0}.aer{color:#c0392b;font-size:13px;margin-top:4px}
+.aup{padding:14px;border:1px solid var(--ln);border-radius:10px;margin-bottom:16px}.apb{height:6px;background:var(--ln);border-radius:4px;margin:12px 0;overflow:hidden}.apb i{display:block;height:100%;width:0;background:var(--ac);transition:width .2s}
+@media(prefers-reduced-motion:reduce){.ac.aplay .abars i{animation:none;height:14px}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -162,7 +176,7 @@ const MULTI=['History','Culture & Lifestyle'];const CATS=['World','Opinion','His
 const SUBS={'World':['News','Analysis','Explainer'],'Culture & Lifestyle':['Culture','Lifestyle']};
 const PG={about:'About Me',contact:'Contact',support:'Support us',privacy:'Privacy',cookies:'Cookies',terms:'Terms'};
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let D={articles:[],home:[],pages:{},views:{}},ready=false,A=null,adm=null,ed=null,tab='articles',limit={};
+let D={articles:[],home:[],pages:{},views:{},audios:[]},ready=false,A=null,adm=null,ed=null,tab='articles',limit={};
 const fd=d=>new Date(d).toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
 const rt=b=>Math.max(1,Math.round((b||'').split(/\s+/).length/220));
 const live=()=>D.articles.filter(a=>a.status==='published'&&new Date(a.date)<=new Date()).sort((a,b)=>new Date(b.date)-new Date(a.date));
@@ -175,7 +189,7 @@ function card(a){const im=safeImg(a.thumb||a.image);return `<div class="card">${
 function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2><div class="empty">No stories published yet.</div></div>`;const n=limit[key+t]||4;
  return `<div class="sec"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
 function shell(inner,cur){
- const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Games','/games.html']];
+ const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Games','/games.html']];
  return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
@@ -233,10 +247,11 @@ async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{
  if(r.ok){adm=null;go()}else $('#le').textContent=(await r.json().catch(()=>({}))).error||'Sign in failed'}
 async function persist(){const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(A)});if(!r.ok){alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
 function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
- let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
+ let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
  h+=stats(A.articles.filter(a=>a.status==='published'));
  if(tab==='articles')h+=ed?editor():list();
  if(tab==='home')h+=`<p class="meta">Featured stories in order: first is the lead, next four are secondary.</p>`+(A.home.length?A.home.map((id,i)=>{const a=A.articles.find(x=>x.id===id);return a?`<div class="row"><span>${i+1}. ${esc(a.title)}</span><span><button class="bt o" onclick="mv(${i},-1)">↑</button><button class="bt o" onclick="mv(${i},1)">↓</button><button class="bt o" onclick="feat('${id}')">Remove</button></span></div>`:''}).join(''):'<div class="empty">Nothing featured. Latest stories are used.</div>');
+ if(tab==='audio')h+=audioTab();
  if(tab==='pages')h+=Object.keys(PG).map(k=>`<label>${PG[k]}</label><textarea style="min-height:110px" id="pg_${k}">${esc(A.pages[k]||DEF[k]||'')}</textarea>`).join('')+`<button class="bt" onclick="savePages()">Save pages</button>`;
  return h+'</div>'}
 async function savePages(){Object.keys(PG).forEach(k=>A.pages[k]=$('#pg_'+k).value);if(await persist())alert('Saved')}
@@ -283,7 +298,8 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(r)r.remove();document.title='The Sujan Khadka';
  if(!ready){$('#app').innerHTML=shell(`<div class="empty" style="padding:60px 0;text-align:center">${ready==='err'?'Could not load stories. Please refresh.':'Loading…'}</div>`,'/');return}
  let out,cur='/'+(p[0]||'');{const ord=['/',...CATS.map(c=>'/'+SL[c])],ni=ord.indexOf(cur),oi=ord.indexOf(lastCur);navDir=(oi<0||ni<0||ni===oi)?0:(ni>oi?36:-36);lastCur=cur}
- if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);
+ if(p[0]!=='audio')auStop();
+ if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
  $('#app').innerHTML=shell(out,cur);ttsUi();insUi();thUi();motion();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
@@ -302,6 +318,44 @@ function listen(a){if(!('speechSynthesis' in window))return alert('Listening is 
  if(a==='play'){if(tts.on)return;if(!tts.q.length){tts.q=chunks(tts.text);tts.i=0}tts.on=true;speechSynthesis.cancel();ttsNext(++tts.id)}
  if(a==='pause'){tts.on=false;tts.id++;speechSynthesis.cancel()}
  if(a==='stop')ttsStop();ttsUi()}
+
+/* ---------- Audio section ---------- */
+const AU=new Audio();AU.preload='none';let auId=null,auBad=null;
+const fmt=t=>{if(!isFinite(t)||t<0)return'–:––';t=Math.round(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+function audioPg(){const L=(D.audios||[]).filter(a=>a.status==='published'&&new Date(a.date)<=new Date()).sort((a,b)=>new Date(b.date)-new Date(a.date));
+ return `<div class="pg au"><h1>Audio</h1><p>Listen to our audio stories, talks and notes. Press play and keep reading, or just listen.</p>${L.length?L.map(auCard).join(''):'<p><span class="empty">No audio has been published yet.</span></p>'}</div>`}
+function auCard(a){return `<div class="ac" data-id="${esc(a.id)}"><button class="apl" onclick="auToggle('${esc(a.id)}')" aria-label="Play ${esc(a.title)}"><span></span></button><div class="ai"><h3>${esc(a.title)}</h3>${a.desc?`<p class="ad1">${esc(a.desc)}</p>`:''}<div class="abars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><input class="asr" type="range" min="0" max="1000" value="0" disabled aria-label="Seek" oninput="auSeek(this.value)"><div class="meta"><span class="at">0:00</span> / <span class="adu">${fmt(a.dur)}</span> · ${fd(a.date)}</div><div class="aer"></div></div></div>`}
+function auToggle(id){const a=(D.audios||[]).find(x=>x.id===id);if(!a)return;
+ if(auId===id){if(AU.paused)AU.play().catch(()=>auFail(id));else AU.pause();return}
+ auStop();auId=id;auBad=null;AU.src=a.url;AU.play().catch(()=>auFail(id));auUi()}
+function auStop(){if(auId===null)return;AU.pause();auId=null;AU.removeAttribute('src');AU.load();auUi()}
+function auFail(id){if(id!==auId)return;auBad=id;AU.pause();auUi()}
+function auSeek(v){if(isFinite(AU.duration))AU.currentTime=v/1000*AU.duration}
+function auUi(){document.querySelectorAll('.ac').forEach(c=>{const on=c.dataset.id===auId,pl=on&&!AU.paused&&!AU.ended;
+ c.classList.toggle('aon',on);c.classList.toggle('aplay',pl);c.querySelector('.apl').setAttribute('aria-label',pl?'Pause':'Play');
+ const sr=c.querySelector('.asr'),at=c.querySelector('.at'),du=c.querySelector('.adu'),er=c.querySelector('.aer');
+ sr.disabled=!on;if(!on){sr.value=0;at.textContent='0:00'}else{at.textContent=fmt(AU.currentTime);if(isFinite(AU.duration)){du.textContent=fmt(AU.duration);sr.value=AU.currentTime/AU.duration*1000}}
+ er.textContent=auBad&&on?'Could not play this audio. Please try again.':''})}
+['play','pause','timeupdate','loadedmetadata','ended','error'].forEach(e=>AU.addEventListener(e,()=>{if(e==='error'&&auId&&AU.src)auBad=auId;auUi()}));
+/* portal: upload + manage */
+function audioTab(){const L=[...(A.audios||[])].sort((a,b)=>new Date(b.date)-new Date(a.date));
+ return `<div class="aup"><label>Title</label><input id="au_t" placeholder="Audio title"><label>Description (optional)</label><textarea id="au_d" style="min-height:70px"></textarea><label>Audio file — from your phone or computer (MP3, M4A, WAV…)</label><input type="file" id="au_f" accept="audio/*"><div class="apb"><i id="au_p"></i></div><button class="bt" id="au_b" onclick="auUpload()">Upload audio</button></div>`+
+ (L.length?L.map(a=>`<div class="row"><span><strong>${esc(a.title)}</strong><br><span class="meta">${a.status} · ${fmt(a.dur)} · ${a.size?(a.size/1048576).toFixed(1)+' MB · ':''}${fd(a.date)}</span><br><audio controls preload="none" src="${esc(a.url)}" style="width:100%;max-width:340px;margin-top:6px"></audio></span><span><button class="bt o" onclick="auPub('${esc(a.id)}')">${a.status==='published'?'Unpublish':'Publish'}</button><button class="bt d" onclick="auDel('${esc(a.id)}')">Delete</button></span></div>`).join(''):'<div class="empty">No audio uploaded yet.</div>')}
+function putAudio(f,pg){return new Promise((ok,no)=>{const x=new XMLHttpRequest();x.open('POST','/api/admin/upload');x.setRequestHeader('content-type',f.type||'audio/mpeg');
+ x.upload.onprogress=e=>{if(e.lengthComputable)pg(Math.round(e.loaded/e.total*100))};
+ x.onload=()=>{if(x.status>=200&&x.status<300){try{ok(JSON.parse(x.responseText).url)}catch(e){no('the server gave an unexpected reply')}}else no('the server answered '+x.status)};
+ x.onerror=()=>no('network error');x.send(f)})}
+const auDur=f=>new Promise(ok=>{const a=new Audio(),u=URL.createObjectURL(f);a.preload='metadata';a.onloadedmetadata=()=>{ok(isFinite(a.duration)?Math.round(a.duration):0);URL.revokeObjectURL(u)};a.onerror=()=>{ok(0);URL.revokeObjectURL(u)};a.src=u});
+async function auUpload(){const t=$('#au_t').value.trim(),f=$('#au_f').files[0];
+ if(!t)return alert('Please enter a title.');if(!f)return alert('Please choose an audio file.');
+ if(f.type&&!f.type.startsWith('audio/'))return alert('Please choose an audio file.');
+ if(f.size>10e6)return alert('This file is '+(f.size/1e6).toFixed(1)+' MB. The limit is 10 MB (about 10 minutes of MP3). Please compress it or upload a shorter clip.');
+ const b=$('#au_b'),bar=$('#au_p'),desc=$('#au_d').value.trim();b.disabled=true;b.textContent='Uploading…';
+ try{const url=await putAudio(f,n=>{bar.style.width=n+'%';b.textContent='Uploading… '+n+'%'}),dur=await auDur(f);
+  A.audios=A.audios||[];A.audios.push({id:'u'+Date.now(),title:t,desc,url,dur,size:f.size,date:new Date().toISOString(),status:'published'});
+  if(await persist())go()}catch(e){alert('Audio upload failed: '+(e||'unknown error'));b.disabled=false;b.textContent='Upload audio'}}
+async function auPub(id){const a=A.audios.find(x=>x.id===id);if(!a)return;a.status=a.status==='published'?'draft':'published';await persist();go()}
+async function auDel(id){if(!confirm('Delete this audio from the website?'))return;A.audios=A.audios.filter(x=>x.id!==id);await persist();go()}
 function share(){const d={title:document.title,url:location.href};if(navigator.share)navigator.share(d).catch(()=>{});else navigator.clipboard.writeText(d.url).then(()=>alert('Link copied'))}
 addEventListener('popstate',()=>swap(go));
 
