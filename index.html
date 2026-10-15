@@ -186,6 +186,7 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .vfoot{display:flex;justify-content:space-between;align-items:center;gap:10px}.vfoot .meta{color:#dbe5f5}
 .vsh{padding:9px 20px;border-radius:20px;border:2px solid #ffe500;background:transparent;color:#ffe500;font-weight:700;cursor:pointer}.vsh:hover{background:#ffe500;color:#052f6b}
 .vlnk{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);font-size:14px}.vlnk a,.vlnk button{color:#dbe5f5;background:none;border:0;padding:0;cursor:pointer;font:inherit;text-decoration:underline}
+.vvr{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:14px;color:#dbe5f5}.vvr select{flex:1;min-width:0;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:#0a3a80;color:#fff;font-size:14px}
 @media(prefers-reduced-motion:reduce){.vp.vplay .vbig,.vp.vplay .abars i{animation:none}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
@@ -344,37 +345,53 @@ function listen(a){if(!('speechSynthesis' in window))return alert('Listening is 
 /* ---------- Voice audio: text written in the portal is hidden and spoken ---------- */
 const vox={q:[],i:0,total:0,on:false,id:0,rate:1,mins:1};
 const SYN='speechSynthesis' in window;
-function voxVoice(){if(!SYN)return null;const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));if(!vs.length)return null;
- const male=/\b(david|mark|daniel|james|george|guy|ryan|alex|fred|arthur|thomas|oliver|male|man)\b/i;
- return vs.find(v=>male.test(v.name)&&/en[-_](US|GB)/i.test(v.lang))||vs.find(v=>male.test(v.name))||vs.find(v=>/en[-_]GB/i.test(v.lang))||vs[0]}
+const lt=t=>Math.max(1,Math.round(((t||'').trim().split(/\s+/).length)/140));
+function voxScore(v){let n=0;const x=v.name+' '+v.lang;
+ if(/natural|neural/i.test(x))n+=60;if(/online|premium|enhanced/i.test(x))n+=40;if(v.localService===false)n+=15;
+ if(/\b(aria|jenny|guy|davis|ryan|sonia|libby|samantha|karen|daniel|serena|moira|tessa|ava|allison|susan|oliver|google (us|uk) english)\b/i.test(x))n+=25;
+ if(/en[-_](US|GB|AU|IN|IE|ZA)/i.test(v.lang))n+=10;if(/compact|espeak|novelty/i.test(x))n-=60;return n}
+function voxList(){if(!SYN)return[];return speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>voxScore(b)-voxScore(a))}
+function voxVoice(){const vs=voxList();if(!vs.length)return null;let n='';try{n=localStorage.getItem('sk_voice')||''}catch(e){}
+ return vs.find(v=>v.name===n)||vs[0]}
+function voxSetVoice(n){try{localStorage.setItem('sk_voice',n)}catch(e){}if(vox.on)voxPlayFrom(vox.i)}
+/* split text into sentences with natural pauses (short after a sentence, longer after a paragraph) */
+function voxChunks(t){const out=[];
+ t.split(/\n+/).map(x=>x.trim()).filter(Boolean).forEach(par=>{
+  const ss=(par.match(/[^.!?\u0964]+[.!?\u0964]*["')\]]*\s*/g)||[par]).map(x=>x.trim()).filter(Boolean),parts=[];let cur='';
+  ss.forEach(x=>{if(!cur)cur=x;else if(cur.length<45&&(cur+' '+x).length<=230)cur+=' '+x;else{parts.push(cur);cur=x}});if(cur)parts.push(cur);
+  const fin=[];parts.forEach(x=>{if(x.length<=230){fin.push({t:x,p:/[?!]$/.test(x)?560:440});return}
+   let c='';x.split(/(?<=[,;:])\s+/).forEach(w=>{if(c&&(c+' '+w).length>230){fin.push({t:c,p:220});c=w}else c=c?c+' '+w:w});if(c)fin.push({t:c,p:440})});
+  if(fin.length)fin[fin.length-1].p=1200;out.push(...fin)});
+ return out}
 const voicePub=a=>a.kind==='voice'&&a.status==='published'&&new Date(a.date)<=new Date();
-function auVoiceCard(a){return `<a class="ac emb vc" href="/listen/${esc(a.id)}"><span class="vpi" aria-hidden="true"><i></i></span><div class="ai"><h3>${esc(a.title)}</h3>${a.desc?`<p class="ad1">${esc(a.desc)}</p>`:''}<div class="meta">${rt(a.text)} min listen · ${fd(a.date)}</div></div></a>`}
+function auVoiceCard(a){return `<a class="ac emb vc" href="/listen/${esc(a.id)}"><span class="vpi" aria-hidden="true"><i></i></span><div class="ai"><h3>${esc(a.title)}</h3>${a.desc?`<p class="ad1">${esc(a.desc)}</p>`:''}<div class="meta">${lt(a.text)} min listen · ${fd(a.date)}</div></div></a>`}
 function voicePg(id){const a=(D.audios||[]).find(x=>x.id===id&&voicePub(x));
  if(!a)return '<div class="empty" style="padding:60px 0">Audio not found.</div>';
- document.title=a.title+' — The Sujan Khadka';tts.text=[a.title,a.desc,a.text].filter(Boolean).join('.\n');tts.path=location.pathname;
- vox.mins=rt(a.text);const u=encodeURIComponent(location.origin+'/listen/'+a.id),t=encodeURIComponent(a.title);
+ document.title=a.title+' — The Sujan Khadka';tts.text=[a.title,a.desc].filter(Boolean).map(x=>/[.!?]$/.test(x.trim())?x:x+'.').concat([a.text]).filter(Boolean).join('\n\n');tts.path=location.pathname;
+ vox.mins=lt(a.text);const u=encodeURIComponent(location.origin+'/listen/'+a.id),t=encodeURIComponent(a.title);
  const more=(D.audios||[]).filter(x=>x.id!==a.id&&(voicePub(x)||(x.kind!=='voice'&&x.status==='published'))).sort((p,q)=>new Date(q.date)-new Date(p.date)).slice(0,3);
  return `<article class="vox"><div class="cat"><a href="/audio">Audio</a></div><h1>${esc(a.title)}</h1>${a.desc?`<p class="sub">${esc(a.desc)}</p>`:''}
  <div class="by meta">${fd(a.date)} · ${vox.mins} min listen</div>
  <div class="vp" id="vp" role="group" aria-label="Audio player"><div class="vt"><button class="vbig" id="vbig" onclick="voxToggle()" aria-label="Play"><span></span></button><div class="vi"><div class="vs" id="vst">Tap play to listen</div><div class="abars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><input type="range" id="vseek" min="0" max="1000" value="0" aria-label="Position" oninput="voxSeek(this.value)"></div></div>
- <div class="vsp" role="group" aria-label="Playback speed">${[0.75,1,1.25,1.5,2].map(x=>`<button data-r="${x}" onclick="voxRate(${x})" class="${x===1?'on2':''}">${x}×</button>`).join('')}</div>
+ <div class="vsp" role="group" aria-label="Playback speed">${[0.6,0.8,1,1.25,1.5].map(x=>`<button data-r="${x}" onclick="voxRate(${x})" class="${x===1?'on2':''}">${x}×</button>`).join('')}</div>
+ <div class="vvr"><label for="vvo">Voice</label><select id="vvo" onchange="voxSetVoice(this.value)"></select></div>
  <div class="vfoot"><span class="meta" id="vtm">About ${vox.mins} min</span><button class="vsh" onclick="voxShare()">Share</button></div>
  <div class="vlnk"><a href="https://wa.me/?text=${t}%20${u}" target="_blank" rel="noopener">WhatsApp</a><a href="https://www.facebook.com/sharer/sharer.php?u=${u}" target="_blank" rel="noopener">Facebook</a><a href="https://twitter.com/intent/tweet?text=${t}&url=${u}" target="_blank" rel="noopener">X</a><a href="https://t.me/share/url?url=${u}&text=${t}" target="_blank" rel="noopener">Telegram</a><button onclick="voxCopy()">Copy link</button></div></div></article>
  ${more.length?`<div class="sec"><h2>More audio</h2>${more.map(auCard).join('')}</div>`:''}`}
 function voxNext(id){if(!vox.on||id!==vox.id)return;
  if(vox.i>=vox.q.length){vox.on=false;vox.q=[];vox.i=0;voxUi(true);return}
- const u=new SpeechSynthesisUtterance(vox.q[vox.i]),v=voxVoice();if(v){u.voice=v;u.lang=v.lang}else u.lang='en';
- u.pitch=0.72;u.volume=1;u.rate=Math.min(2,Math.max(.5,0.95*vox.rate));
- u.onend=()=>{if(vox.on&&id===vox.id){vox.i++;voxUi();voxNext(id)}};
+ const it=vox.q[vox.i],u=new SpeechSynthesisUtterance(it.t),v=voxVoice();if(v){u.voice=v;u.lang=v.lang}else u.lang='en';
+ u.pitch=0.94;u.volume=1;u.rate=Math.min(2,Math.max(.4,0.82*vox.rate));
+ u.onend=()=>{if(vox.on&&id===vox.id){setTimeout(()=>{if(vox.on&&id===vox.id){vox.i++;voxUi();voxNext(id)}},it.p/vox.rate)}};
  u.onerror=e=>{if(id===vox.id&&vox.on&&e.error!=='canceled'&&e.error!=='interrupted'){vox.on=false;voxUi()}};
  voxUi();speechSynthesis.speak(u)}
 function voxPlayFrom(i){vox.i=i;vox.on=true;speechSynthesis.cancel();voxNext(++vox.id)}
 function voxToggle(){if(!SYN)return alert('Audio is not supported in this browser.');
  if(vox.on){vox.on=false;vox.id++;speechSynthesis.cancel();voxUi();return}
- if(!vox.q.length){vox.q=chunks(tts.text);vox.i=0}vox.total=vox.q.length;voxPlayFrom(vox.i)}
+ if(!vox.q.length){vox.q=voxChunks(tts.text);vox.i=0}vox.total=vox.q.length;voxPlayFrom(vox.i)}
 function voxStop(){vox.on=false;vox.id++;vox.q=[];vox.i=0;vox.total=0;if(SYN)speechSynthesis.cancel();voxUi()}
 function voxRate(x){vox.rate=x;if(vox.on)voxPlayFrom(vox.i);else voxUi()}
-function voxSeek(v){if(!vox.q.length)vox.q=chunks(tts.text);vox.total=vox.q.length;const i=Math.min(vox.total-1,Math.floor(v/1000*vox.total));if(vox.on)voxPlayFrom(i);else{vox.i=i;voxUi()}}
+function voxSeek(v){if(!vox.q.length)vox.q=voxChunks(tts.text);vox.total=vox.q.length;const i=Math.min(vox.total-1,Math.floor(v/1000*vox.total));if(vox.on)voxPlayFrom(i);else{vox.i=i;voxUi()}}
 function voxUi(done){const p=$('#vp');if(!p)return;
  if(!SYN){$('#vst').textContent='Audio is not supported in this browser';$('#vbig').disabled=true;return}
  const tot=vox.total||vox.q.length,pr=tot?vox.i/tot:0;
@@ -382,7 +399,11 @@ function voxUi(done){const p=$('#vp');if(!p)return;
  $('#vst').textContent=vox.on?'Playing…':done?'Finished — play again':vox.q.length&&vox.i>0?'Paused':'Tap play to listen';
  if(done)$('#vseek').value=0;else if(document.activeElement!==$('#vseek'))$('#vseek').value=Math.round(pr*1000);
  const left=Math.max(1,Math.round(vox.mins*(1-pr)/vox.rate));$('#vtm').textContent=(vox.on||vox.i>0?left+' min left':'About '+Math.max(1,Math.round(vox.mins/vox.rate))+' min')+' · '+vox.rate+'×';
- p.querySelectorAll('.vsp button').forEach(b=>b.classList.toggle('on2',+b.dataset.r===vox.rate))}
+ p.querySelectorAll('.vsp button').forEach(b=>b.classList.toggle('on2',+b.dataset.r===vox.rate));
+ const sel=$('#vvo'),vs=voxList();if(sel){sel.parentNode.style.display=vs.length>1?'':'none';
+  if(sel.options.length!==vs.length){sel.innerHTML=vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}</option>`).join('')}
+  const cur=voxVoice();if(cur)sel.value=cur.name}}
+if(SYN&&speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',()=>voxUi());
 function voxShare(){const d={title:document.title,url:location.href};if(navigator.share)navigator.share(d).catch(()=>{});else voxCopy()}
 function voxCopy(){(navigator.clipboard?navigator.clipboard.writeText(location.href):Promise.reject()).then(()=>alert('Link copied'),()=>prompt('Copy this link',location.href))}
 /* portal: write voice audio */
@@ -430,7 +451,7 @@ function audioTab(){const L=[...(A.audios||[])].sort((a,b)=>new Date(b.date)-new
  return `<div class="aup"><strong>${avEdit?'Edit audio':'Write audio'}</strong><p class="meta">Write or paste your text here. Visitors will not see the text. They will listen to it in a strong voice, with speed control and sharing.</p><label>Title</label><input id="av_t" value="${esc(e.title||'')}"><label>Short description (optional)</label><input id="av_d" value="${esc(e.desc||'')}"><label>Text to be spoken</label><textarea id="av_x" style="min-height:240px">${esc(e.text||'')}</textarea><button class="bt" onclick="avSave()">${avEdit?'Save changes':'Publish audio'}</button>${avEdit?'<button class="bt o" onclick="avEdit=null;go()">Cancel</button>':''}</div>`+
  `<details class="aup"><summary>Add audio by link (YouTube, SoundCloud, Internet Archive)</summary><p class="meta">Upload your audio to YouTube, SoundCloud or the Internet Archive, then paste its link here. Direct links to an MP3 / M4A / WAV file also work.</p><label>Title</label><input id="al_t" placeholder="Audio title"><label>Description (optional)</label><textarea id="al_d" style="min-height:70px"></textarea><label>Link</label><input id="al_u" type="url" inputmode="url" placeholder="https://…"><button class="bt" onclick="auAddLink()">Add audio</button></details>`+
  `<details class="aup"><summary>Or upload a small file (up to 10 MB)</summary><label>Title</label><input id="au_t" placeholder="Audio title"><label>Description (optional)</label><textarea id="au_d" style="min-height:70px"></textarea><label>Audio file — from your phone or computer</label><input type="file" id="au_f" accept="audio/*"><div class="apb"><i id="au_p"></i></div><button class="bt" id="au_b" onclick="auUpload()">Upload audio</button></details>`+
- (L.length?L.map(a=>{if(a.kind==='voice')return `<div class="row"><span><strong>${esc(a.title)}</strong><br><span class="meta">${a.status} · Voice audio · ${rt(a.text)} min · ${fd(a.date)}</span><br><a class="meta" href="/listen/${esc(a.id)}" target="_blank" rel="noopener">Open audio page</a></span><span><button class="bt o" onclick="avEditSet('${esc(a.id)}')">Edit</button><button class="bt o" onclick="auPub('${esc(a.id)}')">${a.status==='published'?'Unpublish':'Publish'}</button><button class="bt d" onclick="auDel('${esc(a.id)}')">Delete</button></span></div>`;
+ (L.length?L.map(a=>{if(a.kind==='voice')return `<div class="row"><span><strong>${esc(a.title)}</strong><br><span class="meta">${a.status} · Voice audio · ${lt(a.text)} min · ${fd(a.date)}</span><br><a class="meta" href="/listen/${esc(a.id)}" target="_blank" rel="noopener">Open audio page</a></span><span><button class="bt o" onclick="avEditSet('${esc(a.id)}')">Edit</button><button class="bt o" onclick="auPub('${esc(a.id)}')">${a.status==='published'?'Unpublish':'Publish'}</button><button class="bt d" onclick="auDel('${esc(a.id)}')">Delete</button></span></div>`;
   const k=auKind(a.url);return `<div class="row"><span><strong>${esc(a.title)}</strong><br><span class="meta">${a.status} · ${k?AUK[k.k]:'Invalid link'}${a.dur?' · '+fmt(a.dur):''}${a.size?' · '+(a.size/1048576).toFixed(1)+' MB':''} · ${fd(a.date)}</span>${k&&k.k==='file'?`<br><audio controls preload="none" src="${esc(k.u)}" style="width:100%;max-width:340px;margin-top:6px"></audio>`:`<br><a class="meta" href="${esc(a.url)}" target="_blank" rel="noopener">Open original link</a>`}</span><span><button class="bt o" onclick="auPub('${esc(a.id)}')">${a.status==='published'?'Unpublish':'Publish'}</button><button class="bt d" onclick="auDel('${esc(a.id)}')">Delete</button></span></div>`}).join(''):'<div class="empty">No audio added yet.</div>')}
 async function auAddLink(){const t=$('#al_t').value.trim(),u=$('#al_u').value.trim();
  if(!t)return alert('Please enter a title.');if(!u)return alert('Please paste a link.');
