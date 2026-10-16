@@ -190,13 +190,13 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 @media(prefers-reduced-motion:reduce){.vp.vplay .vbig,.vp.vplay .abars i{animation:none}}
 
 /* ---------- popup ad ---------- */
-#adm{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:16px;animation:adf .3s ease both;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#adm{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.9);display:grid;place-items:center;padding:16px;animation:adf .3s ease both;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 #adm.out{animation:adf .25s ease reverse both}
 .adbox{position:relative;width:min(440px,100%);max-height:90vh;overflow:auto;background:var(--bg);color:var(--tx);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.45);animation:adp .45s cubic-bezier(.2,.8,.2,1) both;font-family:system-ui,sans-serif}
 .adbox img{display:block;width:100%;height:auto;border-radius:14px 14px 0 0}
 .adbd{padding:18px 20px 22px;text-align:center}.adbd.noimg{padding-top:46px}.adbd h2{margin:0 0 8px;font:700 22px/1.25 Georgia,'Times New Roman',serif}.adbd p{margin:0 0 16px;line-height:1.5;color:var(--mu);white-space:pre-line}.adbd p:last-child{margin-bottom:0}
 .adbt{display:inline-block;padding:11px 26px;border-radius:24px;background:var(--ac);color:#fff;font-weight:700;text-decoration:none}.adbt:hover{filter:brightness(1.1)}
-.adx{position:absolute;top:8px;right:8px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.7);color:#fff;font-size:18px;cursor:pointer}.adx:hover{background:#000}.adx:disabled{cursor:not-allowed;background:rgba(0,0,0,.55);font-size:16px;font-weight:700}
+.adx{position:absolute;top:8px;right:8px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.7);color:#fff;font-size:18px;cursor:pointer}.adx:hover{background:#000}.adbd.none{display:none}.adbox .bn{margin:0;border-radius:14px}.adbox .bn .bs img{max-height:72vh}.adx:disabled{cursor:not-allowed;background:rgba(0,0,0,.55);font-size:16px;font-weight:700}
 .adtag{position:absolute;top:14px;left:12px;z-index:2;font-size:11px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,0,0,.65);color:#fff;padding:3px 8px;border-radius:4px}
 @keyframes adf{from{opacity:0}to{opacity:1}}@keyframes adp{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){#adm,#adm.out,.adbox{animation:none!important}}
@@ -208,6 +208,19 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .bnd{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}.bnd i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);transition:all .3s}.bnd i.on{background:#ffe500;width:20px;border-radius:4px}
 @keyframes bnf{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.bn .bs.on{animation:none}}
+
+/* ---------- portal: fit every phone screen ---------- */
+.ad,.ad *{box-sizing:border-box}.ad{width:100%;overflow-x:hidden}
+.ad input,.ad select,.ad textarea{max-width:100%;min-width:0}
+.ad input[type=file]{width:100%;font-size:14px}
+.aup{max-width:100%;overflow:hidden}.aup img{max-width:100%;height:auto}
+.aup audio{max-width:100%}
+.bni{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}.bni img{width:92px;height:60px;object-fit:cover;border-radius:6px;flex:none}
+.ad .bni input{flex:1 1 150px;width:auto;margin:0}
+.ad .row>span:first-child{min-width:0;flex:1 1 180px;overflow-wrap:anywhere}
+.ad .row .bt{margin:2px 4px 2px 0}
+.tabs .bt{flex:0 0 auto}
+@media(max-width:520px){.ad{padding:0 12px}.stats{gap:6px}.st span{font-size:10px;letter-spacing:.5px}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -448,16 +461,24 @@ const AD_LOCK=5;let adCt=null;
 function adClose(){const d=document.getElementById('adm');if(!d)return;clearInterval(adCt);document.removeEventListener('keydown',adKey);document.body.style.overflow='';d.classList.add('out');setTimeout(()=>d.remove(),260)}
 function adKey(e){const d=document.getElementById('adm');if(e.key==='Escape'&&d&&!d.dataset.lock)adClose()}
 function adShow(o,preview){if(!o||document.getElementById('adm'))return;
- const img=safeImg(o.img),lk=/^https?:\/\//i.test(o.link||'')?o.link:'';if(!img&&!o.title&&!o.text)return;
+ const img=safeImg(o.img),lk=/^https?:\/\//i.test(o.link||'')?o.link:'',ph=(o.items||[]).filter(x=>safeImg(x.img));if(!img&&!o.title&&!o.text&&!ph.length)return;
  const d=document.createElement('div');d.id='adm';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Advertisement');
- const im=img?(lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored"><img src="${img}" alt=""></a>`:`<img src="${img}" alt="">`):'';
- let n=preview?0:AD_LOCK;if(n)d.dataset.lock='1';
- d.innerHTML=`<div class="adbox"><button class="adx" ${n?'disabled':''} aria-label="${n?'You can close this in '+n+' seconds':'Close advertisement'}">${n||'✕'}</button><div class="adtag">Advertisement</div>${im}<div class="adbd${img?'':' noimg'}">${o.title?`<h2>${esc(o.title)}</h2>`:''}${o.text?`<p>${esc(o.text)}</p>`:''}${lk?`<a class="adbt" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${esc(o.btn||'Learn more')}</a>`:''}</div></div>`;
+ const im=ph.length?bnMarkup(ph,false):img?(lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored"><img src="${img}" alt=""></a>`:`<img src="${img}" alt="">`):'';
+ let n=preview?0:AD_LOCK;if(n)d.dataset.lock='1';if(o.ver!=null)d.dataset.ver=String(o.ver);
+ d.innerHTML=`<div class="adbox"><button class="adx" ${n?'disabled':''} aria-label="${n?'You can close this in '+n+' seconds':'Close advertisement'}">${n||'✕'}</button><div class="adtag">Advertisement</div>${im}<div class="adbd${ph.length?' none':img?'':' noimg'}">${o.title?`<h2>${esc(o.title)}</h2>`:''}${o.text?`<p>${esc(o.text)}</p>`:''}${lk?`<a class="adbt" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${esc(o.btn||'Learn more')}</a>`:''}</div></div>`;
  d.addEventListener('click',e=>{if(e.target.closest('.adx')&&!d.dataset.lock)adClose();else if(e.target===d&&preview)adClose()});
  document.body.appendChild(d);document.body.style.overflow='hidden';document.addEventListener('keydown',adKey);const x=d.querySelector('.adx');
- if(n){adCt=setInterval(()=>{n--;if(n>0){x.textContent=n;x.setAttribute('aria-label','You can close this in '+n+' seconds')}else{clearInterval(adCt);delete d.dataset.lock;x.disabled=false;x.textContent='✕';x.setAttribute('aria-label','Close advertisement');x.focus({preventScroll:true})}},1000)}else x.focus({preventScroll:true})}
-function adInit(){if(adTried||!pub_())return;adTried=true;const o=(D.pages||{}).__ad;if(!adDue(o))return;
- setTimeout(()=>{if(pub_()){adMark(o);adShow(o)}},document.documentElement.classList.contains('noi')?500:2150)}
+ if(n){adCt=setInterval(()=>{n--;if(n>0){x.textContent=n;x.setAttribute('aria-label','You can close this in '+n+' seconds')}else{clearInterval(adCt);delete d.dataset.lock;x.disabled=false;x.textContent='✕';x.setAttribute('aria-label','Close advertisement');x.focus({preventScroll:true})}},1000)}else x.focus({preventScroll:true});if(ph.length>1)bnStart()}
+let adFresh=false;
+function adSet(){const o=(D.pages||{}).__ad||{},ph=(D.pages||{}).__ads||{},items=(ph.items||[]).filter(x=>safeImg(x.img)),po={on:!!(ph.on&&ph.pop&&items.length),ver:'p'+(ph.ver||'0'),freq:ph.freq,items};return{o,po,cfg:o.on?o:po.on?po:null}}
+function adInit(fresh){if(!pub_())return;const{o,po,cfg}=adSet(),cur=document.getElementById('adm');
+ if(fresh&&cur&&cur.dataset.ver&&cur.dataset.ver!==(cfg?String(cfg.ver||'0'):'')){adClose();adTried=false}
+ if(adTried)return;const pick=adDue(o)?o:adDue(po)?po:null;
+ if(!pick){if(fresh)adTried=true;return}
+ adTried=true;
+ setTimeout(()=>{if(!pub_())return;const c=adSet().cfg;
+  if(!c||String(c.ver||'0')!==String(pick.ver||'0')){adTried=false;if(adFresh)adInit(true);return}   /* settings changed or switched off since the saved copy */
+  adMark(pick);adShow(pick)},document.documentElement.classList.contains('noi')?150:2150)}
 /* portal tab */
 const adVals=()=>({on:$('#ad_on').checked,img:adDraft?adDraft.img:'',title:$('#ad_t').value.trim(),text:$('#ad_x').value.trim(),btn:$('#ad_b').value.trim(),link:$('#ad_l').value.trim(),freq:$('#ad_f').value});
 function adTab(){return adPopupTab()+bnTab()}
@@ -480,28 +501,32 @@ async function adSave(){const v=adVals();if(v.link&&!/^https?:\/\//i.test(v.link
 
 /* ---------- Photo banner ads: upload photos only, shown as a slideshow on Home and under articles ---------- */
 let bnDraft=null,bnT=null;
-function bnHtml(){const o=(D.pages||{}).__ads;if(!o||!o.on)return'';const it=(o.items||[]).filter(x=>safeImg(x.img));if(!it.length)return'';
+function bnMarkup(it,label){
  const sl=it.map((x,i)=>{const lk=/^https?:\/\//i.test(x.link||'')?x.link:'',im=`<img src="${safeImg(x.img)}" alt="Advertisement" loading="lazy" decoding="async">`;
   return lk?`<a class="bs${i?'':' on'}" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${im}</a>`:`<div class="bs${i?'':' on'}">${im}</div>`}).join('');
- return `<div class="bn" aria-label="Advertisement"><span class="bnt">Advertisement</span>${sl}${it.length>1?`<div class="bnd">${it.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}</div>`}
+ return `<div class="bn" aria-label="Advertisement">${label?'<span class="bnt">Advertisement</span>':''}${sl}${it.length>1?`<div class="bnd">${it.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}</div>`}
+function bnHtml(){const o=(D.pages||{}).__ads;if(!o||!o.on)return'';const it=(o.items||[]).filter(x=>safeImg(x.img));return it.length?bnMarkup(it,true):''}
 function bnStart(){clearInterval(bnT);const b=document.querySelectorAll('.bn');if(RM||!b.length)return;
  bnT=setInterval(()=>b.forEach(x=>{const s=x.querySelectorAll('.bs');if(s.length<2)return;const d=x.querySelectorAll('.bnd i');let i=[...s].findIndex(e=>e.classList.contains('on'));s[i].classList.remove('on');d[i]&&d[i].classList.remove('on');i=(i+1)%s.length;s[i].classList.add('on');d[i]&&d[i].classList.add('on')}),5000)}
-function bnVals(){const o=(bnDraft||{});return {on:$('#bn_on')?$('#bn_on').checked:o.on,items:[...document.querySelectorAll('.bni')].map(r=>({img:r.dataset.img,link:r.querySelector('input').value.trim()}))}}
+function bnVals(){const o=(bnDraft||{});return {on:$('#bn_on')?$('#bn_on').checked:o.on,pop:$('#bn_pop')?$('#bn_pop').checked:!!o.pop,freq:$('#bn_f')?$('#bn_f').value:(o.freq||'visit'),items:[...document.querySelectorAll('.bni')].map(r=>({img:r.dataset.img,link:r.querySelector('input').value.trim()}))}}
 function bnKeep(){if($('#bn_on'))bnDraft=bnVals()}
 function adKeepAll(){if($('#ad_t'))adKeep();bnKeep()}
-function bnTab(){const o=bnDraft||(A.pages||{}).__ads||{on:false,items:[]};if(!bnDraft)bnDraft={on:!!o.on,items:(o.items||[]).map(x=>({...x}))};const it=bnDraft.items;
- return `<div class="aup"><strong>Photo ads (banner)</strong><p class="meta">Upload photos only. They appear as a banner on the home page and under every article, and change by themselves every 5 seconds. Up to 5 photos. A link is optional.</p>
+function bnTab(){const o=bnDraft||(A.pages||{}).__ads||{on:false,items:[]};if(!bnDraft)bnDraft={on:!!o.on,pop:!!o.pop,freq:o.freq||'visit',items:(o.items||[]).map(x=>({...x}))};const it=bnDraft.items;
+ return `<div class="aup"><strong>Photo ads (banner)</strong><p class="meta">Upload photos only. They appear as a banner on the home page and under every article, and change by themselves every 5 seconds. You can also open them as a popup when the website opens. Up to 5 photos. A link is optional.</p>
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bn_on" ${bnDraft.on?'checked':''} style="width:auto"> Show the photo banner to visitors</label>
- ${it.map((x,i)=>`<div class="bni" data-img="${esc(x.img)}" style="display:flex;gap:10px;align-items:center;margin:10px 0"><img src="${esc(x.img)}" alt="" style="width:92px;height:60px;object-fit:cover;border-radius:6px"><input placeholder="Link when tapped (optional, https://…)" value="${esc(x.link||'')}" style="flex:1;min-width:0"><button class="bt d" onclick="bnRm(${i})">Remove</button></div>`).join('')}
+ <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bn_pop" ${bnDraft.pop?'checked':''} style="width:auto"> Also open these photos as a popup when the website opens (5-second countdown)</label>
+ <label>How often to show the popup</label><select id="bn_f"><option value="visit" ${(bnDraft.freq||'visit')==='visit'?'selected':''}>Once per visit</option><option value="day" ${bnDraft.freq==='day'?'selected':''}>Once per day</option><option value="always" ${bnDraft.freq==='always'?'selected':''}>Every time a page is opened</option></select>
+ ${it.map((x,i)=>`<div class="bni" data-img="${esc(x.img)}"><img src="${esc(x.img)}" alt=""><input placeholder="Link when tapped (optional, https://…)" value="${esc(x.link||'')}"><button class="bt d" onclick="bnRm(${i})">Remove</button></div>`).join('')}
  ${it.length<5?`<label>Add photos</label><input type="file" accept="image/*" multiple onchange="bnUp(this.files)">`:'<p class="meta">Maximum of 5 photos reached.</p>'}
- <div style="margin-top:12px"><button class="bt" onclick="bnSave()">Save photo ads</button></div></div>`}
+ <div style="margin-top:12px"><button class="bt" onclick="bnSave()">Save photo ads</button><button class="bt o" onclick="bnPreview()">Preview popup</button></div></div>`}
+function bnPreview(){const v=bnVals();if(!v.items.length)return alert('Add at least one photo first.');adShow({items:v.items},true)}
 async function bnUp(files){adKeepAll();const room=5-bnDraft.items.length;if(files.length>room)alert('Only '+room+' more photo'+(room===1?'':'s')+' allowed.');
  for(const f of [...files].slice(0,room)){try{const src=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});
   bnDraft.items.push({img:await put(await jpg(i,1200,.8)),link:''})}catch(e){alert('Photo upload failed')}}go()}
 function bnRm(i){adKeepAll();bnDraft.items.splice(i,1);go()}
 async function bnSave(){const v=bnVals();if(v.items.some(x=>x.link&&!/^https?:\/\//i.test(x.link)))return alert('Links must start with https://');
  if(v.on&&!v.items.length)return alert('Add at least one photo first.');
- A.pages=A.pages||{};A.pages.__ads={on:v.on,items:v.items,ver:Date.now().toString(36)};bnDraft=null;if(await persist()){alert('Saved. The photo banner is '+(v.on?'ON':'OFF')+'.');go()}}
+ A.pages=A.pages||{};A.pages.__ads={on:v.on,pop:v.pop,freq:v.freq,items:v.items,ver:Date.now().toString(36)};bnDraft=null;if(await persist()){alert('Saved. The photo banner is '+(v.on?'ON':'OFF')+'.');go()}}
 /* ---------- Audio section ---------- */
 const AU=new Audio();AU.preload='none';let auId=null,auBad=null;
 const fmt=t=>{if(!isFinite(t)||t<0)return'–:––';t=Math.round(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
@@ -615,6 +640,7 @@ if(location.hash.startsWith('#/'))history.replaceState(null,'',location.hash.sli
 try{const c=JSON.parse(localStorage.getItem('sk_d'));if(c&&c.articles){D=c;ready=true}}catch(e){}
 go();
 const pub_=()=>location.pathname.split('/')[1]!=='developer';
+if(ready===true)adInit(false);
 fetch('/api/data').then(r=>r.json()).then(x=>{const t=JSON.stringify(x);let o=null;try{o=localStorage.getItem('sk_d')}catch(e){}
- if(!ready||t!==o){D=x;ready=true;if(pub_())go()}try{localStorage.setItem('sk_d',t)}catch(e){}adInit()}).catch(()=>{if(!ready){ready='err';if(pub_())go()}});
+ if(!ready||t!==o){D=x;ready=true;if(pub_())go()}try{localStorage.setItem('sk_d',t)}catch(e){}adFresh=true;adInit(true)}).catch(()=>{if(!ready){ready='err';if(pub_())go()}});
 </script></body></html>
