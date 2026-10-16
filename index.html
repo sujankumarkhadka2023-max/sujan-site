@@ -199,11 +199,22 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .adx{position:absolute;top:8px;right:8px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.7);color:#fff;font-size:18px;cursor:pointer}.adx:hover{background:#000}.adbd.none{display:none}.adbox .bn{margin:0;border-radius:14px}.adbox .bn .bs img{max-height:72vh}.adx:disabled{cursor:not-allowed;background:rgba(0,0,0,.55);font-size:16px;font-weight:700}
 .adtag{position:absolute;top:14px;left:12px;z-index:2;font-size:11px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,0,0,.65);color:#fff;padding:3px 8px;border-radius:4px}
 @keyframes adf{from{opacity:0}to{opacity:1}}@keyframes adp{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
+
+/* ---------- full-screen photo popup (phone and desktop) ---------- */
+#adm.full{padding:0;background:#000}
+#adm.full .adbox{width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;border-radius:0;box-shadow:none;background:#000;overflow:hidden}
+#adm.full .adbox .bn{width:100%;height:100%;margin:0;border-radius:0;background:#000}
+#adm.full .bn .bs{position:absolute;inset:0;display:none;overflow:hidden;background:#000}#adm.full .bn .bs.on{display:flex;align-items:center;justify-content:center}
+#adm.full .bn .bs:before{content:"";position:absolute;inset:-30px;background:var(--b) center/cover no-repeat;filter:blur(26px) brightness(.55);transform:scale(1.1)}
+#adm.full .bn .bs img{position:relative;width:100%;height:100%;max-height:none;object-fit:contain;border-radius:0}
+#adm.full .adx{top:calc(14px + env(safe-area-inset-top,0px));right:14px;width:46px;height:46px;font-size:20px}
+#adm.full .adtag{top:calc(22px + env(safe-area-inset-top,0px));left:14px}
+#adm.full .bnd{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 @media(prefers-reduced-motion:reduce){#adm,#adm.out,.adbox{animation:none!important}}
 
 /* ---------- photo banner ---------- */
 .bn{position:relative;margin:26px 0;border-radius:12px;overflow:hidden;background:var(--ln);font-family:system-ui,sans-serif}
-.bn .bs{display:none}.bn .bs.on{display:block;animation:bnf .8s ease both}.bn .bs img{display:block;width:100%;height:auto;max-height:340px;object-fit:cover}
+.bn .bs{display:none}.bn .bs.on{display:block;animation:bnf .8s ease both}.bn .bs img{display:block;width:100%;height:auto;max-height:none;object-fit:contain}
 .bnt{position:absolute;top:8px;left:8px;z-index:2;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,0,0,.65);color:#fff;padding:2px 7px;border-radius:4px}
 .bnd{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}.bnd i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);transition:all .3s}.bnd i.on{background:#ffe500;width:20px;border-radius:4px}
 @keyframes bnf{from{opacity:0}to{opacity:1}}
@@ -463,8 +474,8 @@ function adKey(e){const d=document.getElementById('adm');if(e.key==='Escape'&&d&
 function adShow(o,preview){if(!o||document.getElementById('adm'))return;
  const img=safeImg(o.img),lk=/^https?:\/\//i.test(o.link||'')?o.link:'',ph=(o.items||[]).filter(x=>safeImg(x.img));if(!img&&!o.title&&!o.text&&!ph.length)return;
  const d=document.createElement('div');d.id='adm';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Advertisement');
- const im=ph.length?bnMarkup(ph,false):img?(lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored"><img src="${img}" alt=""></a>`:`<img src="${img}" alt="">`):'';
- let n=preview?0:AD_LOCK;if(n)d.dataset.lock='1';if(o.ver!=null)d.dataset.ver=String(o.ver);
+ const im=ph.length?bnMarkup(ph,false,true):img?(lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored"><img src="${img}" alt=""></a>`:`<img src="${img}" alt="">`):'';
+ if(ph.length)d.classList.add('full');let n=preview?0:AD_LOCK;if(n)d.dataset.lock='1';if(o.ver!=null)d.dataset.ver=String(o.ver);
  d.innerHTML=`<div class="adbox"><button class="adx" ${n?'disabled':''} aria-label="${n?'You can close this in '+n+' seconds':'Close advertisement'}">${n||'✕'}</button><div class="adtag">Advertisement</div>${im}<div class="adbd${ph.length?' none':img?'':' noimg'}">${o.title?`<h2>${esc(o.title)}</h2>`:''}${o.text?`<p>${esc(o.text)}</p>`:''}${lk?`<a class="adbt" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${esc(o.btn||'Learn more')}</a>`:''}</div></div>`;
  d.addEventListener('click',e=>{if(e.target.closest('.adx')&&!d.dataset.lock)adClose();else if(e.target===d&&preview)adClose()});
  document.body.appendChild(d);document.body.style.overflow='hidden';document.addEventListener('keydown',adKey);const x=d.querySelector('.adx');
@@ -501,9 +512,9 @@ async function adSave(){const v=adVals();if(v.link&&!/^https?:\/\//i.test(v.link
 
 /* ---------- Photo banner ads: upload photos only, shown as a slideshow on Home and under articles ---------- */
 let bnDraft=null,bnT=null;
-function bnMarkup(it,label){
+function bnMarkup(it,label,big){
  const sl=it.map((x,i)=>{const lk=/^https?:\/\//i.test(x.link||'')?x.link:'',im=`<img src="${safeImg(x.img)}" alt="Advertisement" loading="lazy" decoding="async">`;
-  return lk?`<a class="bs${i?'':' on'}" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${im}</a>`:`<div class="bs${i?'':' on'}">${im}</div>`}).join('');
+  const st=big?` style="--b:url('${safeImg(x.img)}')"`:'';return lk?`<a class="bs${i?'':' on'}"${st} href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${im}</a>`:`<div class="bs${i?'':' on'}"${st}>${im}</div>`}).join('');
  return `<div class="bn" aria-label="Advertisement">${label?'<span class="bnt">Advertisement</span>':''}${sl}${it.length>1?`<div class="bnd">${it.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}</div>`}
 function bnHtml(){const o=(D.pages||{}).__ads;if(!o||!o.on)return'';const it=(o.items||[]).filter(x=>safeImg(x.img));return it.length?bnMarkup(it,true):''}
 function bnStart(){clearInterval(bnT);const b=document.querySelectorAll('.bn');if(RM||!b.length)return;
