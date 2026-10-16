@@ -188,6 +188,26 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .vlnk{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.2);font-size:14px}.vlnk a,.vlnk button{color:#dbe5f5;background:none;border:0;padding:0;cursor:pointer;font:inherit;text-decoration:underline}
 .vvr{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:14px;color:#dbe5f5}.vvr select{flex:1;min-width:0;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:#0a3a80;color:#fff;font-size:14px}
 @media(prefers-reduced-motion:reduce){.vp.vplay .vbig,.vp.vplay .abars i{animation:none}}
+
+/* ---------- popup ad ---------- */
+#adm{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:16px;animation:adf .3s ease both;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#adm.out{animation:adf .25s ease reverse both}
+.adbox{position:relative;width:min(440px,100%);max-height:90vh;overflow:auto;background:var(--bg);color:var(--tx);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.45);animation:adp .45s cubic-bezier(.2,.8,.2,1) both;font-family:system-ui,sans-serif}
+.adbox img{display:block;width:100%;height:auto;border-radius:14px 14px 0 0}
+.adbd{padding:18px 20px 22px;text-align:center}.adbd.noimg{padding-top:46px}.adbd h2{margin:0 0 8px;font:700 22px/1.25 Georgia,'Times New Roman',serif}.adbd p{margin:0 0 16px;line-height:1.5;color:var(--mu);white-space:pre-line}.adbd p:last-child{margin-bottom:0}
+.adbt{display:inline-block;padding:11px 26px;border-radius:24px;background:var(--ac);color:#fff;font-weight:700;text-decoration:none}.adbt:hover{filter:brightness(1.1)}
+.adx{position:absolute;top:8px;right:8px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.7);color:#fff;font-size:18px;cursor:pointer}.adx:hover{background:#000}.adx:disabled{cursor:not-allowed;background:rgba(0,0,0,.55);font-size:16px;font-weight:700}
+.adtag{position:absolute;top:14px;left:12px;z-index:2;font-size:11px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,0,0,.65);color:#fff;padding:3px 8px;border-radius:4px}
+@keyframes adf{from{opacity:0}to{opacity:1}}@keyframes adp{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#adm,#adm.out,.adbox{animation:none!important}}
+
+/* ---------- photo banner ---------- */
+.bn{position:relative;margin:26px 0;border-radius:12px;overflow:hidden;background:var(--ln);font-family:system-ui,sans-serif}
+.bn .bs{display:none}.bn .bs.on{display:block;animation:bnf .8s ease both}.bn .bs img{display:block;width:100%;height:auto;max-height:340px;object-fit:cover}
+.bnt{position:absolute;top:8px;left:8px;z-index:2;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,0,0,.65);color:#fff;padding:2px 7px;border-radius:4px}
+.bnd{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}.bnd i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);transition:all .3s}.bnd i.on{background:#ffe500;width:20px;border-radius:4px}
+@keyframes bnf{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.bn .bs.on{animation:none}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -222,6 +242,7 @@ function home(){const L=live();if(!L.length)return `<div class="empty" style="pa
  let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
  const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
  let h=`<section class="lead"><div><div class="cat">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div><a class="sm" href="${url(lead)}">Read more <span class="ar">→</span></a></div>${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:''}</section>`;
+ h+=bnHtml();
  if(sec.length)h+=`<div class="sec"><div class="g">${sec.map(card).join('')}</div></div>`;
  CATS.forEach(c=>h+=block(c,L.filter(a=>a.category===c),SL[c]));return h}
 function stats(L){let v=0;for(const k in (D.views||{}))v+=+D.views[k]||0;let g=0;try{g=+localStorage.getItem('sk_games_played')||0}catch(e){}
@@ -254,7 +275,7 @@ function articlePg(slug){const L=live(),a=L.find(x=>x.slug===slug);if(!a)return 
  ${im?`<figure style="margin:0"><img style="display:block" src="${im}" alt="${esc(a.imageCaption||a.title)}"><figcaption>${esc(a.imageCaption)}</figcaption></figure>`:''}
  ${body(a.body,(a.images||[]).slice(1))}${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}
 </article>
- ${more.length?`<div class="sec"><h2>More on this story</h2><div class="g">${more.map(card).join('')}</div></div>`:''}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}`}
+ ${bnHtml()}${more.length?`<div class="sec"><h2>More on this story</h2><div class="g">${more.map(card).join('')}</div></div>`:''}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}`}
 const DEF={about:'Hello, I\'m Sujan Kumar Khadka.\n\nI\'m a student and lifelong learner committed to personal growth, continuous learning, and professional development. I enjoy exploring new ideas, developing my skills, and discovering opportunities to grow both personally and professionally.\n\nThis website is my personal space on the internet, where I share news, opinion, and culture and lifestyle.\n\nI believe that consistency, curiosity, and a willingness to learn are essential for long-term success.\n\nMy goal is simple: to keep learning, keep improving, and create something meaningful along the way.\n\nThank you for visiting my website.\n\nLearning today. Building for tomorrow.',contact:'We would be glad to hear from you. Whether you have a question, a news tip, feedback or a correction, please write to us by email.\n\nEmail: sujankumarkhadka56@gmail.com\n\nWHAT YOU CAN WRITE TO US ABOUT\nNews tips and story ideas\nCorrections and feedback on our stories\nQuestions about the website\nPrivacy enquiries\n\nWHEN YOU WRITE\nPlease include a clear subject line and, if you are writing about a story, the link or headline. We read every message and reply as soon as we can.\n\nWe use your email address and message only to reply to you.',support:'The Sujan Khadka is independent, free to read and free of advertising. Your support helps us keep it that way. There are simple ways to help, and every one of them matters.\n\nREAD AND SHARE\nShare stories you value with friends, family and on social media. Word of mouth is the strongest support an independent site can have.\n\nTELL US WHAT YOU THINK\nHonest feedback makes our stories better. Tell us what you liked, what we missed and what you would like to read next.\n\nSEND A TIP OR A CORRECTION\nIf you know about a story we should cover, or you spot a mistake, please write to us. Our Contact page has the details.\n\nINSTALL THE APP\nAdd the site to your home screen from the footer of any page. Recent stories open even with a weak internet connection.\n\nThank you for reading and for being part of The Sujan Khadka.',privacy:"The Sujan Khadka respects your privacy. This page explains what information is handled when you use this website.\n\nWHAT WE COLLECT\nReaders do not need an account, and the site does not ask for your name, email or other personal details. If you email us, we use your email address and message only to reply.\n\nTECHNICAL DATA\nOur hosting provider, Cloudflare, processes technical data such as IP address and browser type to deliver the site and keep it secure. We do not use this data to identify individual readers.\n\nADVERTISING AND TRACKING\nThis site does not run advertising or third-party tracking scripts.\n\nEXTERNAL LINKS\nStories may link to other websites. We are not responsible for their privacy practices.\n\nQUESTIONS\nFor privacy questions, contact: sujankumarkhadka56@gmail.com\n\nWe may update this page from time to time. The latest version is always published here.",cookies:"This website does not use cookies to track readers.\n\nLOCAL STORAGE\nTo load faster, your browser may keep a copy of recently published stories on your device. This contains only public stories and no personal information. You can clear it at any time in your browser settings.\n\nSIGN-IN COOKIE\nA secure sign-in cookie is used only by the site developer to manage content. Readers never receive it.\n\nOTHER WEBSITES\nSites we link to may use their own cookies, which we do not control.\n\nQUESTIONS\nContact: sujankumarkhadka56@gmail.com",terms:"By using The Sujan Khadka you agree to these terms.\n\nCONTENT\nStories, text and images published here belong to The Sujan Khadka unless stated otherwise. You may share links and quote short extracts with credit and a link back. Please do not republish full stories or images without written permission.\n\nOPINION AND ACCURACY\nWe aim to be accurate and fair. Opinion pieces reflect the views of their authors. Content is for general information and is not professional advice. If you find an error, please email us.\n\nUSE OF THE SITE\nPlease do not misuse the site, try to disrupt it, or try to reach areas that are not public.\n\nLINKS\nWe may link to other websites and are not responsible for their content.\n\nCHANGES\nWe may update these terms or the site at any time.\n\nCONTACT\nsujankumarkhadka56@gmail.com"};
 const link=t=>esc(t).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g,m=>`<a href="mailto:${m}">${m}</a>`);
 const FX={
@@ -269,10 +290,11 @@ async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{
  if(r.ok){adm=null;go()}else $('#le').textContent=(await r.json().catch(()=>({}))).error||'Sign in failed'}
 async function persist(){const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(A)});if(!r.ok){alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
 function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
- let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
+ let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}${T('ad','Advertising')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
  h+=stats(A.articles.filter(a=>a.status==='published'));
  if(tab==='articles')h+=ed?editor():list();
  if(tab==='home')h+=`<p class="meta">Featured stories in order: first is the lead, next four are secondary.</p>`+(A.home.length?A.home.map((id,i)=>{const a=A.articles.find(x=>x.id===id);return a?`<div class="row"><span>${i+1}. ${esc(a.title)}</span><span><button class="bt o" onclick="mv(${i},-1)">↑</button><button class="bt o" onclick="mv(${i},1)">↓</button><button class="bt o" onclick="feat('${id}')">Remove</button></span></div>`:''}).join(''):'<div class="empty">Nothing featured. Latest stories are used.</div>');
+ if(tab==='ad')h+=adTab();
  if(tab==='audio')h+=audioTab();
  if(tab==='pages')h+=Object.keys(PG).map(k=>`<label>${PG[k]}</label><textarea style="min-height:110px" id="pg_${k}">${esc(A.pages[k]||DEF[k]||'')}</textarea>`).join('')+`<button class="bt" onclick="savePages()">Save pages</button>`;
  return h+'</div>'}
@@ -323,7 +345,7 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(p[0]!=='audio')auStop();
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();motion();if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
@@ -414,6 +436,72 @@ async function avSave(){const t=$('#av_t').value.trim(),x=$('#av_x').value.trim(
  if(e){e.title=t;e.desc=d;e.text=x}else A.audios.push({id:'u'+Date.now(),kind:'voice',title:t,desc:d,text:x,date:new Date().toISOString(),status:'published'});
  avEdit=null;if(await persist())go()}
 function avEditSet(id){avEdit=id;go();scrollTo(0,0)}
+
+/* ---------- Popup advertisement (stored in pages.__ad so no server change is needed) ---------- */
+let adDraft=null,adTried=false;
+function adDue(o){if(!o||!o.on)return false;const k='sk_ad_'+(o.ver||'0'),f=o.freq||'visit';try{
+ if(f==='always')return true;
+ if(f==='day')return Date.now()-(+localStorage.getItem(k)||0)>864e5;
+ return !sessionStorage.getItem(k)}catch(e){return true}}
+function adMark(o){const k='sk_ad_'+(o.ver||'0');try{if(o.freq==='day')localStorage.setItem(k,Date.now());else sessionStorage.setItem(k,'1')}catch(e){}}
+const AD_LOCK=5;let adCt=null;
+function adClose(){const d=document.getElementById('adm');if(!d)return;clearInterval(adCt);document.removeEventListener('keydown',adKey);document.body.style.overflow='';d.classList.add('out');setTimeout(()=>d.remove(),260)}
+function adKey(e){const d=document.getElementById('adm');if(e.key==='Escape'&&d&&!d.dataset.lock)adClose()}
+function adShow(o,preview){if(!o||document.getElementById('adm'))return;
+ const img=safeImg(o.img),lk=/^https?:\/\//i.test(o.link||'')?o.link:'';if(!img&&!o.title&&!o.text)return;
+ const d=document.createElement('div');d.id='adm';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Advertisement');
+ const im=img?(lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored"><img src="${img}" alt=""></a>`:`<img src="${img}" alt="">`):'';
+ let n=preview?0:AD_LOCK;if(n)d.dataset.lock='1';
+ d.innerHTML=`<div class="adbox"><button class="adx" ${n?'disabled':''} aria-label="${n?'You can close this in '+n+' seconds':'Close advertisement'}">${n||'✕'}</button><div class="adtag">Advertisement</div>${im}<div class="adbd${img?'':' noimg'}">${o.title?`<h2>${esc(o.title)}</h2>`:''}${o.text?`<p>${esc(o.text)}</p>`:''}${lk?`<a class="adbt" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${esc(o.btn||'Learn more')}</a>`:''}</div></div>`;
+ d.addEventListener('click',e=>{if(e.target.closest('.adx')&&!d.dataset.lock)adClose();else if(e.target===d&&preview)adClose()});
+ document.body.appendChild(d);document.body.style.overflow='hidden';document.addEventListener('keydown',adKey);const x=d.querySelector('.adx');
+ if(n){adCt=setInterval(()=>{n--;if(n>0){x.textContent=n;x.setAttribute('aria-label','You can close this in '+n+' seconds')}else{clearInterval(adCt);delete d.dataset.lock;x.disabled=false;x.textContent='✕';x.setAttribute('aria-label','Close advertisement');x.focus({preventScroll:true})}},1000)}else x.focus({preventScroll:true})}
+function adInit(){if(adTried||!pub_())return;adTried=true;const o=(D.pages||{}).__ad;if(!adDue(o))return;
+ setTimeout(()=>{if(pub_()){adMark(o);adShow(o)}},document.documentElement.classList.contains('noi')?500:2150)}
+/* portal tab */
+const adVals=()=>({on:$('#ad_on').checked,img:adDraft?adDraft.img:'',title:$('#ad_t').value.trim(),text:$('#ad_x').value.trim(),btn:$('#ad_b').value.trim(),link:$('#ad_l').value.trim(),freq:$('#ad_f').value});
+function adTab(){return adPopupTab()+bnTab()}
+function adPopupTab(){const o=adDraft||(A.pages||{}).__ad||{};if(!adDraft)adDraft={img:o.img||''};
+ return `<div class="aup"><strong>Popup advertisement</strong><p class="meta">The popup appears when someone opens the website. For the first 5 seconds a countdown shows. After that, visitors can close it only with the ✕ button or the Esc key, then see the site as usual.</p>
+ <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ad_on" ${o.on?'checked':''} style="width:auto"> Show the popup to visitors</label>
+ <label>Image (optional)</label>${adDraft.img?`<img src="${esc(adDraft.img)}" alt="" style="max-width:260px;display:block;margin:6px 0">`:''}<input type="file" accept="image/*" onchange="adUp(this.files[0])">${adDraft.img?'<button class="bt o" onclick="adNoImg()">Remove image</button>':''}
+ <label>Title</label><input id="ad_t" value="${esc(o.title||'')}"><label>Text</label><textarea id="ad_x" style="min-height:90px">${esc(o.text||'')}</textarea>
+ <label>Button text</label><input id="ad_b" value="${esc(o.btn==null?'Learn more':o.btn)}"><label>Button link (https://…)</label><input id="ad_l" type="url" inputmode="url" value="${esc(o.link||'')}" placeholder="https://…">
+ <label>How often to show it</label><select id="ad_f"><option value="visit" ${(o.freq||'visit')==='visit'?'selected':''}>Once per visit</option><option value="day" ${o.freq==='day'?'selected':''}>Once per day</option><option value="always" ${o.freq==='always'?'selected':''}>Every time a page is opened</option></select>
+ <div style="margin-top:12px"><button class="bt" onclick="adSave()">Save ad</button><button class="bt o" onclick="adPreview()">Preview</button></div></div>`}
+function adKeep(){const v=adVals();adDraft={...v}}
+async function adUp(f){if(!f)return;adKeepAll();try{const r=new FileReader(),src=await new Promise((ok,no)=>{r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});
+ adDraft.img=await put(await jpg(i,1000,.82))}catch(e){alert('Image upload failed')}go()}
+function adNoImg(){adKeepAll();adDraft.img='';go()}
+function adPreview(){adShow(adVals(),true)}
+async function adSave(){const v=adVals();if(v.link&&!/^https?:\/\//i.test(v.link))return alert('The link must start with https://');
+ if(!v.img&&!v.title&&!v.text)return alert('Add an image, a title or some text first.');
+ A.pages=A.pages||{};A.pages.__ad={...v,ver:Date.now().toString(36)};adDraft=null;if(await persist()){alert('Saved. The popup is '+(v.on?'ON':'OFF')+'.');go()}}
+
+/* ---------- Photo banner ads: upload photos only, shown as a slideshow on Home and under articles ---------- */
+let bnDraft=null,bnT=null;
+function bnHtml(){const o=(D.pages||{}).__ads;if(!o||!o.on)return'';const it=(o.items||[]).filter(x=>safeImg(x.img));if(!it.length)return'';
+ const sl=it.map((x,i)=>{const lk=/^https?:\/\//i.test(x.link||'')?x.link:'',im=`<img src="${safeImg(x.img)}" alt="Advertisement" loading="lazy" decoding="async">`;
+  return lk?`<a class="bs${i?'':' on'}" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored">${im}</a>`:`<div class="bs${i?'':' on'}">${im}</div>`}).join('');
+ return `<div class="bn" aria-label="Advertisement"><span class="bnt">Advertisement</span>${sl}${it.length>1?`<div class="bnd">${it.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:''}</div>`}
+function bnStart(){clearInterval(bnT);const b=document.querySelectorAll('.bn');if(RM||!b.length)return;
+ bnT=setInterval(()=>b.forEach(x=>{const s=x.querySelectorAll('.bs');if(s.length<2)return;const d=x.querySelectorAll('.bnd i');let i=[...s].findIndex(e=>e.classList.contains('on'));s[i].classList.remove('on');d[i]&&d[i].classList.remove('on');i=(i+1)%s.length;s[i].classList.add('on');d[i]&&d[i].classList.add('on')}),5000)}
+function bnVals(){const o=(bnDraft||{});return {on:$('#bn_on')?$('#bn_on').checked:o.on,items:[...document.querySelectorAll('.bni')].map(r=>({img:r.dataset.img,link:r.querySelector('input').value.trim()}))}}
+function bnKeep(){if($('#bn_on'))bnDraft=bnVals()}
+function adKeepAll(){if($('#ad_t'))adKeep();bnKeep()}
+function bnTab(){const o=bnDraft||(A.pages||{}).__ads||{on:false,items:[]};if(!bnDraft)bnDraft={on:!!o.on,items:(o.items||[]).map(x=>({...x}))};const it=bnDraft.items;
+ return `<div class="aup"><strong>Photo ads (banner)</strong><p class="meta">Upload photos only. They appear as a banner on the home page and under every article, and change by themselves every 5 seconds. Up to 5 photos. A link is optional.</p>
+ <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bn_on" ${bnDraft.on?'checked':''} style="width:auto"> Show the photo banner to visitors</label>
+ ${it.map((x,i)=>`<div class="bni" data-img="${esc(x.img)}" style="display:flex;gap:10px;align-items:center;margin:10px 0"><img src="${esc(x.img)}" alt="" style="width:92px;height:60px;object-fit:cover;border-radius:6px"><input placeholder="Link when tapped (optional, https://…)" value="${esc(x.link||'')}" style="flex:1;min-width:0"><button class="bt d" onclick="bnRm(${i})">Remove</button></div>`).join('')}
+ ${it.length<5?`<label>Add photos</label><input type="file" accept="image/*" multiple onchange="bnUp(this.files)">`:'<p class="meta">Maximum of 5 photos reached.</p>'}
+ <div style="margin-top:12px"><button class="bt" onclick="bnSave()">Save photo ads</button></div></div>`}
+async function bnUp(files){adKeepAll();const room=5-bnDraft.items.length;if(files.length>room)alert('Only '+room+' more photo'+(room===1?'':'s')+' allowed.');
+ for(const f of [...files].slice(0,room)){try{const src=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});
+  bnDraft.items.push({img:await put(await jpg(i,1200,.8)),link:''})}catch(e){alert('Photo upload failed')}}go()}
+function bnRm(i){adKeepAll();bnDraft.items.splice(i,1);go()}
+async function bnSave(){const v=bnVals();if(v.items.some(x=>x.link&&!/^https?:\/\//i.test(x.link)))return alert('Links must start with https://');
+ if(v.on&&!v.items.length)return alert('Add at least one photo first.');
+ A.pages=A.pages||{};A.pages.__ads={on:v.on,items:v.items,ver:Date.now().toString(36)};bnDraft=null;if(await persist()){alert('Saved. The photo banner is '+(v.on?'ON':'OFF')+'.');go()}}
 /* ---------- Audio section ---------- */
 const AU=new Audio();AU.preload='none';let auId=null,auBad=null;
 const fmt=t=>{if(!isFinite(t)||t<0)return'–:––';t=Math.round(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
@@ -528,5 +616,5 @@ try{const c=JSON.parse(localStorage.getItem('sk_d'));if(c&&c.articles){D=c;ready
 go();
 const pub_=()=>location.pathname.split('/')[1]!=='developer';
 fetch('/api/data').then(r=>r.json()).then(x=>{const t=JSON.stringify(x);let o=null;try{o=localStorage.getItem('sk_d')}catch(e){}
- if(!ready||t!==o){D=x;ready=true;if(pub_())go()}try{localStorage.setItem('sk_d',t)}catch(e){}}).catch(()=>{if(!ready){ready='err';if(pub_())go()}});
+ if(!ready||t!==o){D=x;ready=true;if(pub_())go()}try{localStorage.setItem('sk_d',t)}catch(e){}adInit()}).catch(()=>{if(!ready){ready='err';if(pub_())go()}});
 </script></body></html>
