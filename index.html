@@ -232,6 +232,8 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .ad .row .bt{margin:2px 4px 2px 0}
 .tabs .bt{flex:0 0 auto}
 @media(max-width:520px){.ad{padding:0 12px}.stats{gap:6px}.st span{font-size:10px;letter-spacing:.5px}}
+.pdfbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}.cap{height:6px;background:var(--ln);border-radius:4px;overflow:hidden;margin:6px 0 2px}.cap i{display:block;height:100%;width:0;transition:width .3s}
+.wxb{background:none;border:0;padding:0;margin-left:2px;font:inherit;color:var(--mu);cursor:pointer;text-align:left}.wxb:hover{color:var(--ac)}.wxb:empty{display:none}@media(max-width:700px){.wxl{display:none}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -256,7 +258,7 @@ function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2
  return `<div class="sec"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
 function shell(inner,cur){
  const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Games','/games.html']];
- return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
+ return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
  <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a></div></div></div>
@@ -312,7 +314,8 @@ const pagePg=k=>{if(!PG[k])return '<div class="empty" style="padding:60px 0">Pag
 function loginView(){return `<div class="ad" style="max-width:380px"><h1>Editor sign in</h1><label>Password</label><input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"><button class="bt" onclick="doLogin()">Sign in</button><p class="meta" id="le"></p></div>`}
 async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:$('#pw').value})});
  if(r.ok){adm=null;go()}else $('#le').textContent=(await r.json().catch(()=>({}))).error||'Sign in failed'}
-async function persist(){const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(A)});if(!r.ok){alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
+async function persist(){const body=JSON.stringify(A);if(body.length>SITE_LIMIT){alert('Not saved: the site is too full ('+body.length.toLocaleString()+' characters; the limit is '+SITE_LIMIT.toLocaleString()+' for all articles, pages and audio together). Shorten or remove some text, then save again.');return false}
+ const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body});if(!r.ok){if(r.status===413){alert('Not saved: this is too large for the server.');return false}alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
 function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
  let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}${T('ad','Advertising')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
  h+=stats(A.articles.filter(a=>a.status==='published'));
@@ -334,7 +337,10 @@ function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=m
  <label>Images ${imgs.length}/${max}${multi?' — first is the main image':''}</label>
  ${imgs.map((m,i)=>`<div class="row"><img src="${safeImg(m.thumb||m.url)}" style="width:90px;height:60px;object-fit:cover" alt=""><input class="ic" data-i="${i}" style="flex:1;margin:0" placeholder="Caption (optional)" value="${esc(m.caption)}"><button class="bt d" onclick="rmImg(${i})">Remove</button></div>`).join('')}
  ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs(this.files)">`:'<p class="meta">Maximum reached.</p>'}
- <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link)</label><textarea id="e_b">${esc(a.body)}</textarea>
+ <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link)</label>
+ <div class="pdfbar"><label class="bt o" style="cursor:pointer">Import from PDF<input type="file" accept="application/pdf,.pdf" hidden onchange="pdfImport(this.files[0]);this.value=''"></label><button type="button" class="bt o" onclick="copyBody()">Copy all text</button><span id="pdfst" class="meta"></span></div>
+ <textarea id="e_b" oninput="bodyStat()">${esc(a.body)}</textarea>
+ <div class="meta" id="bstat"></div><div class="cap"><i id="capb"></i></div><div class="meta" id="capt"></div>
  <label>Publication date/time (future = scheduled)</label><input id="e_d" type="datetime-local" value="${dt}">
  <label>SEO title</label><input id="e_st" value="${esc(a.seoTitle)}"><label>SEO description</label><input id="e_sd" value="${esc(a.seoDesc)}">
  <label class="ck"><input type="checkbox" id="e_f" ${a.featured?'checked':''}> Feature on homepage</label>
@@ -369,7 +375,7 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(p[0]!=='audio')auStop();
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
@@ -538,6 +544,72 @@ function bnRm(i){adKeepAll();bnDraft.items.splice(i,1);go()}
 async function bnSave(){const v=bnVals();if(v.items.some(x=>x.link&&!/^https?:\/\//i.test(x.link)))return alert('Links must start with https://');
  if(v.on&&!v.items.length)return alert('Add at least one photo first.');
  A.pages=A.pages||{};A.pages.__ads={on:v.on,pop:v.pop,freq:v.freq,items:v.items,ver:Date.now().toString(36)};bnDraft=null;if(await persist()){alert('Saved. The photo banner is '+(v.on?'ON':'OFF')+'.');go()}}
+
+/* ---------- PDF → text import, copy-all and size meter for the article editor ---------- */
+const SITE_LIMIT=4e6;let capKey=null,capRest=0,bsT=null;
+async function pdfLib(){if(window.__pdfjs)return window.__pdfjs;const base=window.PDFJS_BASE||'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';
+ const lib=await import(base+'pdf.min.mjs');lib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.mjs';return window.__pdfjs=lib}
+function pdfPageParas(tc){const lines=[];let cur=null,py=0;
+ for(const it of tc.items){if(typeof it.str!=='string')continue;const y=it.transform[5],h=Math.abs(it.transform[3])||it.height||10,x=it.transform[4];
+  if(cur&&Math.abs(y-py)<=Math.max(2,h*.5)){const gap=x-cur.x1;cur.t+=(gap>h*.15&&!/\s$/.test(cur.t)&&!/^\s/.test(it.str)?' ':'')+it.str;cur.x1=x+(it.width||0)}
+  else{if(!it.str.trim())continue;cur={y,h,t:it.str,x1:x+(it.width||0)};lines.push(cur)}
+  py=y;if(it.hasEOL)cur=null}
+ const ls=lines.map(l=>({y:l.y,h:l.h,t:l.t.replace(/\s+/g,' ').trim()})).filter(l=>l.t&&!/^(page\s*)?\d{1,4}$/i.test(l.t));
+ const gaps=[];for(let i=1;i<ls.length;i++){const d=ls[i-1].y-ls[i].y;if(d>0)gaps.push(d)}gaps.sort((a,b)=>a-b);const hs=ls.map(l=>l.h).sort((a,b)=>a-b),g=gaps.length>=3?gaps[gaps.length>>1]:(hs.length?hs[hs.length>>1]*1.35:0);
+ const paras=[];let p='';
+ ls.forEach((l,i)=>{const d=i?ls[i-1].y-l.y:0;const brk=i>0&&g&&(d>g*1.5||d<0);
+  if(!p)p=l.t;else if(brk){paras.push(p);p=l.t}else if(/[-‐]$/.test(p)&&/^[a-z]/.test(l.t))p=p.slice(0,-1)+l.t;else p+=' '+l.t});
+ if(p)paras.push(p);return paras}
+const nWords=t=>{let w=0,inw=false;for(let i=0;i<t.length;i++){const c=t.charCodeAt(i),sp=c<=32||c===160;if(!sp&&!inw){w++;inw=true}else if(sp)inw=false}return w};
+async function pdfImport(f){if(!f)return;const st=$('#pdfst');
+ try{st.textContent='Loading PDF reader…';const lib=await pdfLib();st.textContent='Opening PDF…';
+  const doc=await lib.getDocument({data:await f.arrayBuffer()}).promise,out=[];let chars=0;
+  for(let n=1;n<=doc.numPages;n++){st.textContent='Reading page '+n+' of '+doc.numPages+'…';
+   const pg=await doc.getPage(n),ps=pdfPageParas(await pg.getTextContent());pg.cleanup();if(!ps.length)continue;chars+=ps.join('').length;
+   if(out.length){const last=out[out.length-1],first=ps[0];if(!/[.!?:;"”’)\]\u0964]$/.test(last)&&/^[a-z]/.test(first)){out[out.length-1]=(/[-‐]$/.test(last)?last.slice(0,-1):last+' ')+first;ps.shift()}}
+   out.push(...ps);if(n%10===0)await new Promise(r=>setTimeout(r))}
+  if(chars<doc.numPages*15){st.textContent='';return alert('No readable text was found. This PDF is probably scanned pictures of pages, which need OCR. This importer reads real text only.')}
+  const text=out.join('\n\n'),ta=$('#e_b');let add=false;
+  if(ta.value.trim()&&!confirm('Replace the current text with the text from the PDF?\n\nOK = replace\nCancel = add it to the end'))add=true;
+  ta.value=add?ta.value.replace(/\s+$/,'')+'\n\n'+text:text;
+  try{const m=await doc.getMetadata(),t=m&&m.info&&m.info.Title;if(t&&!$('#e_t').value.trim())$('#e_t').value=String(t).trim()}catch(e){}
+  bodyStat(true);st.textContent='Imported '+doc.numPages+' pages · '+nWords(text).toLocaleString()+' words. Check it, then save.'}
+ catch(e){st.textContent='';alert('Could not read this PDF. '+(navigator.onLine?'Try another file.':'Please check your internet connection and try again.'))}}
+async function copyBody(){const ta=$('#e_b'),t=ta.value;if(!t)return alert('There is no text to copy.');
+ try{await navigator.clipboard.writeText(t);alert('Copied the full text: '+nWords(t).toLocaleString()+' words.')}
+ catch(e){ta.focus();ta.select();ta.setSelectionRange(0,t.length);let ok=false;try{ok=document.execCommand('copy')}catch(x){}alert(ok?'Copied the full text.':'All the text is selected. Press and hold, then choose Copy.')}}
+function bodyStat(now){clearTimeout(bsT);const run=()=>{const ta=$('#e_b');if(!ta||!ed)return;const t=ta.value,k=ed.id||'new';
+  if(capKey!==k){capKey=k;capRest=JSON.stringify({...A,articles:(A.articles||[]).filter(x=>x.id!==ed.id)}).length+1500}
+  const used=capRest+JSON.stringify(t).length,pct=Math.min(100,used/SITE_LIMIT*100),cb=$('#capb');
+  $('#bstat').textContent=nWords(t).toLocaleString()+' words · '+t.length.toLocaleString()+' characters';
+  cb.style.width=pct+'%';cb.style.background=pct>90?'#c0392b':'var(--ac)';
+  $('#capt').textContent='Site storage used: '+pct.toFixed(pct<10?1:0)+'% (the limit is about '+(SITE_LIMIT/1e6)+' million characters for the whole site)'+(used>SITE_LIMIT?' — too large to save':'')};
+ if(now)run();else bsT=setTimeout(run,300)}
+
+/* ---------- Weather for the visitor's own place (free: Cloudflare location + Open-Meteo) ---------- */
+const WXC={0:['☀️','Clear'],1:['🌤️','Mostly clear'],2:['⛅','Partly cloudy'],3:['☁️','Cloudy'],45:['🌫️','Fog'],48:['🌫️','Fog'],51:['🌦️','Light drizzle'],53:['🌦️','Drizzle'],55:['🌧️','Heavy drizzle'],56:['🌧️','Freezing drizzle'],57:['🌧️','Freezing drizzle'],61:['🌧️','Light rain'],63:['🌧️','Rain'],65:['🌧️','Heavy rain'],66:['🌧️','Freezing rain'],67:['🌧️','Freezing rain'],71:['🌨️','Light snow'],73:['🌨️','Snow'],75:['🌨️','Heavy snow'],77:['🌨️','Snow grains'],80:['🌦️','Showers'],81:['🌧️','Showers'],82:['⛈️','Heavy showers'],85:['🌨️','Snow showers'],86:['🌨️','Snow showers'],95:['⛈️','Thunderstorm'],96:['⛈️','Thunderstorm'],99:['⛈️','Thunderstorm']};
+let wx=null;
+function wxHtml(){if(!wx)return'';const c=WXC[wx.code]||['🌡️','Weather'];return `· ${c[0]} ${Math.round(wx.t)}°C <span class="wxl">${c[1]} ·</span> ${esc(wx.place||'')}`}
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+async function wxPlace(){
+ const ex=lsGet('sk_wloc');if(ex&&ex.lat!=null)return ex;                                  /* exact place the visitor chose */
+ const c=lsGet('sk_wip');if(c&&Date.now()-c.ts<216e5)return c;                              /* approximate place, remembered 6 hours */
+ let loc=null;
+ try{const g=await(await fetch('/api/geo')).json();if(g&&g.lat!=null&&g.lon!=null&&!isNaN(+g.lat))loc={lat:+g.lat,lon:+g.lon,place:g.city||g.region||g.country||''}}catch(e){}
+ if(!loc){try{const g=await(await fetch('https://ipwho.is/')).json();if(g&&g.success!==false&&g.latitude!=null)loc={lat:+g.latitude,lon:+g.longitude,place:g.city||g.region||g.country||''}}catch(e){}}
+ if(loc){loc.ts=Date.now();lsSet('sk_wip',loc)}return loc}
+async function wxLoad(){
+ try{const loc=await wxPlace();if(!loc)return;
+  const key=loc.lat.toFixed(2)+','+loc.lon.toFixed(2),c=lsGet('sk_w');
+  if(c&&c.key===key&&Date.now()-c.ts<12e5){wx=c}
+  else{const j=await(await fetch('https://api.open-meteo.com/v1/forecast?latitude='+loc.lat+'&longitude='+loc.lon+'&current=temperature_2m,weather_code&timezone=auto')).json();
+   if(!j||!j.current)return;wx={key,t:j.current.temperature_2m,code:j.current.weather_code,place:loc.place,ts:Date.now()};lsSet('sk_w',wx)}
+  const e=$('#wx');if(e)e.innerHTML=wxHtml()}catch(e){}}
+function wxExact(){if(!navigator.geolocation)return;
+ if(!confirm('Show the weather for your exact location?\n\nYour phone will ask for permission. Your location is not saved on our servers.'))return;
+ navigator.geolocation.getCurrentPosition(async p=>{const lat=p.coords.latitude,lon=p.coords.longitude;let place='Your location';
+  try{const g=await(await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lon+'&localityLanguage=en')).json();place=g.city||g.locality||g.principalSubdivision||place}catch(e){}
+  lsSet('sk_wloc',{lat,lon,place});localStorage.removeItem('sk_w');wxLoad()},()=>alert('Location permission was not given, so the weather stays on your approximate place.'),{timeout:12000,maximumAge:600000})}
 /* ---------- Audio section ---------- */
 const AU=new Audio();AU.preload='none';let auId=null,auBad=null;
 const fmt=t=>{if(!isFinite(t)||t<0)return'–:––';t=Math.round(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
@@ -652,6 +724,7 @@ try{const c=JSON.parse(localStorage.getItem('sk_d'));if(c&&c.articles){D=c;ready
 go();
 const pub_=()=>location.pathname.split('/')[1]!=='developer';
 if(ready===true)adInit(false);
+wxLoad();setInterval(wxLoad,12e5);
 fetch('/api/data').then(r=>r.json()).then(x=>{const t=JSON.stringify(x);let o=null;try{o=localStorage.getItem('sk_d')}catch(e){}
  if(!ready||t!==o){D=x;ready=true;if(pub_())go()}try{localStorage.setItem('sk_d',t)}catch(e){}adFresh=true;adInit(true)}).catch(()=>{if(!ready){ready='err';if(pub_())go()}});
 </script></body></html>
