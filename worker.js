@@ -70,6 +70,11 @@ function sendAudio(req, buf, type) {
 
 async function handle({ request: req, env, next }) {
   const p = new URL(req.url).pathname, r = req.method;
+  // Visitor's approximate place from Cloudflare (free, no permission prompt) — used for the weather
+  if (p === '/api/geo' && r === 'GET') {
+    const c = req.cf || {};
+    return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
+  }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/');
   if (!isApi && !isImg && !isAud) return next();
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
