@@ -233,7 +233,12 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .tabs .bt{flex:0 0 auto}
 @media(max-width:520px){.ad{padding:0 12px}.stats{gap:6px}.st span{font-size:10px;letter-spacing:.5px}}
 .pdfbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}.cap{height:6px;background:var(--ln);border-radius:4px;overflow:hidden;margin:6px 0 2px}.cap i{display:block;height:100%;width:0;transition:width .3s}
-.wxb{background:none;border:0;padding:0;margin-left:2px;font:inherit;color:var(--mu);cursor:pointer;text-align:left}.wxb:hover{color:var(--ac)}.wxb:empty{display:none}@media(max-width:700px){.wxl{display:none}}
+.util{border-bottom:1px solid var(--ln)}
+.util .w>span:first-child{font-size:14px;font-weight:700;color:var(--tx);letter-spacing:.1px;font-variant-numeric:tabular-nums}
+.util .w{padding-top:8px;padding-bottom:8px;align-items:center}
+.wxb{background:none;border:0;padding:0;margin-left:2px;font:inherit;font-weight:700;color:var(--tx);cursor:pointer;text-align:left}.wxb:hover{color:var(--ac)}.wxt{color:var(--ac);font-weight:800}
+.util a{font-size:13px;font-weight:700}.util .thb{font-size:13px;font-weight:700}
+@media(min-width:900px){.util .w>span:first-child{font-size:16px}.util a,.util .thb{font-size:14px}}.wxb:empty{display:none}@media(max-width:700px){.wxl,.wxs{display:none}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -589,7 +594,7 @@ function bodyStat(now){clearTimeout(bsT);const run=()=>{const ta=$('#e_b');if(!t
 /* ---------- Weather for the visitor's own place (free: Cloudflare location + Open-Meteo) ---------- */
 const WXC={0:['☀️','Clear'],1:['🌤️','Mostly clear'],2:['⛅','Partly cloudy'],3:['☁️','Cloudy'],45:['🌫️','Fog'],48:['🌫️','Fog'],51:['🌦️','Light drizzle'],53:['🌦️','Drizzle'],55:['🌧️','Heavy drizzle'],56:['🌧️','Freezing drizzle'],57:['🌧️','Freezing drizzle'],61:['🌧️','Light rain'],63:['🌧️','Rain'],65:['🌧️','Heavy rain'],66:['🌧️','Freezing rain'],67:['🌧️','Freezing rain'],71:['🌨️','Light snow'],73:['🌨️','Snow'],75:['🌨️','Heavy snow'],77:['🌨️','Snow grains'],80:['🌦️','Showers'],81:['🌧️','Showers'],82:['⛈️','Heavy showers'],85:['🌨️','Snow showers'],86:['🌨️','Snow showers'],95:['⛈️','Thunderstorm'],96:['⛈️','Thunderstorm'],99:['⛈️','Thunderstorm']};
 let wx=null;
-function wxHtml(){if(!wx)return'';const c=WXC[wx.code]||['🌡️','Weather'];return `· ${c[0]} ${Math.round(wx.t)}°C <span class="wxl">${c[1]} ·</span> ${esc(wx.place||'')}`}
+function wxHtml(){if(!wx)return'';const c=WXC[wx.code]||['🌡️','Weather'];return `<span class="wxs">· </span>${c[0]} <span class="wxt">${Math.round(wx.t)}°C</span> <span class="wxl">${c[1]} ·</span> ${esc(wx.place||'')}`}
 const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 async function wxPlace(){
  const ex=lsGet('sk_wloc');if(ex&&ex.lat!=null)return ex;                                  /* exact place the visitor chose */
