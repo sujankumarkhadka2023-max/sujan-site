@@ -83,7 +83,7 @@ footer .g{grid-template-columns:repeat(2,1fr);gap:16px}footer h4{margin:0 0 8px;
 .rv.in{opacity:1;transform:none}
 .sec>h2{position:relative;display:inline-block}.sec>h2:after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:100%;background:var(--ac);transform:scaleX(0);transform-origin:0 50%;transition:transform .8s .2s cubic-bezier(.2,.7,.2,1)}
 .sec.in>h2:after{transform:scaleX(1)}
-.card{transition:transform .35s ease,box-shadow .35s ease}.card:hover,.card.rv.in:hover{transform:translateY(-6px);box-shadow:0 14px 28px rgba(0,0,0,.14)}
+.card{transition:transform .35s ease,box-shadow .35s ease}.card:hover,.card.rv.in:hover{transform:perspective(900px) translateY(-6px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));box-shadow:0 14px 28px rgba(0,0,0,.14)}
 .card.rv{transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1),box-shadow .35s;transition-delay:var(--d,0s)}
 .card.rv.in{transition:transform .35s ease,box-shadow .35s ease,opacity .3s;transition-delay:0s}
 .card a:has(.ph){display:block;overflow:hidden}.card .ph{transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .5s}.card:hover .ph{transform:scale(1.07);filter:saturate(1.15)}
@@ -239,6 +239,33 @@ a.ac.vc{text-decoration:none;color:inherit;align-items:center}a.ac.vc:hover{bord
 .wxb{background:none;border:0;padding:0;margin-left:2px;font:inherit;font-weight:700;color:var(--tx);cursor:pointer;text-align:left}.wxb:hover{color:var(--ac)}.wxt{color:var(--ac);font-weight:800}
 .util a{font-size:13px;font-weight:700}.util .thb{font-size:13px;font-weight:700}
 @media(min-width:900px){.util .w>span:first-child{font-size:16px}.util a,.util .thb{font-size:14px}}.wxb:empty{display:none}@media(max-width:700px){.wxl,.wxs{display:none}}
+
+/* ---------- multimedia & professional polish ---------- */
+.vid{position:relative;margin:1.7em 0;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.vid.mp{aspect-ratio:auto}.vid.mp video{display:block;width:100%;height:auto}
+.vfc{position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;cursor:pointer;background:#16213a center/cover no-repeat;display:grid;place-items:center}
+.vfc.vnt{background:linear-gradient(135deg,#052f6b,#8b1e2d)}.vfc:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.45));transition:opacity .3s}.vfc:hover:before{opacity:.6}
+.vfc span{position:relative;width:76px;height:76px;border-radius:50%;background:#ffe500;display:grid;place-items:center;box-shadow:0 0 0 0 rgba(255,229,0,.55);animation:vpl 2s ease-out infinite;transition:transform .25s}.vfc:hover span{transform:scale(1.1)}
+.vfc span:after{content:"";margin-left:6px;border-left:22px solid #052f6b;border-top:14px solid transparent;border-bottom:14px solid transparent}
+main article img{cursor:zoom-in}
+#lb{position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.95);animation:adf .25s ease both;touch-action:pan-y}#lb.out{animation:adf .22s ease reverse both}
+.lbs{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
+.lbi{max-width:100vw;max-height:100vh;max-height:100dvh;object-fit:contain;user-select:none;-webkit-user-drag:none;cursor:zoom-in;transition:transform .25s ease,opacity .3s ease;touch-action:none}.lbi.z{cursor:grab;transition:opacity .3s}
+.lbx,.lbn{position:absolute;z-index:3;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:grid;place-items:center}.lbx:hover,.lbn:hover{background:rgba(255,255,255,.3)}
+.lbx{top:calc(14px + env(safe-area-inset-top,0px));right:14px;width:44px;height:44px;font-size:18px}.lbn{top:50%;margin-top:-24px;width:48px;height:48px;font-size:32px;line-height:1;padding-bottom:4px}.lbp{left:12px}.lbq{right:12px}
+.lbc{position:absolute;z-index:3;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));text-align:center;color:#fff;font:14px/1.4 system-ui,sans-serif;padding:0 70px;text-shadow:0 1px 5px #000;pointer-events:none}
+.tk{display:flex;align-items:stretch;margin:0 0 10px;border:1px solid var(--ln);border-radius:8px;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.tkl{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--ac);color:#fff;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.tkl i{width:8px;height:8px;border-radius:50%;background:#fff;animation:tkp 1.4s ease-in-out infinite}@keyframes tkp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.7);opacity:.35}}
+.tkw{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent)}
+.tkt{display:flex;flex:none;white-space:nowrap;animation:tkm var(--d,60s) linear infinite}.tkw:hover .tkt{animation-play-state:paused}
+.tkt span{display:flex;align-items:center}.tkt a{padding:0 4px;font-size:14px;font-weight:600;color:var(--tx)}.tkt a:hover{color:var(--ac)}.tks{color:var(--ac);font-style:normal;font-size:9px;padding:0 16px}
+@keyframes tkm{to{transform:translateX(-50%)}}
+.skl{border-radius:8px;background:linear-gradient(90deg,var(--ln) 25%,rgba(128,128,128,.28) 50%,var(--ln) 75%);background-size:220% 100%;animation:shm 1.3s ease-in-out infinite}@keyframes shm{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.lz{opacity:0;filter:blur(12px);transform:scale(1.03);transition:opacity .7s ease,filter .7s ease,transform .7s ease}.lz.ok{opacity:1;filter:none;transform:none}
+article h2{position:relative;padding-top:.2em}article h2:before{content:"";display:block;width:44px;height:4px;background:var(--ac);border-radius:2px;margin-bottom:10px}
+blockquote{position:relative;background:linear-gradient(90deg,rgba(139,30,45,.07),transparent);padding:14px 18px 14px 22px;border-radius:0 10px 10px 0}
+@media(prefers-reduced-motion:reduce){.tkt,.tkl i,.skl,.vfc span{animation:none!important}.tkw{overflow-x:auto}.lz{opacity:1;filter:none;transform:none;transition:none}#lb,#lb.out{animation:none}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -267,7 +294,7 @@ function shell(inner,cur){
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
  <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a></div></div></div>
- <div class="w"><main id="main">${inner}</main></div>
+ <div class="w">${ticker()}<main id="main">${inner}</main></div>
  <footer><div class="w"><div class="g"><div><h4>Sections</h4>${CATS.map(c=>`<a href="/${SL[c]}">${c}</a>`).join('')}</div><div><a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a></div></div><div class="ins" id="ins"><div><h4>Install as an app</h4><span>Add the site to your home screen. Recent stories open even with weak internet.</span><span id="inh" style="display:none"></span></div><button class="bt" id="inb" onclick="installApp()">Install</button></div><div class="meta fb"><span>© ${new Date().getFullYear()} The Sujan Khadka. All rights reserved.</span><a href="#top" onclick="event.preventDefault();document.getElementById('top').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})">Back to top ↑</a></div></div></footer>`}
 function home(){const L=live();if(!L.length)return `<div class="empty" style="padding:60px 0;text-align:center">No stories have been published yet.</div>`;
  let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
@@ -288,7 +315,7 @@ function section(c){const L=live().filter(a=>a.category===c),k=SL[c];let h=`<h1 
  else if(c==='Culture & Lifestyle')h+=block('Culture',L.filter(a=>a.subcategory==='Culture'),k)+block('Lifestyle',L.filter(a=>a.subcategory==='Lifestyle'),k);
  else h+=block('Latest',rest,k);return h}
 function body(t,ex=[]){const fig=x=>`<figure style="margin:1.5em 0"><img style="display:block" loading="lazy" decoding="async" src="${safeImg(x.url)}" alt="${esc(x.caption||'Photo')}">${x.caption?`<figcaption>${esc(x.caption)}</figcaption>`:''}</figure>`;let k=0;
- const out=esc(t).split(/\n{2,}/).map((p,i)=>{let h=p.startsWith('## ')?`<h2>${p.slice(3)}</h2>`:p.startsWith('&gt; ')?`<blockquote>${p.slice(5)}</blockquote>`:`<p>${p.replace(/\n/g,'<br>').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" rel="noopener">$1</a>')}</p>`;if(i%2===1&&k<ex.length)h+=fig(ex[k++]);return h});
+ const out=esc(t).split(/\n{2,}/).map((p,i)=>{const mb=mediaBlock(p);if(mb)return mb;let h=p.startsWith('## ')?`<h2>${p.slice(3)}</h2>`:p.startsWith('&gt; ')?`<blockquote>${p.slice(5)}</blockquote>`:`<p>${p.replace(/\n/g,'<br>').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" rel="noopener">$1</a>')}</p>`;if(i%2===1&&k<ex.length)h+=fig(ex[k++]);return h});
  while(k<ex.length)out.push(fig(ex[k++]));return out.join('')}
 function articlePg(slug){const L=live(),a=L.find(x=>x.slug===slug);if(!a)return '<div class="empty" style="padding:60px 0">Story not found.</div>';
  document.title=(a.seoTitle||a.title)+' — The Sujan Khadka';$('meta[name=description]').content=a.seoDesc||a.subtitle||'';
@@ -342,7 +369,7 @@ function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=m
  <label>Images ${imgs.length}/${max}${multi?' — first is the main image':''}</label>
  ${imgs.map((m,i)=>`<div class="row"><img src="${safeImg(m.thumb||m.url)}" style="width:90px;height:60px;object-fit:cover" alt=""><input class="ic" data-i="${i}" style="flex:1;margin:0" placeholder="Caption (optional)" value="${esc(m.caption)}"><button class="bt d" onclick="rmImg(${i})">Remove</button></div>`).join('')}
  ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs(this.files)">`:'<p class="meta">Maximum reached.</p>'}
- <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link)</label>
+ <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link); a YouTube, Vimeo or .mp4 link alone on its own line becomes a video</label>
  <div class="pdfbar"><label class="bt o" style="cursor:pointer">Import from PDF<input type="file" accept="application/pdf,.pdf" hidden onchange="pdfImport(this.files[0]);this.value=''"></label><button type="button" class="bt o" onclick="copyBody()">Copy all text</button><span id="pdfst" class="meta"></span></div>
  <textarea id="e_b" oninput="bodyStat()">${esc(a.body)}</textarea>
  <div class="meta" id="bstat"></div><div class="cap"><i id="capb"></i></div><div class="meta" id="capt"></div>
@@ -375,12 +402,12 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
   if(adm===null){adm='loading';$('#app').innerHTML='<div class="ad">Loading…</div>';api('/api/admin/db').then(async x=>{if(x.ok){A=await x.json();adm='in'}else adm='out';go()}).catch(()=>{adm='out';go()});return}
   if(adm==='loading')return;$('#app').innerHTML=adm==='in'?adminView():loginView();return}
  if(r)r.remove();document.title='The Sujan Khadka';
- if(!ready){$('#app').innerHTML=shell(`<div class="empty" style="padding:60px 0;text-align:center">${ready==='err'?'Could not load stories. Please refresh.':'Loading…'}</div>`,'/');return}
+ if(!ready){$('#app').innerHTML=shell(`${ready==='err'?'<div class="empty" style="padding:60px 0;text-align:center">Could not load stories. Please refresh.</div>':skeleton()}`,'/');return}
  let out,cur='/'+(p[0]||'');{const ord=['/',...CATS.map(c=>'/'+SL[c])],ni=ord.indexOf(cur),oi=ord.indexOf(lastCur);navDir=(oi<0||ni<0||ni===oi)?0:(ni>oi?36:-36);lastCur=cur}
  if(p[0]!=='audio')auStop();
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
@@ -615,6 +642,47 @@ function wxExact(){if(!navigator.geolocation)return;
  navigator.geolocation.getCurrentPosition(async p=>{const lat=p.coords.latitude,lon=p.coords.longitude;let place='Your location';
   try{const g=await(await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+lat+'&longitude='+lon+'&localityLanguage=en')).json();place=g.city||g.locality||g.principalSubdivision||place}catch(e){}
   lsSet('sk_wloc',{lat,lon,place});localStorage.removeItem('sk_w');wxLoad()},()=>alert('Location permission was not given, so the weather stays on your approximate place.'),{timeout:12000,maximumAge:600000})}
+
+/* ---------- Multimedia & polish: videos, photo viewer, latest ticker, skeletons, image fade-in, card tilt ---------- */
+function mediaBlock(p){p=p.trim();let u=(p.match(/^\[(?:video|watch)[^\]]*\]\((https?:[^)\s]+)\)$/i)||[])[1]||(/^https?:\/\/\S+$/.test(p)?p:null);if(!u)return null;u=u.replace(/&amp;/g,'&');let m;
+ if(m=u.match(/^https?:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/))return `<figure class="vid" data-yt="${m[1]}"><button type="button" class="vfc" aria-label="Play video" style="background-image:url(https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg)"><span></span></button></figure>`;
+ if(m=u.match(/^https?:\/\/(?:www\.)?vimeo\.com\/(?:video\/)?(\d+)/))return `<figure class="vid" data-vm="${m[1]}"><button type="button" class="vfc vnt" aria-label="Play video"><span></span></button></figure>`;
+ if(/^https?:\/\/\S+\.(?:mp4|webm)(?:\?\S*)?$/i.test(u))return `<figure class="vid mp"><video controls preload="metadata" playsinline src="${esc(u)}"></video></figure>`;
+ return null}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.vfc');if(!b)return;const f=b.closest('.vid');if(!f)return;let src='';
+ if(f.dataset.yt)src='https://www.youtube-nocookie.com/embed/'+f.dataset.yt+'?autoplay=1&rel=0&playsinline=1';else if(f.dataset.vm)src='https://player.vimeo.com/video/'+f.dataset.vm+'?autoplay=1';
+ if(src)f.innerHTML=`<iframe src="${src}" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`});
+/* photo viewer */
+let lbL=[],lbI=0,lbZ=false,lbP={x:0,y:0};
+function lbShow(){const im=document.querySelector('#lb .lbi'),c=lbL[lbI];if(!im)return;lbZ=false;lbP={x:0,y:0};im.classList.remove('z');im.style.transform='';im.style.opacity=0;
+ im.onload=()=>{im.style.opacity=1};im.src=c.src;im.alt=c.alt;document.querySelector('#lb .lbc').textContent=(lbL.length>1?(lbI+1)+' / '+lbL.length+(c.alt?' · ':''):'')+c.alt;
+ [lbI-1,lbI+1].forEach(k=>{if(lbL[k]){const x=new Image();x.src=lbL[k].src}})}
+function lbMove(d){if(lbL.length<2)return;lbI=(lbI+d+lbL.length)%lbL.length;lbShow()}
+function lbClose(){const d=document.getElementById('lb');if(!d)return;document.removeEventListener('keydown',lbKey);document.body.style.overflow='';d.classList.add('out');setTimeout(()=>d.remove(),220)}
+function lbKey(e){if(e.key==='Escape')lbClose();else if(e.key==='ArrowRight')lbMove(1);else if(e.key==='ArrowLeft')lbMove(-1)}
+function lbOpen(list,i){if(document.getElementById('lb'))return;lbL=list.map(im=>{const f=im.closest('figure'),cap=f&&f.querySelector('figcaption');return{src:im.currentSrc||im.src,alt:(cap&&cap.textContent.trim())||(im.alt&&im.alt!=='Photo'?im.alt:'')}});lbI=i;
+ const d=document.createElement('div');d.id='lb';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Photo viewer');
+ d.innerHTML=`<button class="lbx" aria-label="Close">✕</button>${lbL.length>1?'<button class="lbn lbp" aria-label="Previous photo">‹</button><button class="lbn lbq" aria-label="Next photo">›</button>':''}<div class="lbs"><img class="lbi" alt=""></div><div class="lbc"></div>`;
+ document.body.appendChild(d);document.body.style.overflow='hidden';document.addEventListener('keydown',lbKey);lbShow();
+ let sx=0,sy=0,drag=false,moved=false,ox=0,oy=0;const im=d.querySelector('.lbi'),ap=()=>{im.style.transform=lbZ?`translate(${lbP.x}px,${lbP.y}px) scale(2.2)`:''};
+ d.addEventListener('click',e=>{if(e.target.closest('.lbx')||e.target.classList.contains('lbs')||e.target===d)lbClose();else if(e.target.closest('.lbp'))lbMove(-1);else if(e.target.closest('.lbq'))lbMove(1)});
+ im.addEventListener('click',e=>{e.stopPropagation();if(moved){moved=false;return}lbZ=!lbZ;lbP={x:0,y:0};im.classList.toggle('z',lbZ);ap()});
+ d.addEventListener('pointerdown',e=>{if(e.target!==im)return;sx=e.clientX;sy=e.clientY;ox=lbP.x;oy=lbP.y;drag=true;moved=false});
+ d.addEventListener('pointermove',e=>{if(!drag||!lbZ)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;lbP={x:ox+dx,y:oy+dy};ap()});
+ d.addEventListener('pointerup',e=>{if(drag&&!lbZ&&Math.abs(e.clientX-sx)>60&&Math.abs(e.clientX-sx)>Math.abs(e.clientY-sy)){moved=true;lbMove(e.clientX<sx?1:-1)}drag=false})}
+document.addEventListener('click',e=>{const im=e.target.closest&&e.target.closest('main article img');if(!im||im.closest('a,.vid,.bn,.vfc'))return;
+ const all=[...document.querySelectorAll('main article img')].filter(x=>!x.closest('a,.vid,.bn'));const i=all.indexOf(im);if(i>=0)lbOpen(all,i)});
+/* latest-news ticker, loading skeleton, image fade-in */
+function ticker(){if(ready!==true)return'';const L=live().slice(0,8);if(L.length<2)return'';
+ const it=L.map(a=>`<a href="${url(a)}">${esc(a.title)}</a>`).join('<i class="tks">◆</i>')+'<i class="tks">◆</i>',dur=Math.max(30,Math.round(L.reduce((n,a)=>n+a.title.length,0)*.3));
+ return `<div class="tk" role="region" aria-label="Latest stories"><span class="tkl"><i></i>Latest</span><div class="tkw"><div class="tkt" style="--d:${dur}s"><span>${it}</span><span aria-hidden="true">${it.replace(/<a /g,'<a tabindex="-1" ')}</span></div></div></div>`}
+function skeleton(){const b=(h,w,m)=>`<div class="skl" style="height:${h}px;width:${w};margin:${m}"></div>`;
+ return `<div aria-busy="true" aria-label="Loading stories">${b(30,'55%','22px 0 12px')}${b(16,'92%','0 0 8px')}${b(16,'70%','0 0 26px')}<div class="g">${[1,2,3,4].map(()=>`<div>${b(150,'100%','0 0 10px')}${b(16,'90%','0 0 8px')}${b(13,'55%','0')}</div>`).join('')}</div></div>`}
+function imgFx(){if(RM)return;document.querySelectorAll('main img').forEach(im=>{if(im.complete||im.classList.contains('lz'))return;im.classList.add('lz');const ok=()=>im.classList.add('ok');im.addEventListener('load',ok,{once:true});im.addEventListener('error',ok,{once:true})})}
+/* card tilt (mouse devices only) */
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&matchMedia('(hover:hover) and (pointer:fine)').matches){let raf=0;
+ document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.closest('.card');if(!c||raf)return;raf=requestAnimationFrame(()=>{raf=0;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.setProperty('--ry',(x*7).toFixed(2)+'deg');c.style.setProperty('--rx',(-y*6).toFixed(2)+'deg')})},{passive:true});
+ document.addEventListener('pointerout',e=>{const c=e.target.closest&&e.target.closest('.card');if(c&&!c.contains(e.relatedTarget)){c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')}},{passive:true})}
 /* ---------- Audio section ---------- */
 const AU=new Audio();AU.preload='none';let auId=null,auBad=null;
 const fmt=t=>{if(!isFinite(t)||t<0)return'–:––';t=Math.round(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
