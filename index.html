@@ -266,6 +266,85 @@ main article img{cursor:zoom-in}
 article h2{position:relative;padding-top:.2em}article h2:before{content:"";display:block;width:44px;height:4px;background:var(--ac);border-radius:2px;margin-bottom:10px}
 blockquote{position:relative;background:linear-gradient(90deg,rgba(139,30,45,.07),transparent);padding:14px 18px 14px 22px;border-radius:0 10px 10px 0}
 @media(prefers-reduced-motion:reduce){.tkt,.tkl i,.skl,.vfc span{animation:none!important}.tkw{overflow-x:auto}.lz{opacity:1;filter:none;transform:none;transition:none}#lb,#lb.out{animation:none}}
+
+/* ---------- videos page ---------- */
+.pg.vds{max-width:1040px}.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px;margin-top:10px}
+.vcd{min-width:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.vcd .vid{margin:0 0 12px}.vcd h3{margin:0 0 4px;font:700 18px/1.3 Georgia,'Times New Roman',serif}.vcd .ad1{margin:0 0 6px}
+
+/* ---------- horoscope ---------- */
+.hzb{color:var(--ac)!important;white-space:nowrap}.hzc5{letter-spacing:1px;font-size:11px}
+.pg.hz{max-width:1000px}
+.hzhero{position:relative;overflow:hidden;border-radius:18px;margin:18px 0;padding:26px 22px;color:#fff;background:radial-gradient(120% 140% at 80% 0%,#2a2170 0%,#0e1a45 48%,#070d24 100%);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;box-shadow:0 14px 34px rgba(5,12,40,.35)}
+.hzst{position:absolute;inset:0;pointer-events:none}.hzst i{position:absolute;width:var(--s);height:var(--s);border-radius:50%;background:#fff;opacity:.85;animation:hzt 3.4s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes hzt{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1.25)}}
+.hzwh{position:absolute;right:-70px;top:50%;width:360px;height:360px;margin-top:-180px;opacity:.55;animation:hzs 140s linear infinite;pointer-events:none}@keyframes hzs{to{transform:rotate(360deg)}}
+.hzsky{position:relative;display:flex;align-items:center;gap:22px}
+.hzmoon{flex:none;width:116px;height:116px;animation:hzf 6s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(255,240,170,.45))}.hzmoon svg{width:100%;height:100%;display:block}@keyframes hzf{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.hzinfo{display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:1.45;color:#dbe5f5}.hzinfo strong{color:#fff}.hzlbl{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:#ffe500;font-weight:700}.hzph{font:700 26px/1.2 Georgia,'Times New Roman',serif;color:#fff}
+.hzfind{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px;font-family:system-ui,sans-serif;font-size:14px}.hzfind select{padding:8px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);font-size:14px}
+.hzgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-family:system-ui,sans-serif}
+.hzsg{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 6px;border:1px solid var(--ln);border-radius:14px;background:var(--bg);color:var(--tx);cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s,background .25s}
+.hzsg:hover{transform:translateY(-4px);border-color:var(--ac);box-shadow:0 10px 22px rgba(0,0,0,.12)}.hzsg .hzg{font-size:34px;line-height:1.1;color:var(--ac);transition:transform .4s}.hzsg:hover .hzg{transform:scale(1.18) rotate(-6deg)}
+.hzsg b{font-size:15px}.hzsg small{color:var(--mu);font-size:12px}.hzsg em{font-style:normal;color:var(--mu);font-size:11px}
+.hzsg.on{background:linear-gradient(160deg,#16205a,#2a1d6e);color:#fff;border-color:#ffe500;box-shadow:0 0 0 2px rgba(255,229,0,.35),0 12px 26px rgba(20,20,80,.35)}.hzsg.on .hzg{color:#ffe500}.hzsg.on small,.hzsg.on em{color:#cdd8f0}
+#hzread{margin-top:20px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}.hzempty{padding:26px;text-align:center;color:var(--mu);border:1px dashed var(--ln);border-radius:14px}
+.hzr{border:1px solid var(--ln);border-radius:16px;padding:20px;background:var(--bg);box-shadow:0 10px 28px rgba(0,0,0,.08);opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}.hzr.go{opacity:1;transform:none}
+.hzh{display:flex;gap:16px;align-items:center}.hzbig{flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:38px;color:#ffe500;background:linear-gradient(160deg,#16205a,#2a1d6e);box-shadow:0 0 0 0 rgba(42,29,110,.5);animation:hzp 3s ease-out infinite}@keyframes hzp{0%{box-shadow:0 0 0 0 rgba(90,70,200,.5)}100%{box-shadow:0 0 0 16px rgba(90,70,200,0)}}
+.hzh h2{margin:0;font:700 26px/1.2 Georgia,'Times New Roman',serif}.hzh h2 small{font:600 14px system-ui,sans-serif;color:var(--mu)}
+.hztabs{display:flex;gap:6px;margin:16px 0 10px;padding:4px;border-radius:12px;background:var(--ln)}.hztabs button{flex:1;padding:9px 0;border:0;border-radius:9px;background:transparent;color:var(--tx);font-weight:700;font-size:14px;cursor:pointer;transition:background .25s,color .25s}.hztabs button.on{background:var(--ac);color:#fff}
+.hzdate{margin-bottom:10px}.hz5{display:inline-flex;gap:1px;vertical-align:middle}.hz5 i{font-style:normal;font-size:15px;color:var(--ln);opacity:.9}.hz5 i.on{color:#e0a800}.hzr.go .hz5 i.on{animation:hzpop .5s cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--i)*.09s + .25s)}@keyframes hzpop{0%{transform:scale(0) rotate(-40deg)}100%{transform:none}}
+.hzmain{font:19px/1.65 Georgia,'Times New Roman',serif;margin:14px 0 18px}
+.hzed{margin:6px 0 14px;padding:12px 14px;border-left:4px solid var(--ac);background:rgba(139,30,45,.07);border-radius:0 10px 10px 0}.hzed b{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ac)}.hzed p{margin:4px 0 0;font:17px/1.55 Georgia,serif}
+.hzrow{margin:0 0 14px}.hzrh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.hzrh b{font-size:15px}
+.hzbar{height:8px;border-radius:5px;background:var(--ln);overflow:hidden}.hzbar i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,#e0a800,#c0392b);transition:width 1.1s cubic-bezier(.2,.7,.2,1) .2s}.hzr.go .hzbar i{width:var(--w)}
+.hzrow p{margin:7px 0 0;font-size:15px;line-height:1.55;color:var(--tx)}
+.hzlk{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}.hzlk div{padding:12px 8px;border-radius:12px;text-align:center;background:var(--ln)}.hzlk small{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);margin-bottom:4px}.hzlk b{font-size:17px;display:inline-flex;align-items:center;gap:6px}.hzsw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.25);display:inline-block}
+.hzr.go .hzlk div{animation:hzup .6s ease both}.hzr.go .hzlk div:nth-child(2){animation-delay:.12s}.hzr.go .hzlk div:nth-child(3){animation-delay:.24s}@keyframes hzup{from{opacity:0;transform:translateY(12px) scale(.94)}to{opacity:1;transform:none}}
+.hzdis{margin-top:22px;font:12.5px/1.5 system-ui,sans-serif;color:var(--mu)}
+@media(max-width:700px){.hzgrid{grid-template-columns:repeat(3,1fr);gap:9px}.hzsky{flex-direction:column;text-align:center;gap:12px}.hzhero{padding:22px 16px}.hzwh{right:-120px;opacity:.4}.hzmain{font-size:17px}.hzlk{grid-template-columns:1fr}.hzh h2{font-size:22px}.hzsg .hzg{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.hzst i,.hzwh,.hzmoon,.hzbig,.hzr.go .hz5 i.on,.hzr.go .hzlk div{animation:none!important}.hzr{transition:none;opacity:1;transform:none}.hzbar i{transition:none;width:var(--w)}}
+
+.hzmode{display:flex;gap:8px;margin:6px 0 4px;flex-wrap:wrap}.hzmode button{padding:8px 16px;border-radius:20px;border:1px solid var(--ln);background:none;color:var(--tx);font-weight:700;font-size:14px;cursor:pointer}.hzmode button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.hzmn{margin:0 0 12px}.hzda{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 6px}.hzda div{border:1px solid var(--ln);border-radius:10px;padding:10px 12px}.hzda small{display:block;color:var(--mu);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.hzwhy{margin:10px 0 0;font-size:13px;color:var(--mu);font-style:italic}
+#hzread{scroll-margin-top:104px}
+
+/* ---------- rashifal ---------- */
+.rf{max-width:820px;margin:0 auto;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans Devanagari',sans-serif}
+.rh{position:relative;overflow:hidden;border-radius:20px;padding:16px 14px 22px;text-align:center;color:#fff;background:radial-gradient(120% 90% at 50% 0%,#0d4aa8 0%,#052f6b 48%,#021634 100%);box-shadow:0 18px 44px rgba(5,47,107,.45)}
+.rh:before,.rh:after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:no-repeat}
+.rh:before{background-image:radial-gradient(1.6px 1.6px at 12% 22%,#fff,transparent),radial-gradient(1.2px 1.2px at 28% 70%,#fff,transparent),radial-gradient(1.8px 1.8px at 46% 12%,#fff,transparent),radial-gradient(1.2px 1.2px at 63% 82%,#fff,transparent),radial-gradient(1.6px 1.6px at 82% 30%,#fff,transparent),radial-gradient(1.2px 1.2px at 92% 66%,#fff,transparent);animation:twk 3.6s ease-in-out infinite}
+.rh:after{background-image:radial-gradient(1.2px 1.2px at 8% 55%,#ffe500,transparent),radial-gradient(1.6px 1.6px at 35% 36%,#fff,transparent),radial-gradient(1.2px 1.2px at 55% 58%,#fff,transparent),radial-gradient(1.8px 1.8px at 74% 14%,#ffe500,transparent),radial-gradient(1.2px 1.2px at 88% 88%,#fff,transparent);animation:twk 5.2s ease-in-out -2s infinite}
+.rsh{position:absolute;top:10%;left:-20%;width:90px;height:2px;background:linear-gradient(90deg,transparent,#fff);transform:rotate(20deg);opacity:0;animation:sht 7s ease-in 2s infinite}
+.rhz{position:relative;width:min(300px,76vw);margin:0 auto}.rfz{display:block;width:100%;height:auto;overflow:visible}
+.rfzs{transform-origin:160px 160px;animation:zsp 180s linear infinite}.rfzs circle:not(.rfmk){fill:none;stroke:rgba(255,229,0,.4);stroke-width:1}.rfzs line{stroke:rgba(255,229,0,.28);stroke-width:1}.rfzs text{fill:#ffe500;font-size:20px;font-family:'Segoe UI Symbol','Noto Sans Symbols','Noto Sans Symbols 2','DejaVu Sans',sans-serif}
+.rfmk{fill:#fff;stroke:#ffe500;stroke-width:2;animation:rmk 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes rmk{0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px #ffe500)}50%{transform:scale(1.5);filter:drop-shadow(0 0 9px #ffe500)}}
+.rht{position:relative}.rlg{display:inline-flex;gap:4px;background:rgba(255,255,255,.12);border-radius:30px;padding:3px;margin:4px 0 6px}.rlg button{border:0;background:none;color:#fff;font:600 13px system-ui,'Noto Sans Devanagari',sans-serif;padding:6px 14px;border-radius:26px;cursor:pointer}.rlg button[aria-pressed=true]{background:#ffe500;color:#052f6b}
+.rht h1{margin:4px 0 2px;font:800 clamp(24px,6vw,34px)/1.2 Georgia,'Times New Roman','Noto Serif Devanagari',serif}.rht p{margin:0;color:#dbe5f5;font-size:14px}.rkt{margin-top:8px!important;font-size:15px!important;color:#fff!important}.rkt b{color:#ffe500}
+.rpc{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}@media(min-width:700px){.rpc{grid-template-columns:repeat(4,1fr)}}
+.rc{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--ln);border-radius:14px;background:var(--bg);animation:hup .55s ease both;animation-delay:calc(var(--i)*90ms);transition:transform .25s,border-color .25s}.rc:hover{transform:translateY(-3px);border-color:var(--ac)}
+.ri{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:linear-gradient(135deg,#052f6b,#8b1e2d);color:#fff}.rc div{min-width:0}.rc small{display:block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--mu)}.rc b{display:block;font-size:15px;line-height:1.3}.rc em{display:block;font-style:normal;font-size:12.5px;color:var(--mu);margin-top:2px}
+.ral{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.5);margin:0 0 14px;font-size:14px;animation:hup .5s ease both}.ral i{flex:none;width:10px;height:10px;border-radius:50%;background:#c0392b;animation:rpl 1.6s ease-out infinite}@keyframes rpl{0%{box-shadow:0 0 0 0 rgba(192,57,43,.6)}100%{box-shadow:0 0 0 12px rgba(192,57,43,0)}}.ral[hidden]{display:none}
+.rtl{border:1px solid var(--ln);border-radius:16px;padding:14px;margin:0 0 16px;background:var(--bg)}.rtt{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:14px;margin-bottom:10px}.rtt span{color:var(--mu);font-size:12px}
+.rbar{position:relative;display:flex;gap:3px;height:58px;border-radius:12px}.rsg2{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:10px;min-width:34px;overflow:hidden;color:#fff;transform-origin:left;animation:rgw .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*140ms)}@keyframes rgw{from{transform:scaleX(0);opacity:0}}
+.rsg2 b{font-size:20px;line-height:1;font-family:'Segoe UI Symbol','Noto Sans Symbols','DejaVu Sans',sans-serif}.rsg2 small{font-size:11px;opacity:.9;margin-top:2px}
+.q-good{background:#2e9e4f}.q-mid{background:#d99a00}.q-bad{background:#c0392b}
+.rnow{position:absolute;top:-7px;bottom:-7px;width:3px;margin-left:-1.5px;border-radius:2px;background:#ffe500;box-shadow:0 0 0 2px rgba(5,47,107,.6),0 0 12px #ffe500;animation:rnw 1.8s ease-in-out infinite}@keyframes rnw{0%,100%{opacity:1}50%{opacity:.45}}
+.rleg{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--mu)}.rleg span{display:inline-flex;align-items:center;gap:6px;background:none!important;color:var(--mu)}.rleg span:before{content:"";width:10px;height:10px;border-radius:3px;background:currentColor}.rleg .q-good:before{background:#2e9e4f}.rleg .q-mid:before{background:#d99a00}.rleg .q-bad:before{background:#c0392b}
+.rpk{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px}@media(min-width:560px){.rpk{grid-template-columns:repeat(4,1fr)}}@media(min-width:760px){.rpk{grid-template-columns:repeat(6,1fr)}}
+.rsg{display:flex;flex-direction:column;align-items:center;gap:1px;padding:10px 4px;border:1px solid var(--ln);border-radius:14px;background:var(--bg);color:var(--tx);cursor:pointer;font-family:inherit;transition:transform .25s,box-shadow .25s,border-color .25s;animation:hup .5s ease both;animation-delay:calc(var(--i)*35ms)}
+.rsg:hover{transform:translateY(-4px);border-color:var(--ac)}.rsg[aria-pressed=true]{border-color:var(--ac);background:linear-gradient(160deg,rgba(139,30,45,.15),rgba(5,47,107,.08));box-shadow:0 8px 22px rgba(139,30,45,.25)}
+.rg{font-size:22px;color:var(--ac);line-height:1.1}.rsg b{font-size:17px}.rsg small{font-size:11.5px;color:var(--mu)}
+.rrd{border:1px solid var(--ln);border-radius:18px;padding:18px;background:var(--bg);box-shadow:0 10px 30px rgba(0,0,0,.08);animation:hup .55s ease both}
+.rrd header{display:flex;gap:14px;align-items:center;margin-bottom:6px}.rbg{flex:none;width:66px;height:66px;border-radius:50%;display:grid;place-items:center;font-size:36px;color:#ffe500;background:radial-gradient(circle at 30% 30%,#0d4aa8,#052f6b);animation:rbp 2.6s ease-out infinite}@keyframes rbp{0%{box-shadow:0 0 0 0 rgba(5,47,107,.5)}100%{box-shadow:0 0 0 18px rgba(5,47,107,0)}}
+.rrd h2{margin:0;font:700 23px/1.25 Georgia,'Times New Roman','Noto Serif Devanagari',serif}.rrd header p{margin:2px 0 6px;color:var(--mu);font-size:14px}
+.rbd{display:inline-block;border-radius:30px;padding:4px 14px;font-weight:700;font-size:13px;color:#fff;animation:rbb 2.4s ease-in-out infinite}.rbd.good{background:#2e9e4f}.rbd.mixed{background:#d99a00}.rbd.bad{background:#c0392b}@keyframes rbb{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.rnote{margin:14px 0;padding:10px 14px;border-radius:12px;background:rgba(5,47,107,.08);border-left:4px solid #ffe500}.rnote b{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--ac)}.rnote p{margin:4px 0 0}
+.rsq{margin:14px 0;padding:4px 0 4px 14px;border-left:4px solid var(--ln);animation:hup .55s ease both;animation-delay:calc(var(--i)*140ms + 150ms)}.rsq.q-good{border-color:#2e9e4f;background:none}.rsq.q-mid{border-color:#d99a00;background:none}.rsq.q-bad{border-color:#c0392b;background:none}
+.rsq p{margin:2px 0;font:16.5px/1.65 Georgia,'Times New Roman','Noto Serif Devanagari',serif}.rsq .rw{font:600 13px system-ui,'Noto Sans Devanagari',sans-serif;color:var(--mu)}
+.rmt{margin:16px 4px 6px;font-size:12px;line-height:1.55;color:var(--mu)}
+.rfd{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:3px;vertical-align:middle}.rfd.good{background:#2e9e4f}.rfd.mixed{background:#d99a00}.rfd.bad{background:#c0392b}
+@media(prefers-reduced-motion:reduce){.rh:before,.rh:after,.rsh,.rfzs,.rfmk,.rc,.ral i,.rsg2,.rnow,.rsg,.rrd,.rbg,.rbd,.rsq{animation:none!important}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
 </style></head><body>
@@ -289,8 +368,8 @@ function card(a){const im=safeImg(a.thumb||a.image);return `<div class="card">${
 function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2><div class="empty">No stories published yet.</div></div>`;const n=limit[key+t]||4;
  return `<div class="sec"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
 function shell(inner,cur){
- const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Games','/games.html']];
- return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
+ const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Videos','/videos'],['Horoscope','/horoscope'],['Games','/games.html']];
+ return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/horoscope" id="rf-hz" class="hzb">${hzChip()}</a><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
  <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a></div></div></div>
@@ -349,10 +428,12 @@ async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{
 async function persist(){const body=JSON.stringify(A);if(body.length>SITE_LIMIT){alert('Not saved: the site is too full ('+body.length.toLocaleString()+' characters; the limit is '+SITE_LIMIT.toLocaleString()+' for all articles, pages and audio together). Shorten or remove some text, then save again.');return false}
  const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body});if(!r.ok){if(r.status===413){alert('Not saved: this is too large for the server.');return false}alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
 function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
- let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}${T('ad','Advertising')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
+ let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}${T('videos','Videos')}${T('horo','Horoscope')}${T('ad','Advertising')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
  h+=stats(A.articles.filter(a=>a.status==='published'));
  if(tab==='articles')h+=ed?editor():list();
  if(tab==='home')h+=`<p class="meta">Featured stories in order: first is the lead, next four are secondary.</p>`+(A.home.length?A.home.map((id,i)=>{const a=A.articles.find(x=>x.id===id);return a?`<div class="row"><span>${i+1}. ${esc(a.title)}</span><span><button class="bt o" onclick="mv(${i},-1)">↑</button><button class="bt o" onclick="mv(${i},1)">↓</button><button class="bt o" onclick="feat('${id}')">Remove</button></span></div>`:''}).join(''):'<div class="empty">Nothing featured. Latest stories are used.</div>');
+ if(tab==='videos')h+=videosTab();
+ if(tab==='horo')h+=hzTab();
  if(tab==='ad')h+=adTab();
  if(tab==='audio')h+=audioTab();
  if(tab==='pages')h+=Object.keys(PG).map(k=>`<label>${PG[k]}</label><textarea style="min-height:110px" id="pg_${k}">${esc(A.pages[k]||DEF[k]||'')}</textarea>`).join('')+`<button class="bt" onclick="savePages()">Save pages</button>`;
@@ -405,9 +486,9 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(!ready){$('#app').innerHTML=shell(`${ready==='err'?'<div class="empty" style="padding:60px 0;text-align:center">Could not load stories. Please refresh.</div>':skeleton()}`,'/');return}
  let out,cur='/'+(p[0]||'');{const ord=['/',...CATS.map(c=>'/'+SL[c])],ni=ord.indexOf(cur),oi=ord.indexOf(lastCur);navDir=(oi<0||ni<0||ni===oi)?0:(ni>oi?36:-36);lastCur=cur}
  if(p[0]!=='audio')auStop();
- if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);
+ if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);else if(p[0]==='videos')out=videoPg();else if(p[0]==='horoscope')out=rfPg();
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();hzInit();RF.init();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
@@ -652,6 +733,8 @@ function mediaBlock(p){p=p.trim();let u=(p.match(/^\[(?:video|watch)[^\]]*\]\((h
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.vfc');if(!b)return;const f=b.closest('.vid');if(!f)return;let src='';
  if(f.dataset.yt)src='https://www.youtube-nocookie.com/embed/'+f.dataset.yt+'?autoplay=1&rel=0&playsinline=1';else if(f.dataset.vm)src='https://player.vimeo.com/video/'+f.dataset.vm+'?autoplay=1';
  if(src)f.innerHTML=`<iframe src="${src}" title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`});
+/* only one video or audio plays at a time */
+document.addEventListener('play',e=>{if(!e.target||e.target.tagName!=='VIDEO')return;document.querySelectorAll('video').forEach(v=>{if(v!==e.target)v.pause()});try{if(!AU.paused)AU.pause()}catch(x){}},true);
 /* photo viewer */
 let lbL=[],lbI=0,lbZ=false,lbP={x:0,y:0};
 function lbShow(){const im=document.querySelector('#lb .lbi'),c=lbL[lbI];if(!im)return;lbZ=false;lbP={x:0,y:0};im.classList.remove('z');im.style.transform='';im.style.opacity=0;
@@ -683,6 +766,481 @@ function imgFx(){if(RM)return;document.querySelectorAll('main img').forEach(im=>
 if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&matchMedia('(hover:hover) and (pointer:fine)').matches){let raf=0;
  document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.closest('.card');if(!c||raf)return;raf=requestAnimationFrame(()=>{raf=0;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.setProperty('--ry',(x*7).toFixed(2)+'deg');c.style.setProperty('--rx',(-y*6).toFixed(2)+'deg')})},{passive:true});
  document.addEventListener('pointerout',e=>{const c=e.target.closest&&e.target.closest('.card');if(c&&!c.contains(e.relatedTarget)){c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')}},{passive:true})}
+
+/* ---------- Videos section (stored in pages.__videos, so links work without any server change) ---------- */
+const vids=()=>(((D.pages||{}).__videos||{}).items||[]);
+const vidPub=v=>v.status==='published'&&new Date(v.date)<=new Date();
+function vidPlayer(v){const u=String(v.url||'');
+ if(/^\/video\/[a-f0-9-]{36}\.(mp4|webm)$/.test(u))return `<figure class="vid mp"><video controls preload="metadata" playsinline src="${esc(u)}#t=0.1"></video></figure>`;
+ return mediaBlock(u)||''}
+function vidCard(v){const pl=vidPlayer(v);if(!pl)return'';return `<div class="vcd">${pl}<h3>${esc(v.title)}</h3>${v.desc?`<p class="ad1">${esc(v.desc)}</p>`:''}<div class="meta">${v.dur?fmt(v.dur)+' · ':''}${fd(v.date)}</div></div>`}
+function videoPg(){const L=vids().filter(vidPub).sort((a,b)=>new Date(b.date)-new Date(a.date)),cards=L.map(vidCard).filter(Boolean);
+ document.title='Videos — The Sujan Khadka';
+ return `<div class="pg vds"><h1>Videos</h1><p>Watch our latest videos. Tap a video to play it right here.</p>${cards.length?`<div class="vgrid">${cards.join('')}</div>`:'<p><span class="empty">No videos have been published yet.</span></p>'}</div>`}
+/* portal */
+function videosTab(){const L=[...vids()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+ return `<div class="aup"><strong>Add a video by link (recommended)</strong><p class="meta">Upload the video to YouTube or Vimeo, then paste its link here. Any length works. A direct https link to an MP4 file also works.</p><label>Title</label><input id="vd_t" placeholder="Video title"><label>Description (optional)</label><textarea id="vd_d" style="min-height:70px"></textarea><label>Link</label><input id="vd_u" type="url" inputmode="url" placeholder="https://…"><button class="bt" onclick="vdAddLink()">Add video</button></div>`+
+ `<details class="aup"><summary>Or upload a short clip (up to 10 MB, about 30–60 seconds)</summary><p class="meta">Export it as MP4 at 720p to keep it small. Longer videos should go on YouTube.</p><label>Title</label><input id="vf_t" placeholder="Video title"><label>Description (optional)</label><textarea id="vf_d" style="min-height:70px"></textarea><label>Video file — from your phone or computer</label><input type="file" id="vf_f" accept="video/mp4,video/webm,video/*"><div class="apb"><i id="vf_p"></i></div><button class="bt" id="vf_b" onclick="vdUpload()">Upload video</button></details>`+
+ (L.length?L.map(v=>{const loc=/^\/video\//.test(v.url||''),ok=!!vidPlayer(v);return `<div class="row"><span><strong>${esc(v.title)}</strong><br><span class="meta">${v.status} · ${loc?'Uploaded clip':ok?'Link':'Invalid link'}${v.dur?' · '+fmt(v.dur):''}${v.size?' · '+(v.size/1048576).toFixed(1)+' MB':''} · ${fd(v.date)}</span><br><a class="meta" href="${esc(v.url||'#')}" target="_blank" rel="noopener">Open video</a></span><span><button class="bt o" onclick="vdPub('${esc(v.id)}')">${v.status==='published'?'Unpublish':'Publish'}</button><button class="bt d" onclick="vdDel('${esc(v.id)}')">Delete</button></span></div>`}).join(''):'<div class="empty">No videos added yet.</div>')}
+async function vdSave(mut){A.pages=A.pages||{};const o=A.pages.__videos||{items:[]};o.items=o.items||[];mut(o.items);A.pages.__videos=o;return persist()}
+async function vdAddLink(){const t=$('#vd_t').value.trim(),u=$('#vd_u').value.trim();
+ if(!t)return alert('Please enter a title.');if(!u)return alert('Please paste a link.');
+ if(!/^https:\/\//i.test(u)||!mediaBlock(u))return alert('This link is not supported. Use a YouTube or Vimeo link, or a direct https link to an MP4 / WebM file.');
+ if(await vdSave(it=>it.push({id:'v'+Date.now(),title:t,desc:$('#vd_d').value.trim(),url:u,date:new Date().toISOString(),status:'published'})))go()}
+const vidDur=f=>new Promise(ok=>{const v=document.createElement('video'),u=URL.createObjectURL(f);v.preload='metadata';v.onloadedmetadata=()=>{ok(isFinite(v.duration)?Math.round(v.duration):0);URL.revokeObjectURL(u)};v.onerror=()=>{ok(0);URL.revokeObjectURL(u)};v.src=u});
+async function vdUpload(){const t=$('#vf_t').value.trim(),f=$('#vf_f').files[0];
+ if(!t)return alert('Please enter a title.');if(!f)return alert('Please choose a video file.');
+ if(f.type&&!f.type.startsWith('video/'))return alert('Please choose a video file.');
+ if(f.size>10e6)return alert('This clip is '+(f.size/1e6).toFixed(1)+' MB. The limit is 10 MB (about 30–60 seconds at 720p). Please shorten or compress it, or put the video on YouTube and add it by link.');
+ const b=$('#vf_b'),bar=$('#vf_p'),desc=$('#vf_d').value.trim();b.disabled=true;b.textContent='Uploading…';
+ try{const url=await putAudio(f,n=>{bar.style.width=n+'%';b.textContent='Uploading… '+n+'%'},'video/mp4'),dur=await vidDur(f);
+  if(await vdSave(it=>it.push({id:'v'+Date.now(),title:t,desc,url,dur,size:f.size,date:new Date().toISOString(),status:'published'})))go()}
+ catch(e){alert('Video upload failed: '+(e||'unknown error')+'. If it says the server answered 400 or 415, the new worker.js has not been uploaded yet.');b.disabled=false;b.textContent='Upload video'}}
+async function vdPub(id){await vdSave(it=>{const v=it.find(x=>x.id===id);if(v)v.status=v.status==='published'?'draft':'published'});go()}
+async function vdDel(id){if(!confirm('Delete this video from the website?'))return;await vdSave(it=>{const i=it.findIndex(x=>x.id===id);if(i>=0)it.splice(i,1)});go()}
+
+/* ---------- Daily horoscope: real Moon/Sun astronomy + daily readings ---------- */
+const HZ=[
+ {k:'aries',n:'Aries',g:'♈\uFE0E',ne:'मेष',nr:'Mesh',d:'Mar 21 – Apr 19',el:'Fire',ru:'Mars'},
+ {k:'taurus',n:'Taurus',g:'♉\uFE0E',ne:'वृष',nr:'Brish',d:'Apr 20 – May 20',el:'Earth',ru:'Venus'},
+ {k:'gemini',n:'Gemini',g:'♊\uFE0E',ne:'मिथुन',nr:'Mithun',d:'May 21 – Jun 20',el:'Air',ru:'Mercury'},
+ {k:'cancer',n:'Cancer',g:'♋\uFE0E',ne:'कर्कट',nr:'Karkat',d:'Jun 21 – Jul 22',el:'Water',ru:'the Moon'},
+ {k:'leo',n:'Leo',g:'♌\uFE0E',ne:'सिंह',nr:'Simha',d:'Jul 23 – Aug 22',el:'Fire',ru:'the Sun'},
+ {k:'virgo',n:'Virgo',g:'♍\uFE0E',ne:'कन्या',nr:'Kanya',d:'Aug 23 – Sep 22',el:'Earth',ru:'Mercury'},
+ {k:'libra',n:'Libra',g:'♎\uFE0E',ne:'तुला',nr:'Tula',d:'Sep 23 – Oct 22',el:'Air',ru:'Venus'},
+ {k:'scorpio',n:'Scorpio',g:'♏\uFE0E',ne:'वृश्चिक',nr:'Brischik',d:'Oct 23 – Nov 21',el:'Water',ru:'Mars'},
+ {k:'sagittarius',n:'Sagittarius',g:'♐\uFE0E',ne:'धनु',nr:'Dhanu',d:'Nov 22 – Dec 21',el:'Fire',ru:'Jupiter'},
+ {k:'capricorn',n:'Capricorn',g:'♑\uFE0E',ne:'मकर',nr:'Makar',d:'Dec 22 – Jan 19',el:'Earth',ru:'Saturn'},
+ {k:'aquarius',n:'Aquarius',g:'♒\uFE0E',ne:'कुम्भ',nr:'Kumbha',d:'Jan 20 – Feb 18',el:'Air',ru:'Saturn'},
+ {k:'pisces',n:'Pisces',g:'♓\uFE0E',ne:'मीन',nr:'Meen',d:'Feb 19 – Mar 20',el:'Water',ru:'Jupiter'}];
+const HZB={
+ moon:{
+  Fire:['motivation is strong and it is easy to start the things you have been putting off.','energy runs high, so put it into one clear goal rather than many small ones.','confidence is up, and your enthusiasm can lift the people around you.','you may feel an urge to act, and bold but thoughtful steps are favoured.','the mood is lively, and a spontaneous plan could turn out better than expected.'],
+  Earth:['the mood is steady and practical, which suits finishing tasks and sorting out details.','slow, careful progress works better than rushing, so take things one step at a time.','routine feels supportive, and small improvements at home or at work add up.','it is a good day to plan your money, your time and your priorities sensibly.','patience is your strength, and what you build today has a chance to last.'],
+  Air:['conversation and ideas flow easily, so reach out to someone you have been meaning to contact.','your mind is quick and curious, which helps with learning, writing and decisions.','a short message or a friendly chat could bring a useful new viewpoint.','variety helps today, so mix up your routine and stay open to new information.','listening carefully is as valuable as speaking, and it may reveal something helpful.'],
+  Water:['feelings run deeper than usual, and your intuition is worth listening to.','emotions are close to the surface, so be gentle with yourself and with others.','quiet time and kind words help, and a creative or reflective activity restores balance.','you may pick up on the moods around you, which makes it a good day for care and understanding.','trust your instincts, but give strong feelings a little time before acting on them.']},
+ sign:['Your natural drive helps you take the lead where others hesitate.','Your patience is an advantage, and slow, steady steps win out.','Your curiosity opens a useful door, so ask the extra question.','Trust the instincts that usually protect the people around you.','Your warmth draws attention, so use it to encourage someone else.','Small details matter, and your careful eye catches what others miss.','A calm, fair approach settles something that felt uneven.','Your focus is intense, so aim it at one goal rather than many.','Your optimism is contagious, and a new idea deserves a trial.','Discipline pays off, so keep your long-term goal in view.','An original thought sets you apart, so share it with the right person.','Your imagination is strong, so give it a creative outlet.'],
+ advice:['Take a short walk before any big decision.','Drink enough water and keep your day simple.','Write down your top three tasks and start with the hardest.','Say thank you to someone who helped you recently.','Avoid arguing over small things; they pass quickly.','Spend a few minutes away from your phone.','Save a little today, even a small amount.','Check your plans twice before sending important messages.','Spend time with someone who makes you feel at ease.','Finish one unfinished job before you start another.','Keep your voice calm if a conversation becomes tense.','Learn one new thing, however small.','Tidy your workspace to clear your mind.','Be kind to yourself if things move slower than you hoped.','Get some fresh air and sunlight if you can.','End the day by noting one thing that went well.'],
+ love:{
+  hi:['Warm, open conversation brings you closer to someone special, and small gestures mean a lot.','A friendly mood makes it easy to connect, and a kind message could brighten someone\u2019s day.','Relationships feel supportive, so share your appreciation openly.','If you are single, a relaxed chat with someone new may be pleasantly surprising.','Family and loved ones respond well to your patience and humour today.','Honest words said gently help a close bond grow stronger.','Time spent together, even over a simple meal, strengthens an important connection.','Your caring side shows, and others notice and appreciate it.'],
+  mid:['Relationships are steady today, and listening more than you talk keeps things smooth.','A quiet day for love, so enjoy simple company without expecting much.','Small misunderstandings are possible, so ask before you assume.','Spend a little time with those you care about, even by phone.','Keep expectations realistic and let conversations develop at their own pace.','Be clear about what you need and equally open to what others need.','A calm evening with family or friends helps you recharge.','Patience with a loved one\u2019s mood will be appreciated.'],
+  lo:['Take extra care with your tone today, as tired moods can make small things seem bigger.','It may be best to postpone sensitive conversations until you feel more settled.','Give people some space, and avoid taking passing remarks personally.','Focus on self-care first, because a calmer mind makes relationships easier.','Avoid comparing your situation with others and be patient with yourself.','If tension appears, pause, breathe and respond slowly.','Choose gentle words, and keep important talks for another day if needed.','A kind gesture, even a small one, can soften a difficult moment.']},
+ career:{
+  hi:['Work or study goes well, and your effort is likely to be noticed by the right people.','A clear plan helps you make real progress, and colleagues respond well to your ideas.','It is a good day to start a new task, ask a question or present your thoughts.','Focus and confidence help you finish something important ahead of time.','Teamwork pays off, so share credit and keep communication open.','A useful chance to learn or earn may appear, so stay alert and prepared.','Your skills are valued today, so speak up about what you can offer.','Good planning with money or time brings a sense of progress.'],
+  mid:['A steady day at work: complete routine tasks first and keep a simple list.','Progress is gradual, so avoid rushing and double-check important details.','Stay organised, and keep your promises to colleagues and teachers.','Review your goals for the week and adjust where needed.','Spend carefully today and avoid unplanned purchases.','Ask for clarity if instructions seem unclear instead of guessing.','Use quieter moments to learn something that helps your future plans.','Calm, consistent effort is better than a burst of energy.'],
+  lo:['Take your time with important decisions, and avoid committing in a hurry.','Delays are possible, so allow extra time and keep a flexible plan.','Double-check figures, messages and deadlines before you submit anything.','Keep spending modest today and postpone large purchases if you can.','Do not take criticism personally; treat it as information you can use.','Focus on one task at a time rather than trying to do everything at once.','If work feels heavy, break it into small steps and begin with the easiest.','Rest and preparation today will help you perform better tomorrow.']},
+ health:{
+  hi:['Energy and mood are good, so a walk, stretching or light exercise will feel rewarding.','You feel more positive than usual, so keep up healthy habits and regular meals.','A good day to start a small healthy routine, such as drinking more water or sleeping on time.','Fresh air and sunlight lift your spirits and sharpen your focus.','Your mind feels clear, which makes it a good time for planning and learning.','Cheerful company and a little laughter do you good today.','Balanced meals and steady movement keep your energy even through the day.','Your motivation for self-care is strong, so make the most of it.'],
+  mid:['Energy is steady, so keep to regular meals and a normal routine.','Short breaks between tasks help you stay fresh and focused.','Listen to your body, and rest if you feel tired rather than pushing on.','A gentle walk or a few minutes of stretching will help you relax.','Keep your screen time moderate and give your eyes a rest.','Eat simple, light food and drink enough water.','Take a few slow breaths whenever the day feels busy.','Good sleep tonight will help you feel better tomorrow.'],
+  lo:['Energy may dip, so rest when you need to and do not take on too much.','Take things slowly and avoid heavy meals late in the evening.','Stress can build up quietly, so take short pauses and breathe deeply.','Try to sleep early tonight, and keep your phone away from the bed.','Light exercise and fresh air will help more than pushing through tiredness.','Drink plenty of water and avoid skipping meals.','Be gentle with yourself, because a quiet evening may be the best medicine.','If you feel unwell for more than a day or two, consider seeing a doctor.']}};
+const HZC=[['Crimson','#c0392b'],['Saffron','#f39c12'],['Emerald','#1e8449'],['Sky blue','#3498db'],['Royal purple','#6c3483'],['Pearl white','#ecf0f1'],['Gold','#d4ac0d'],['Teal','#16a085'],['Rose pink','#e8788f'],['Indigo','#34459e'],['Ivory','#f5ecd0'],['Turquoise','#1abc9c']];
+const HZT=['6:30 AM','8:15 AM','10:30 AM','12:45 PM','3:20 PM','5:40 PM','7:10 PM','9:00 PM'];
+const HZM=['Confident','Curious','Calm','Focused','Hopeful','Bold','Creative','Patient','Cheerful','Thoughtful','Energetic','Grounded','Playful','Determined','Open-minded','Reflective','Warm','Steady','Adventurous','Balanced'];
+/* astronomy: Sun (apparent) and Moon (Meeus ch.47, 59 terms) – checked against known new/full moon times to about 2 minutes */
+const hzRad=Math.PI/180,hzN=x=>((x%360)+360)%360,hzJD=d=>d.getTime()/864e5+2440587.5;
+function sunLon(j){const T=(j-2451545)/36525,L0=280.46646+36000.76983*T+.0003032*T*T,M=357.52911+35999.05029*T-.0001537*T*T,
+ C=(1.914602-.004817*T-.000014*T*T)*Math.sin(M*hzRad)+(.019993-.000101*T)*Math.sin(2*M*hzRad)+.000289*Math.sin(3*M*hzRad);
+ return hzN(L0+C-.00569-.00478*Math.sin((125.04-1934.136*T)*hzRad))}
+const HS_ML=[[0,0,1,0,6288774],[2,0,-1,0,1274027],[2,0,0,0,658314],[0,0,2,0,213618],[0,1,0,0,-185116],[0,0,0,2,-114332],[2,0,-2,0,58793],[2,-1,-1,0,57066],[2,0,1,0,53322],[2,-1,0,0,45758],[0,1,-1,0,-40923],[1,0,0,0,-34720],[0,1,1,0,-30383],[2,0,0,-2,15327],[0,0,1,2,-12528],[0,0,1,-2,10980],[4,0,-1,0,10675],[0,0,3,0,10034],[4,0,-2,0,8548],[2,1,-1,0,-7888],[2,1,0,0,-6766],[1,0,-1,0,-5163],[1,1,0,0,4987],[2,-1,1,0,4036],[2,0,2,0,3994],[4,0,0,0,3861],[2,0,-3,0,3665],[0,1,-2,0,-2689],[2,0,-1,2,-2602],[2,-1,-2,0,2390],[1,0,1,0,-2348],[2,-2,0,0,2236],[0,1,2,0,-2120],[0,2,0,0,-2069],[2,-2,-1,0,2048],[2,0,1,-2,-1773],[2,0,0,2,-1595],[4,-1,-1,0,1215],[0,0,2,2,-1110],[3,0,-1,0,-892],[2,1,1,0,-810],[4,-1,-2,0,759],[0,2,-1,0,-713],[2,2,-1,0,-700],[2,1,-2,0,691],[2,-1,0,-2,596],[4,0,1,0,549],[0,0,4,0,537],[4,-1,0,0,520],[1,0,-2,0,-487],[2,1,0,-2,-399],[0,0,2,-2,-381],[1,1,1,0,351],[3,0,-2,0,-340],[4,0,-3,0,330],[2,-1,2,0,327],[0,2,1,0,-323],[1,1,-1,0,299],[2,0,3,0,294]];
+function moonLon(j){const T=(j-2451545)/36525,r=hzRad,Lp=hzN(218.3164477+481267.88123421*T-.0015786*T*T),D=hzN(297.8501921+445267.1114034*T-.0018819*T*T),M=hzN(357.5291092+35999.0502909*T-.0001536*T*T),Mp=hzN(134.9633964+477198.8675055*T+.0087414*T*T),F=hzN(93.272095+483202.0175233*T-.0036539*T*T),E=1-.002516*T-.0000074*T*T;
+ let t=0;for(const[d,m,mp,f,c]of HS_ML)t+=c*(Math.abs(m)===1?E:Math.abs(m)===2?E*E:1)*Math.sin((d*D+m*M+mp*Mp+f*F)*r);
+ t+=3958*Math.sin((119.75+131.849*T)*r)+1962*Math.sin((Lp-F)*r)+318*Math.sin((53.09+479264.29*T)*r);
+ return hzN(Lp+t/1e6-.00478*Math.sin((125.04-1934.136*T)*r))}
+const hzElong=j=>hzN(moonLon(j)-sunLon(j));
+const hzAyan=j=>23.853+.013969*((j-2451545)/365.25);                         /* Lahiri ayanamsa */
+function hzVd(){try{const v=JSON.parse(localStorage.getItem('sk_zv')||'null');return v===null?true:!!v}catch(e){return true}}
+const hzNm=i=>hzVd()?HZ[i].nr:HZ[i].n;
+const HZVD=['Apr 14 – May 14','May 15 – Jun 14','Jun 15 – Jul 15','Jul 16 – Aug 16','Aug 17 – Sep 16','Sep 17 – Oct 16','Oct 17 – Nov 15','Nov 16 – Dec 15','Dec 16 – Jan 13','Jan 14 – Feb 12','Feb 13 – Mar 13','Mar 14 – Apr 13'];
+const hzDt=i=>hzVd()?HZVD[i]:HZ[i].d;
+const HZ_TITHI=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi'],
+ HZ_NAK=['Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha','Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha','Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha','Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+function hzPanch(j){const e=hzElong(j),t=Math.floor(e/12)+1,pk=t<=15?'Shukla':'Krishna',n=((t-1)%15)+1,tn=n===15?(t===15?'Purnima':'Amavasya'):HZ_TITHI[n-1];return pk==='Shukla'&&n===15?{t:'Purnima',nk:HZ_NAK[Math.floor(hzN(moonLon(j)-hzAyan(j))/(360/27))]}:{t:(n===15?tn:pk+' '+tn),nk:HZ_NAK[Math.floor(hzN(moonLon(j)-hzAyan(j))/(360/27))]}}
+function hzMoonMove(){const v=hzVd(),f=t=>{const j=t/864e5+2440587.5;return Math.floor(hzN(moonLon(j)-(v?hzAyan(j):0))/30)};let t=Date.now();const s0=f(t),end=t+80*36e5;
+ while(t<end){const n=t+20*6e4;if(f(n)!==s0){let a=t,b=n;for(let i=0;i<12;i++){const m=(a+b)/2;if(f(m)===s0)a=m;else b=m}return{t:new Date(b),to:f(b+6e4)}}t=n}return null}
+const HZ_DAYRU=['the Sun','the Moon','Mars','Mercury','Jupiter','Venus','Saturn'],HZ_NUM={'Mars':9,'Venus':6,'Mercury':5,'the Moon':2,'the Sun':1,'Jupiter':3,'Saturn':8},
+ HZ_WC=[['Orange','#f39c12'],['Pearl white','#ecf0f1'],['Crimson','#c0392b'],['Emerald','#1e8449'],['Golden yellow','#f1c40f'],['Rose pink','#e8788f'],['Midnight blue','#1b2a6b']],
+ HZ_ORD=['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
+/* classical Moon-transit rule: the Moon is favourable in the 1st, 3rd, 6th, 7th, 10th and 11th house counted from your sign */
+const HH=[null,
+ {o:4,l:4,c:4,m:3,h:4,mood:'Confident',sum:'The Moon is in your own sign, which usually brings a calm mind, good appetite and a warm, confident mood. People notice you today. Start a personal task you have been postponing, and keep your tone gentle in discussions.',lo:'Warm, open conversation brings you closer to someone.',ca:'Good for taking the lead on a task you own.',mo:'Money is steady, and small comforts are fine.',he:'Energy is good; rest if you feel emotionally tired.',dd:'Begin something personal',av:'Taking everything to heart'},
+ {o:2,l:3,c:3,m:2,h:3,mood:'Careful',sum:'The Moon is in the second house from your sign, which tradition links with higher spending and careless words. Think twice before you speak or pay, and be patient with family and food matters.',lo:'Choose gentle words, because sharp remarks hurt more than you mean.',ca:'Double-check messages and numbers before you send them.',mo:'Expenses run high, so delay big purchases.',he:'Watch your eating habits and eye strain.',dd:'Count before you spend',av:'Harsh speech'},
+ {o:4,l:3,c:4,m:4,h:4,mood:'Courageous',sum:'The Moon is in your third house, a supportive position linked with courage, effort that pays off and help from friends and siblings. A short trip, a call or a message can move something forward.',lo:'A friendly message opens a door.',ca:'Initiative and communication are rewarded.',mo:'Small gains come from your own effort.',he:'You feel active and strong; a walk will help.',dd:'Take the first step',av:'Waiting for others to move first'},
+ {o:2,l:3,c:2,m:2,h:3,mood:'Restless',sum:'The Moon is in your fourth house, which tradition links with restlessness and a heavy mind at home. Your attention may drift, so keep routines simple and avoid arguments with family.',lo:'Home feels sensitive, so listen more than you explain.',ca:'Focus is low; do routine work first.',mo:'Avoid property and vehicle decisions today.',he:'Rest well and eat light food.',dd:'Keep the day simple',av:'Family arguments'},
+ {o:2,l:3,c:2,m:3,h:3,mood:'Thoughtful',sum:'The Moon is in your fifth house, when thoughts may be scattered and decisions feel unclear. Creative work is fine, but avoid risks and speculation, and keep an eye on the needs of children and students.',lo:'Feelings are mixed, so do not rush into promises.',ca:'Study and plan, and leave final decisions for later.',mo:'Avoid gambling and risky bets.',he:'Your mind is busy; short breaks and sleep help.',dd:'Plan instead of gambling',av:'Quick decisions'},
+ {o:4,l:3,c:4,m:4,h:4,mood:'Determined',sum:'The Moon is in your sixth house, a strong position for overcoming obstacles. Rivals and old problems lose their power, and health improves with a good routine. It is a day to finish pending work.',lo:'Clear up an old misunderstanding.',ca:'Pending work gets finished and competition is easier.',mo:'A good day to recover dues or pay off a small debt.',he:'Recovery is good, so start a healthy habit.',dd:'Finish what is pending',av:'Holding grudges'},
+ {o:5,l:5,c:4,m:4,h:4,mood:'Sociable',sum:'The Moon is in your seventh house, one of the best positions for relationships and partnerships. Meetings go well, and you get cooperation from partners, clients and friends. Social plans bring happiness.',lo:'A very good day for love, marriage talks and reconciliation.',ca:'Partnerships and meetings succeed.',mo:'Gains come through cooperation or clients.',he:'A cheerful mood supports good health.',dd:'Meet people and agree on plans',av:'Doing everything alone'},
+ {o:1,l:2,c:2,m:2,h:2,mood:'Cautious',sum:'The Moon is in your eighth house, traditionally the most testing position. Delays, sudden changes and a low mood are possible. Stay careful with travel, money and health, and avoid new risks.',lo:'Misunderstandings come easily, so stay patient.',ca:'Expect delays and extra checks; do not start something new.',mo:'Avoid lending, loans and investments.',he:'Be careful with travel, fire and sharp tools, and rest.',dd:'Stay careful and slow',av:'New risks'},
+ {o:2,l:3,c:2,m:3,h:3,mood:'Patient',sum:'The Moon is in your ninth house, which tradition links with obstacles in plans and long journeys. Luck feels slower than usual. Prayer, learning and time with elders will steady you.',lo:'Distance or timing causes small problems.',ca:'Plans take longer, so be flexible.',mo:'Hold back from major spending.',he:'Avoid overwork and long travel if you can.',dd:'Ask advice from elders',av:'Long trips'},
+ {o:5,l:3,c:5,m:4,h:4,mood:'Ambitious',sum:'The Moon is in your tenth house, a powerful position for career and reputation. Your efforts are noticed by seniors and the public. It is a very good day to take responsibility, present your work or make a career move.',lo:'Work success lifts your mood at home.',ca:'Excellent: recognition and progress.',mo:'Good income opportunities appear.',he:'You are strong, but do not skip meals.',dd:'Present your work',av:'Hiding your effort'},
+ {o:5,l:4,c:4,m:5,h:4,mood:'Hopeful',sum:'The Moon is in your eleventh house, a position linked with gains and fulfilled wishes. Friends, networks and older relatives help you. Money, news or support you have been waiting for may arrive.',lo:'Friends bring good company and a social bond grows.',ca:'Networking and teamwork pay off.',mo:'Excellent for income and long-awaited payments.',he:'Good; enjoy time with friends.',dd:'Reach out to your network',av:'Ignoring offers of help'},
+ {o:2,l:3,c:2,m:2,h:3,mood:'Reflective',sum:'The Moon is in your twelfth house, a quiet day linked with expenses, tiredness and a wish for solitude. Rest, prayer and charity suit it better than big new steps. Guard against waste and lost items.',lo:'Give space and keep conversations short.',ca:'Behind-the-scenes work is better than public moves.',mo:'Expenses rise, so track every payment.',he:'Sleep and rest are the priority.',dd:'Rest and help someone',av:'Waste and late nights'}];
+
+function hzPhaseName(e){return e<6.5||e>=353.5?'New Moon':e<83.5?'Waxing Crescent':e<96.5?'First Quarter':e<173.5?'Waxing Gibbous':e<186.5?'Full Moon':e<263.5?'Waning Gibbous':e<276.5?'Last Quarter':'Waning Crescent'}
+function hzNext(target,from){const f=t=>hzN(hzElong(t/864e5+2440587.5)-target+180)-180,t0=from||Date.now();let a=t0,fa=f(a);
+ for(let i=1;i<=24*35;i++){const b=t0+i*36e5,fb=f(b);if(fa<0&&fb>=0){let lo=a,hi=b;for(let k=0;k<30;k++){const m=(lo+hi)/2;if(f(m)<0)lo=m;else hi=m}return new Date(hi)}a=b;fa=fb}return null}
+function hzMoonSvg(e){const k=Math.cos(e*hzRad),R=50,rx=(R*Math.abs(k)).toFixed(2),wax=e<180,sw1=wax?1:0,sw2=wax?(k>0?0:1):(k>0?1:0);
+ const lit=e<2||e>358?'':`<path d="M50 0A50 50 0 0 ${sw1} 50 100A${rx} 50 0 0 ${sw2} 50 0Z" fill="url(#hzl)"/>`;
+ return `<svg viewBox="-8 -8 116 116" role="img" aria-label="Moon phase"><defs><radialGradient id="hzl" cx=".35" cy=".35" r=".9"><stop offset="0" stop-color="#fffdf0"/><stop offset="1" stop-color="#e6dcae"/></radialGradient><radialGradient id="hzd" cx=".5" cy=".5" r=".5"><stop offset=".7" stop-color="#26325a"/><stop offset="1" stop-color="#171f3c"/></radialGradient></defs><circle cx="50" cy="50" r="52" fill="rgba(255,244,190,.10)"/><circle cx="50" cy="50" r="50" fill="url(#hzd)"/>${lit}<g fill="#000" opacity=".07"><circle cx="38" cy="36" r="7"/><circle cx="62" cy="58" r="9"/><circle cx="44" cy="72" r="5"/><circle cx="66" cy="30" r="4"/></g></svg>`}
+function hzSky(){const j=hzJD(new Date()),e=hzElong(j),v=hzVd(),a=v?hzAyan(j):0,ms=hzN(moonLon(j)-a),ss=hzN(sunLon(j)-a);return{e,ill:Math.round((1-Math.cos(e*hzRad))/2*100),name:hzPhaseName(e),mi:Math.floor(ms/30),mdeg:Math.floor(ms%30),si:Math.floor(ss/30),full:hzNext(180),nw:hzNext(0),mn:hzMoonMove(),pc:hzPanch(j),v}}
+/* readings: the same for everyone on the same day, shaped by the real Moon sign */
+const hzYmd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function hzSeed(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function hzRng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const hzCompat=(a,b)=>(a==='Fire'&&b==='Air')||(a==='Air'&&b==='Fire')||(a==='Earth'&&b==='Water')||(a==='Water'&&b==='Earth');
+function hzRead(si,off){const n=new Date(),dt=new Date(n.getFullYear(),n.getMonth(),n.getDate()+off,12),ds=hzYmd(dt),j=hzJD(dt),S=HZ[si],v=hzVd(),a=v?hzAyan(j):0,mi=Math.floor(hzN(moonLon(j)-a)/30),h=((mi-si+12)%12)+1,H=HH[h],R=hzRng(hzSeed(ds+'|'+S.k)),pick=x=>x[Math.floor(R()*x.length)],
+  el=hzElong(j),bright=el>=84&&el<180,faint=el>=312,wk=dt.getDay(),ruled=HZ_DAYRU[wk]===S.ru,
+  fx=x=>Math.max(1,Math.min(5,x+(bright&&x<=3?1:0)-(faint&&x>=4?1:0))),
+  love=fx(H.l),career=fx(Math.round((H.c+H.m)/2)),health=fx(H.h),overall=Math.min(5,fx(H.o)+(ruled&&H.o<5?1:0)),
+  why=`The Moon is in ${hzNm(mi)}, your ${HZ_ORD[h]} house.`+(bright&&H.o<=3?' A bright, growing Moon softens the difficult side of this position.':'')+(faint&&H.o>=4?' A very thin Moon slightly dampens the good side of this position.':'')+(ruled?` ${S.ru[0].toUpperCase()+S.ru.slice(1)}, your ruling planet, also rules today.`:'');
+ return{ds,dt,S,mi,h,why,love,career,health,overall,mood:H.mood,dd:H.dd,av:H.av,
+  main:H.sum+' '+pick(HZB.advice),loveT:H.lo,careerT:H.ca+' '+H.mo,healthT:H.he,
+  num:HZ_NUM[S.ru],col:HZ_WC[wk]}}
+const hzSaved=()=>{const v=lsGet('sk_sign');return typeof v==='number'&&v>=0&&v<12?v:-1};
+function hzChip(){return RF.chip()}
+function horoPg(){document.title='Daily Horoscope — The Sujan Khadka';const k=hzSky(),R=hzRng(7),st=Array.from({length:44},()=>`<i style="left:${(R()*100).toFixed(1)}%;top:${(R()*100).toFixed(1)}%;--s:${(1+R()*2.2).toFixed(1)}px;--d:${(R()*4).toFixed(1)}s"></i>`).join('');
+ const wheel=HZ.map((s,i)=>{const a=(i*30-90+15)*hzRad,x=(Math.cos(a)*112).toFixed(1),y=(Math.sin(a)*112).toFixed(1);return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central">${s.g}</text>`}).join('');
+ const fd2=d=>d?d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}):'–';
+ const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
+ return `<div class="pg hz"><h1>Daily Horoscope</h1><p>Pick your sign for today’s reading, with the real Moon and Sun positions for the day. Come back tomorrow for a new one.</p>
+ <div class="hzmode" role="group" aria-label="Zodiac system"><button class="${hzVd()?'on':''}" onclick="hzMode(true)">Nepali · Vedic (Rashifal)</button><button class="${hzVd()?'':'on'}" onclick="hzMode(false)">Western</button></div><p class="meta hzmn">${hzVd()?'Rashi is your Moon sign at birth, taken from your janma kundali. Signs use the Lahiri (sidereal) zodiac, the system used in Nepal.':'Signs use the Western (tropical) zodiac, based on your Sun sign.'}</p>
+ <div class="hzhero"><div class="hzst" aria-hidden="true">${st}</div><svg class="hzwh" viewBox="-150 -150 300 300" aria-hidden="true"><circle r="142" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.2"/><circle r="84" fill="none" stroke="rgba(255,255,255,.2)"/><g stroke="rgba(255,255,255,.2)">${HZ.map((_,i)=>`<line x1="0" y1="0" x2="${(Math.cos(i*30*hzRad)*142).toFixed(1)}" y2="${(Math.sin(i*30*hzRad)*142).toFixed(1)}"/>`).join('')}</g><g fill="rgba(255,236,160,.85)" font-size="17">${wheel}</g></svg>
+  <div class="hzsky"><div class="hzmoon">${hzMoonSvg(k.e)}</div><div class="hzinfo"><span class="hzlbl">Today’s sky</span><b class="hzph">${k.name}</b><span>${k.ill}% lit · Moon in <strong>${hzNm(k.mi)} ${HZ[k.mi].g}</strong> ${k.mdeg}°</span><span>Sun in <strong>${hzNm(k.si)} ${HZ[k.si].g}</strong></span>${k.mn?`<span>Moon enters <strong>${hzNm(k.mn.to)}</strong> on <strong>${k.mn.t.toLocaleString(undefined,{weekday:'short',hour:'numeric',minute:'2-digit'})}</strong></span>`:''}${k.v?`<span>Tithi <strong>${k.pc.t}</strong> · Nakshatra <strong>${k.pc.nk}</strong></span>`:''}<span>Next full moon <strong>${fd2(k.full)}</strong> · new moon <strong>${fd2(k.nw)}</strong></span></div></div></div>
+ <div class="hzfind"${hzVd()?' hidden':''}><span>Not sure of your sign?</span><select id="hz_m" aria-label="Birth month">${mo.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('')}</select><select id="hz_d" aria-label="Birth day">${Array.from({length:31},(_,i)=>`<option>${i+1}</option>`).join('')}</select><button class="bt o" onclick="hzFind()">Find my sign</button></div>
+ <div class="hzgrid" role="radiogroup" aria-label="Choose your sign">${HZ.map((s,i)=>`<button class="hzsg" role="radio" aria-checked="false" data-i="${i}" onclick="hzShow(${i},0,true)"><span class="hzg">${s.g}</span><b>${hzNm(i)}</b><small>${s.ne}</small><em>${hzDt(i)}</em></button>`).join('')}</div>
+ <div id="hzread" aria-live="polite"></div>
+ <p class="hzdis">Moon phase, Moon sign, tithi and nakshatra are calculated from astronomy for the current moment. The daily readings follow the classical Moon-transit rule, with the Moon counted as a house from your sign. Astrology is a traditional belief and is not scientifically proven, so these readings are for guidance and entertainment only, not predictions, medical, legal or financial advice.</p></div>`}
+let hzSi=-1,hzOff=0;
+function hzMode(v){try{localStorage.setItem('sk_zv',JSON.stringify(!!v))}catch(e){}go();const c=$('#hz');if(c)c.innerHTML=hzChip()}
+function hzStars(n){return `<span class="hz5" role="img" aria-label="${n} out of 5">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}" style="--i:${i}">★</i>`).join('')}</span>`}
+function hzHtml(si,off){const r=hzRead(si,off),S=r.S,ov=(((D.pages||{}).__horo||{}).days||{})[r.ds],note=ov&&ov[S.k]?`<div class="hzed"><b>Editor’s note</b><p>${esc(ov[S.k])}</p></div>`:'',
+ row=(t,n,x)=>`<div class="hzrow"><div class="hzrh"><b>${t}</b>${hzStars(n)}</div><div class="hzbar"><i style="--w:${n*20}%"></i></div><p>${x}</p></div>`,
+ tab=(l,o)=>`<button class="${o===off?'on':''}" onclick="hzShow(${si},${o})">${l}</button>`;
+ return `<div class="hzr"><div class="hzh"><span class="hzbig">${S.g}</span><div><h2>${hzNm(si)} <small>${S.ne} · ${hzVd()?S.n:S.nr}</small></h2><div class="meta">${hzDt(si)} · ${S.el} · ruled by ${S.ru}</div></div></div>
+ <div class="hztabs" role="tablist">${tab('Yesterday',-1)}${tab('Today',0)}${tab('Tomorrow',1)}</div>
+ <div class="meta hzdate">${r.dt.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · Mood: <b>${r.mood}</b> · Overall ${hzStars(r.overall)}</div>
+ ${note}<p class="hzmain">${r.main}</p>
+ ${row('Love',r.love,r.loveT)}${row('Career &amp; money',r.career,r.careerT)}${row('Health &amp; mind',r.health,r.healthT)}
+ <div class="hzlk"><div><small>Lucky number</small><b>${r.num}</b></div><div><small>Lucky colour</small><b><i class="hzsw" style="background:${r.col[1]}"></i>${r.col[0]}</b></div><div><small>Moon is in your</small><b>${HZ_ORD[r.h]} house</b></div></div><div class="hzda"><div><small>Do</small><b>${r.dd}</b></div><div><small>Avoid</small><b>${r.av}</b></div></div><p class="hzwhy">${r.why}</p></div>`}
+function hzShow(si,off,sc){hzSi=si;hzOff=off||0;const box=$('#hzread');if(!box)return;
+ document.querySelectorAll('.hzsg').forEach(b=>{const on=+b.dataset.i===si;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
+ if(si<0){box.innerHTML='<div class="hzempty">Choose your sign above to see today’s reading.</div>';return}
+ box.innerHTML=hzHtml(si,hzOff);if(lsGet('sk_sign')!==si){lsSet('sk_sign',si);const c=$('#hz');if(c)c.innerHTML=hzChip()}
+ const r=box.querySelector('.hzr');requestAnimationFrame(()=>requestAnimationFrame(()=>r&&r.classList.add('go')));if(sc)setTimeout(()=>box.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'}),80)}
+function hzInit(){if(!$('#hzread'))return;hzShow(hzSi>=0?hzSi:hzSaved(),hzOff)}
+function hzFind(){const m=+$('#hz_m').value,d=+$('#hz_d').value,cut=[[1,20,'aquarius'],[2,19,'pisces'],[3,21,'aries'],[4,20,'taurus'],[5,21,'gemini'],[6,21,'cancer'],[7,23,'leo'],[8,23,'virgo'],[9,23,'libra'],[10,23,'scorpio'],[11,22,'sagittarius'],[12,22,'capricorn']];
+ let k='capricorn';cut.forEach(c=>{if(m>c[0]||(m===c[0]&&d>=c[1]))k=c[2]});hzShow(HZ.findIndex(x=>x.k===k),0);const b=$('#hzread');if(b)b.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'})}
+/* portal: optional editor's notes per sign and date */
+let hzAD=null;
+function hzTab(){const ds=hzAD||hzYmd(new Date()),cur=((((A.pages||{}).__horo||{}).days)||{})[ds]||{};
+ return `<div class="aup"><strong>Daily horoscope</strong><p class="meta">Every sign already gets an automatic daily reading based on the real position of the Moon. If you write a message here for a date, readers see it as an “Editor’s note” on top of that sign’s reading. Leave a box empty to show only the automatic reading.</p><label>Date</label><input type="date" id="hz_dt" value="${ds}" onchange="hzAD=this.value;go()">${HZ.map(s=>`<label>${s.g} ${s.n} (${s.nr})</label><textarea id="hz_${s.k}" style="min-height:70px" maxlength="600">${esc(cur[s.k]||'')}</textarea>`).join('')}<div style="margin-top:12px"><button class="bt" onclick="hzSave()">Save</button></div></div>`}
+async function hzSave(){const ds=$('#hz_dt').value;if(!ds)return alert('Choose a date.');A.pages=A.pages||{};const o=A.pages.__horo||{days:{}};o.days=o.days||{};const day={};
+ HZ.forEach(s=>{const t=$('#hz_'+s.k).value.trim();if(t)day[s.k]=t.slice(0,600)});if(Object.keys(day).length)o.days[ds]=day;else delete o.days[ds];
+ const keep=hzYmd(new Date(Date.now()-30*864e5));Object.keys(o.days).forEach(k=>{if(k<keep)delete o.days[k]});A.pages.__horo=o;if(await persist()){alert('Saved.');go()}}
+/* ---------- Rashifal (real Nepal-time engine: Moon over Kathmandu, Lahiri ayanamsa) ---------- */
+var RashifalEngine = (function () {
+  "use strict";
+  var RAD = Math.PI / 180;
+  var DELTA_T = 69.2; // seconds, TT minus UT, about 2026
+  var OFFSET_MS = (5 * 60 + 45) * 60 * 1000; // Nepal Time, UTC+05:45
+  var DAY_MS = 86400000;
+  var LAT = 27.7172, LON = 85.3240; // Kathmandu
+
+  function norm(x) { x = x % 360; return x < 0 ? x + 360 : x; }
+  function jdUT(ms) { return ms / DAY_MS + 2440587.5; }
+  function jde(ms) { return jdUT(ms) + DELTA_T / 86400; }
+
+  // [D, M, M', F, coefficient in 1e-6 degrees]
+  var MOON_TERMS = [
+    [0,0,1,0,6288774],[2,0,-1,0,1274027],[2,0,0,0,658314],[0,0,2,0,213618],[0,1,0,0,-185116],
+    [0,0,0,2,-114332],[2,0,-2,0,58793],[2,-1,-1,0,57066],[2,0,1,0,53322],[2,-1,0,0,45758],
+    [0,1,-1,0,-40923],[1,0,0,0,-34720],[0,1,1,0,-30383],[2,0,0,-2,15327],[0,0,1,2,-12528],
+    [0,0,1,-2,10980],[4,0,-1,0,10675],[0,0,3,0,10034],[4,0,-2,0,8548],[2,1,-1,0,-7888],
+    [2,1,0,0,-6766],[1,0,-1,0,-5163],[1,1,0,0,4987],[2,-1,1,0,4036],[2,0,2,0,3994],
+    [4,0,0,0,3861],[2,0,-3,0,3665],[0,1,-2,0,-2689],[2,0,-1,2,-2602],[2,-1,-2,0,2390],
+    [1,0,1,0,-2348],[2,-2,0,0,2236],[0,1,2,0,-2120],[0,2,0,0,-2069],[2,-2,-1,0,2048],
+    [2,0,1,-2,-1773],[2,0,0,2,-1595],[4,-1,-1,0,1215],[0,0,2,2,-1110],[3,0,-1,0,-892],
+    [2,1,1,0,-810],[4,-1,-2,0,759],[0,2,-1,0,-713],[2,2,-1,0,-700],[2,1,-2,0,691],
+    [2,-1,0,-2,596],[4,0,1,0,549],[0,0,4,0,537],[4,-1,0,0,520],[1,0,-2,0,-487]
+  ];
+
+  function moonTropical(ms) {
+    var T = (jde(ms) - 2451545.0) / 36525;
+    var Lp = 218.3164477 + 481267.88123421 * T - 0.0015786 * T * T;
+    var D = 297.8501921 + 445267.1114034 * T - 0.0018819 * T * T;
+    var M = 357.5291092 + 35999.0502909 * T - 0.0001536 * T * T;
+    var Mp = 134.9633964 + 477198.8675055 * T + 0.0087414 * T * T;
+    var F = 93.2720950 + 483202.0175233 * T - 0.0036539 * T * T;
+    var E = 1 - 0.002516 * T - 0.0000074 * T * T;
+    var A1 = 119.75 + 131.849 * T, A2 = 53.09 + 479264.290 * T;
+    var sum = 0;
+    for (var i = 0; i < MOON_TERMS.length; i++) {
+      var t = MOON_TERMS[i];
+      var arg = (t[0] * D + t[1] * M + t[2] * Mp + t[3] * F) * RAD;
+      var c = t[4];
+      var am = Math.abs(t[1]);
+      if (am === 1) c *= E; else if (am === 2) c *= E * E;
+      sum += c * Math.sin(arg);
+    }
+    sum += 3958 * Math.sin(A1 * RAD) + 1962 * Math.sin((Lp - F) * RAD) + 318 * Math.sin(A2 * RAD);
+    var lon = Lp + sum / 1e6;
+    // nutation in longitude (low precision) to get apparent longitude
+    var Om = 125.04452 - 1934.136261 * T;
+    var dpsi = -17.20 * Math.sin(Om * RAD) - 1.32 * Math.sin(2 * (280.4665 + 36000.7698 * T) * RAD)
+             - 0.23 * Math.sin(2 * Lp * RAD) + 0.21 * Math.sin(2 * Om * RAD);
+    return norm(lon + dpsi / 3600);
+  }
+
+  function sunTropical(ms) {
+    var T = (jde(ms) - 2451545.0) / 36525;
+    var L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+    var M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+    var C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M * RAD)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * M * RAD) + 0.000289 * Math.sin(3 * M * RAD);
+    var om = 125.04 - 1934.136 * T;
+    return norm(L0 + C - 0.00569 - 0.00478 * Math.sin(om * RAD));
+  }
+
+  function ayanamsa(ms) { // Lahiri, degrees
+    var years = (jdUT(ms) - 2451545.0) / 365.25;
+    return 23.857 + 0.0139697 * years;
+  }
+
+  function moonSidereal(ms) { return norm(moonTropical(ms) - ayanamsa(ms)); }
+  function elongation(ms) { return norm(moonTropical(ms) - sunTropical(ms)); }
+
+  // monotonic "unwrapped" quantities so crossings can be found by bisection
+  function crossing(fn, step, from, target, spanMs) {
+    // fn returns an angle in [0,360) increasing with time; find first time ms>=from where it reaches target
+    var t0 = from, a0 = fn(t0);
+    var maxT = from + (spanMs || 3 * DAY_MS);
+    for (var t = from + step; t <= maxT + step; t += step) {
+      var a1 = fn(t);
+      var d0 = norm(target - a0), d1 = norm(target - a1);
+      if (d0 < 180 && (d1 > d0 || d1 >= 180)) { // passed target between t0 and t
+        var lo = t0, hi = t;
+        for (var i = 0; i < 40; i++) {
+          var mid = (lo + hi) / 2;
+          if (norm(target - fn(mid)) < 180 && norm(target - fn(mid)) > 0) lo = mid; else hi = mid;
+        }
+        return (lo + hi) / 2;
+      }
+      t0 = t; a0 = a1;
+    }
+    return null;
+  }
+
+  var TITHI_EN = ["Pratipada","Dwitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi"];
+  var TITHI_NP = ["प्रतिपदा","द्वितीया","तृतीया","चतुर्थी","पञ्चमी","षष्ठी","सप्तमी","अष्टमी","नवमी","दशमी","एकादशी","द्वादशी","त्रयोदशी","चतुर्दशी"];
+  function tithiInfo(ms) {
+    var n = Math.floor(elongation(ms) / 12) + 1; // 1..30
+    var shukla = n <= 15;
+    var k = shukla ? n : n - 15;
+    var en, np;
+    if (k === 15) { en = shukla ? "Purnima" : "Amavasya"; np = shukla ? "पूर्णिमा" : "औंसी"; }
+    else { en = TITHI_EN[k - 1]; np = TITHI_NP[k - 1]; }
+    return { number: n, en: en, np: np, paksha: shukla ? "Shukla" : "Krishna", pakshaNp: shukla ? "शुक्ल" : "कृष्ण" };
+  }
+  function tithiEnd(ms) {
+    var n = Math.floor(elongation(ms) / 12) + 1;
+    return crossing(elongation, 10 * 60000, ms, norm(n * 12), 3 * DAY_MS);
+  }
+
+  var NAK_EN = ["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
+  var NAK_NP = ["अश्विनी","भरणी","कृत्तिका","रोहिणी","मृगशिरा","आर्द्रा","पुनर्वसु","पुष्य","आश्लेषा","मघा","पूर्व फाल्गुनी","उत्तर फाल्गुनी","हस्त","चित्रा","स्वाति","विशाखा","अनुराधा","ज्येष्ठा","मूल","पूर्वाषाढा","उत्तराषाढा","श्रवण","धनिष्ठा","शतभिषा","पूर्व भाद्रपद","उत्तर भाद्रपद","रेवती"];
+  function nakshatraInfo(ms) {
+    var i = Math.floor(moonSidereal(ms) / (360 / 27));
+    return { index: i, en: NAK_EN[i], np: NAK_NP[i] };
+  }
+  function nakshatraEnd(ms) {
+    var i = Math.floor(moonSidereal(ms) / (360 / 27));
+    return crossing(moonSidereal, 10 * 60000, ms, norm((i + 1) * (360 / 27)), 2 * DAY_MS);
+  }
+
+  function moonSign(ms) { return Math.floor(moonSidereal(ms) / 30); } // 0 = Mesh ... 11 = Meen
+
+  // Kathmandu day boundaries
+  function nepalDayStart(ms) {
+    var local = ms + OFFSET_MS;
+    return Math.floor(local / DAY_MS) * DAY_MS - OFFSET_MS;
+  }
+  function dateKey(ms) { return new Date(ms + OFFSET_MS).toISOString().slice(0, 10); }
+
+  // Moon sign segments between start and end (ms)
+  function moonSignSegments(start, end) {
+    var segs = [], t = start, sign = moonSign(t);
+    while (t < end) {
+      var nxt = crossing(moonSidereal, 10 * 60000, t, norm((sign + 1) * 30), 4 * DAY_MS);
+      if (nxt === null || nxt >= end) { segs.push({ from: t, to: end, sign: sign }); break; }
+      segs.push({ from: t, to: nxt, sign: sign });
+      t = nxt; sign = (sign + 1) % 12;
+    }
+    return segs;
+  }
+
+  // approximate sunrise at Kathmandu (upper limb, refraction included), ms
+  function sunrise(dayStartMs) {
+    var civil = new Date(dayStartMs + OFFSET_MS);
+    var utcMidnight = Date.UTC(civil.getUTCFullYear(), civil.getUTCMonth(), civil.getUTCDate());
+    var t = utcMidnight + (720 - 4 * LON) * 60000; // start from local solar noon, then iterate
+    for (var k = 0; k < 4; k++) {
+      var T = (jde(t) - 2451545.0) / 36525;
+      var lam = sunTropical(t) * RAD;
+      var eps = (23.439291 - 0.0130042 * T) * RAD;
+      var dec = Math.asin(Math.sin(eps) * Math.sin(lam));
+      var ra = Math.atan2(Math.cos(eps) * Math.sin(lam), Math.cos(lam)) / RAD;
+      var L0 = 280.46646 + 36000.76983 * T;
+      var eqtMin = 4 * (norm(L0 - ra + 180) - 180); // equation of time, minutes
+      var cosH = (Math.sin(-0.8333 * RAD) - Math.sin(LAT * RAD) * Math.sin(dec)) / (Math.cos(LAT * RAD) * Math.cos(dec));
+      var H = Math.acos(Math.max(-1, Math.min(1, cosH))) / RAD; // hour angle, degrees
+      t = utcMidnight + (720 - 4 * LON - eqtMin - 4 * H) * 60000;
+    }
+    return t;
+  }
+
+  // Chandra gochar: house of the transiting Moon counted from the birth rashi
+  var FAVOURABLE = { 1: true, 3: true, 6: true, 7: true, 10: true, 11: true };
+  function house(moonSignIdx, natalIdx) { return ((moonSignIdx - natalIdx + 12) % 12) + 1; }
+
+  return {
+    moonTropical: moonTropical, sunTropical: sunTropical, ayanamsa: ayanamsa,
+    moonSidereal: moonSidereal, elongation: elongation, moonSign: moonSign,
+    tithiInfo: tithiInfo, tithiEnd: tithiEnd, nakshatraInfo: nakshatraInfo, nakshatraEnd: nakshatraEnd,
+    nepalDayStart: nepalDayStart, dateKey: dateKey, moonSignSegments: moonSignSegments, sunrise: sunrise,
+    house: house, FAVOURABLE: FAVOURABLE, OFFSET_MS: OFFSET_MS, DAY_MS: DAY_MS, norm: norm, jde: jde
+  };
+})();
+const RF=(function(){
+"use strict";
+var E=RashifalEngine,RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var SIGNS = [
+    { np: "मेष", en: "Aries", tr: "Mesh", trait: { en: "Bold, direct and quick to start things", ne: "साहसी, स्पष्ट र छिट्टै सुरु गर्ने" } },
+    { np: "वृष", en: "Taurus", tr: "Brish", trait: { en: "Steady, patient and loyal", ne: "स्थिर, धैर्यवान् र निष्ठावान्" } },
+    { np: "मिथुन", en: "Gemini", tr: "Mithun", trait: { en: "Curious, social and quick-minded", ne: "जिज्ञासु, मिलनसार र तीक्ष्ण बुद्धि" } },
+    { np: "कर्कट", en: "Cancer", tr: "Karkat", trait: { en: "Caring, intuitive and protective", ne: "स्नेही, अन्तर्ज्ञानी र रक्षक" } },
+    { np: "सिंह", en: "Leo", tr: "Singha", trait: { en: "Warm, confident and generous", ne: "न्यानो, आत्मविश्वासी र उदार" } },
+    { np: "कन्या", en: "Virgo", tr: "Kanya", trait: { en: "Careful, practical and observant", ne: "सावधान, व्यावहारिक र सूक्ष्म दृष्टि" } },
+    { np: "तुला", en: "Libra", tr: "Tula", trait: { en: "Fair-minded, graceful and diplomatic", ne: "न्यायप्रिय, सौम्य र कूटनीतिज्ञ" } },
+    { np: "वृश्चिक", en: "Scorpio", tr: "Brischik", trait: { en: "Intense, focused and resourceful", ne: "गहिरो, केन्द्रित र साधनसम्पन्न" } },
+    { np: "धनु", en: "Sagittarius", tr: "Dhanu", trait: { en: "Adventurous, honest and hopeful", ne: "साहसिक, इमानदार र आशावादी" } },
+    { np: "मकर", en: "Capricorn", tr: "Makar", trait: { en: "Disciplined, ambitious and reliable", ne: "अनुशासित, महत्त्वाकांक्षी र भरपर्दो" } },
+    { np: "कुम्भ", en: "Aquarius", tr: "Kumbha", trait: { en: "Original, independent and friendly", ne: "मौलिक, स्वतन्त्र र मिलनसार" } },
+    { np: "मीन", en: "Pisces", tr: "Meen", trait: { en: "Gentle, creative and empathetic", ne: "कोमल, सिर्जनशील र संवेदनशील" } }
+  ];
+
+  // Traditional Chandra gochar: the Moon's house counted from your birth rashi.
+  var HOUSE = {
+    en: [
+      "The Moon is in your own sign. The mind is settled and comfortable; a good day for routine and looking after yourself.",
+      "Family, speech and money turn sensitive. Speak carefully and watch your spending.",
+      "Courage and initiative are strong. Good for short trips, messages and starting small efforts.",
+      "Home and comfort come to the front, but satisfaction is slow to arrive. Avoid brooding and keep to your routine.",
+      "Creativity, children and romance are in focus, but feeling can run ahead of judgment. Double-check decisions.",
+      "A practical, steady mind. Good for routine work, dealing with competition and settling debts.",
+      "Partnerships and meetings go well. A favourable time for your partner and for dealings with the public.",
+      "Chandrashtama: energy runs low and obstacles are more likely. Avoid launches, signings and confrontations if you can.",
+      "Restlessness around teachers, long travel and belief. Be patient with delays.",
+      "Career and public action are favoured. A good day to be visible at work.",
+      "Gains, friends and networks. Requests are more likely to be received well.",
+      "Expenses and withdrawal. A day for rest and quiet; keep spending modest."
+    ],
+    ne: [
+      "चन्द्रमा तपाईंको आफ्नै राशिमा छ। मन शान्त र सहज रहन्छ; दैनिक काम र आफ्नो हेरचाहका लागि राम्रो दिन।",
+      "परिवार, बोली र धनका विषय संवेदनशील हुन सक्छन्। सोचेर बोल्नुहोस् र खर्चमा सावधानी अपनाउनुहोस्।",
+      "साहस र पहल बलियो रहन्छ। छोटो यात्रा, सम्पर्क र साना काम सुरु गर्न राम्रो।",
+      "घर र सुखका कुरा अघि आउँछन् तर सन्तुष्टि ढिलो मिल्न सक्छ। चिन्ता नगरी दैनिक लयमै रहनुहोस्।",
+      "सिर्जना, सन्तान र प्रेमका विषय चर्चामा रहन्छन् तर भावना निर्णयभन्दा अघि जान सक्छ। निर्णय दोहोर्‍याएर हेर्नुहोस्।",
+      "मन व्यावहारिक र स्थिर रहन्छ। नियमित काम, प्रतिस्पर्धा र ऋण मिलाउन राम्रो।",
+      "साझेदारी र भेटघाट राम्रो रहन्छ। जीवनसाथी र जनसम्पर्कका काममा अनुकूल समय।",
+      "चन्द्राष्टम: ऊर्जा कम र अवरोध बढी हुन सक्छ। सकेसम्म नयाँ सुरुवात, हस्ताक्षर र विवादबाट टाढा रहनुहोस्।",
+      "शिक्षक, लामो यात्रा र आस्थासँग सम्बन्धित बेचैनी हुन सक्छ। ढिलाइमा धैर्य राख्नुहोस्।",
+      "काम र सार्वजनिक भूमिकामा अनुकूलता रहन्छ। कार्यक्षेत्रमा सक्रिय हुन राम्रो दिन।",
+      "लाभ, मित्र र सम्पर्कको साथ मिल्छ। अनुरोध र प्रस्ताव राम्रोसँग स्वीकार हुन सक्छन्।",
+      "खर्च र एकान्त बढ्न सक्छ। आराम गर्नुहोस् र खर्च सीमित राख्नुहोस्।"
+    ]
+  };
+
+  var UI = {
+    en: {
+      title: "Daily Rashifal", tithi: "Tithi", nak: "Nakshatra", moon: "Moon sign", sunrise: "Sunrise",
+      until: "until", then: "then", allDay: "all day", house: "house from", ends: "ends",
+      good: "Favourable", mixed: "Mixed", bad: "Challenging", ctr: "Chandrashtama",
+      chandrashtama: "Chandrashtama today for", tomorrow: "tomorrow", moonIn: "Moon in", times: "Nepal time",
+      method: "Calculated for Kathmandu from the Moon's real position (Lahiri ayanamsa) using the traditional Chandra gochar method: the Moon's house is counted from your birth rashi. " +
+              "This is a general reading for each rashi. It does not use your full birth chart or the other planets, and traditional texts differ in detail. " +
+              "Astrology is a traditional belief system and not a scientific forecast. Times are Nepal Time and can differ by a few minutes from printed patros."
+    },
+    ne: {
+      title: "दैनिक राशिफल", tithi: "तिथि", nak: "नक्षत्र", moon: "चन्द्र राशि", sunrise: "सूर्योदय",
+      until: "सम्म", then: "त्यसपछि", allDay: "दिनभर", house: "भाव", ends: "समाप्त",
+      good: "अनुकूल", mixed: "मिश्रित", bad: "चुनौतीपूर्ण", ctr: "चन्द्राष्टम",
+      chandrashtama: "आज चन्द्राष्टम रहने राशि", tomorrow: "भोलि", moonIn: "चन्द्रमा", times: "नेपाली समय",
+      method: "चन्द्रमाको वास्तविक स्थिति (लाहिरी अयनांश) बाट काठमाडौंका लागि गणना गरी परम्परागत चन्द्र गोचर विधि अपनाइएको छ: तपाईंको जन्म राशिबाट चन्द्रमा कुन भावमा छ भनेर हेरिन्छ। " +
+              "यो प्रत्येक राशिको सामान्य फल हो। यसमा पूरा जन्मकुण्डली र अन्य ग्रहहरू समावेश छैनन्, र ग्रन्थअनुसार केही भिन्नता हुन सक्छ। " +
+              "ज्योतिष परम्परागत विश्वास हो, वैज्ञानिक भविष्यवाणी होइन। समय नेपाली समयमा हो र छापिएका पात्रोसँग केही मिनेटको फरक हुन सक्छ।"
+    }
+  };
+
+var NPT=E.OFFSET_MS,lang='en',cur=0,key=null,cache=null,timer=0;
+try{var _l=localStorage.getItem('rf-lang');if(_l==='ne'||_l==='en')lang=_l}catch(e){}
+try{var _s=parseInt(localStorage.getItem('rf-sign'),10);if(_s>=0&&_s<12)cur=_s}catch(e){}
+var G=function(i){return '♈♉♊♋♌♍♎♏♐♑♒♓'[i]+'\uFE0E'};
+var hm=function(ms){var d=new Date(ms+NPT);return('0'+d.getUTCHours()).slice(-2)+':'+('0'+d.getUTCMinutes()).slice(-2)};
+var dayLabel=function(ms){return new Intl.DateTimeFormat(lang==='ne'?'ne-NP':'en-GB',{timeZone:'Asia/Kathmandu',weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(ms))};
+var sname=function(i){return lang==='ne'?SIGNS[i].np:SIGNS[i].tr+' ('+SIGNS[i].en+')'};
+var endTxt=function(ms,c){var t=UI[lang];return t.ends+' '+hm(ms)+(ms>=c.end?' ('+t.tomorrow+')':'')};
+function compute(now){var start=E.nepalDayStart(now),end=start+E.DAY_MS,sr=E.sunrise(start),ref=now<sr?sr:now;
+ return{key:E.dateKey(now),start:start,end:end,sunrise:sr,tithi:E.tithiInfo(ref),tithiEnd:E.tithiEnd(ref),nak:E.nakshatraInfo(ref),nakEnd:E.nakshatraEnd(ref),segs:E.moonSignSegments(start,end),stamp:now,ml:E.moonSidereal(now),el:E.elongation(now)}}
+function getC(now){if(!cache||cache.key!==E.dateKey(now)||now-cache.stamp>30*60000)cache=compute(now);return cache}
+function verdict(houses,durs){var total=0,good=0,bad8=0;for(var i=0;i<houses.length;i++){total+=durs[i];if(E.FAVOURABLE[houses[i]])good+=durs[i];if(houses[i]===8)bad8+=durs[i]}
+ if(bad8>=2*3600000)return'ctr';var s=good/total;return s>=0.66?'good':(s<=0.34?'bad':'mixed')}
+var hq=function(h){return h===8?'bad':(E.FAVOURABLE[h]?'good':'mid')};
+function verdictFor(c,i){var h=[],d=[];c.segs.forEach(function(g){h.push(E.house(g.sign,i));d.push(g.to-g.from)});return{v:verdict(h,d),h:h}}
+function ringSvg(c){var g='';for(var i=0;i<12;i++){var a=(i*30+15-90)*RAD,b=(i*30-90)*RAD;
+  g+='<text x="'+(160+131*Math.cos(a)).toFixed(1)+'" y="'+(160+131*Math.sin(a)+7).toFixed(1)+'" text-anchor="middle" data-i="'+i+'">'+G(i)+'</text><line x1="'+(160+112*Math.cos(b)).toFixed(1)+'" y1="'+(160+112*Math.sin(b)).toFixed(1)+'" x2="'+(160+150*Math.cos(b)).toFixed(1)+'" y2="'+(160+150*Math.sin(b)).toFixed(1)+'"/>'}
+ var m=(c.ml-90)*RAD,moon=hzMoonSvg(c.el).replace('<svg viewBox','<svg x="97" y="97" width="126" height="126" viewBox');
+ return '<svg class="rfz" viewBox="0 0 320 320" role="img" aria-label="Zodiac wheel with the Moon"><g class="rfzs"><circle cx="160" cy="160" r="150"/><circle cx="160" cy="160" r="112"/>'+g+'<circle class="rfmk" cx="'+(160+112*Math.cos(m)).toFixed(1)+'" cy="'+(160+112*Math.sin(m)).toFixed(1)+'" r="7"/></g>'+moon+'</svg>'}
+var RAD=Math.PI/180;
+function nowPct(c,now){return Math.max(0,Math.min(100,(now-c.start)/E.DAY_MS*100))}
+function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElementById('rf');if(!r)return;key=c.key;document.documentElement.lang=lang==='ne'?'ne':'en';
+ var R=function(id){return document.getElementById(id)};
+ if(!r.dataset.b){r.dataset.b='1';r.innerHTML='<section class="rh"><div class="rsh"></div><div class="rhz" id="rfz"></div><div class="rht"><div class="rlg" role="group" aria-label="Language"><button type="button" id="rfen">English</button><button type="button" id="rfne">नेपाली</button></div><h1 id="rft"></h1><p id="rfd"></p><p class="rkt" id="rfk"></p></div></section><div class="rpc" id="rfpc"></div><div class="ral" id="rfal" hidden></div><div class="rtl" id="rftl"></div><div class="rpk" id="rfpk" role="group"></div><section class="rrd" id="rfrd" aria-live="polite"></section><p class="rmt" id="rfmt"></p>';
+  R('rfen').onclick=function(){lang='en';try{localStorage.setItem('rf-lang','en')}catch(e){}render()};R('rfne').onclick=function(){lang='ne';try{localStorage.setItem('rf-lang','ne')}catch(e){}render()}}
+ if(r.dataset.k!==c.key+'|'+(c.stamp===cache.stamp?cache.stamp:'')){r.dataset.k=c.key+'|'+cache.stamp;R('rfz').innerHTML=ringSvg(c)}
+ R('rft').textContent=t.title;R('rfd').textContent=dayLabel(now)+' · '+t.times+' · '+(lang==='ne'?'काठमाडौं':'Kathmandu');
+ R('rfk').innerHTML=(lang==='ne'?'चन्द्रमा':'Moon')+' <b>'+G(c.segs[c.segs.length?E.moonSign(now)>=0?0:0:0].sign)+'</b>';
+ R('rfen').setAttribute('aria-pressed',lang==='en');R('rfne').setAttribute('aria-pressed',lang==='ne');
+ var ms=E.moonSign(now);R('rfk').innerHTML=(lang==='ne'?'अहिले चन्द्रमा ':'Moon now in ')+'<b>'+G(ms)+' '+esc(lang==='ne'?SIGNS[ms].np:SIGNS[ms].tr)+'</b>';
+ /* panchang */
+ var tl=lang==='ne'?c.tithi.pakshaNp+' '+c.tithi.np:c.tithi.paksha+' '+c.tithi.en;
+ var mv=c.segs.map(function(g,i){return sname(g.sign)+(i<c.segs.length-1?' '+t.until+' '+hm(c.segs[i+1].from):'')}).join(', '+t.then+' ');
+ var pc=function(ic,k,v,s,i){return '<div class="rc" style="--i:'+i+'"><span class="ri">'+ic+'</span><div><small>'+esc(k)+'</small><b>'+esc(v)+'</b>'+(s?'<em>'+esc(s)+'</em>':'')+'</div></div>'};
+ R('rfpc').innerHTML=pc('🌙',t.tithi,tl,endTxt(c.tithiEnd,c),0)+pc('✨',t.nak,lang==='ne'?c.nak.np:c.nak.en,endTxt(c.nakEnd,c),1)+pc(G(ms),t.moon,mv,c.segs.length===1?t.allDay:'',2)+pc('🌅',t.sunrise,hm(c.sunrise),'',3);
+ /* chandrashtama alert */
+ var cs=[];c.segs.forEach(function(g){var s8=(g.sign-7+12)%12;if(g.to-g.from>=30*60000&&cs.indexOf(s8)<0)cs.push(s8)});var al=R('rfal');
+ if(cs.length){al.hidden=false;al.innerHTML='<i></i><span>'+esc(t.chandrashtama+': '+cs.map(function(i){return lang==='ne'?SIGNS[i].np:SIGNS[i].tr}).join(', '))+'</span>'}else al.hidden=true;
+ /* picker */
+ R('rfpk').innerHTML=SIGNS.map(function(s,i){return '<button type="button" class="rsg" style="--i:'+i+'" data-i="'+i+'" aria-pressed="'+(i===cur)+'"><span class="rg">'+G(i)+'</span><b>'+esc(s.np)+'</b><small>'+esc(lang==='ne'?s.tr:s.en)+'</small></button>'}).join('');
+ R('rfpk').querySelectorAll('.rsg').forEach(function(b){b.onclick=function(){cur=+b.dataset.i;try{localStorage.setItem('rf-sign',String(cur))}catch(e){}render();var h=document.getElementById('rf-hz');if(h)h.innerHTML=chip();var rd=R('rfrd');if(rd)setTimeout(function(){rd.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'})},60)}});
+ /* timeline of the day for the chosen rashi */
+ var V=verdictFor(c,cur),s=SIGNS[cur],houses=V.h;
+ var tlh='<div class="rtt"><b>'+esc(lang==='ne'?'आजको चन्द्र गोचर · '+s.np:'Today’s Moon path · '+s.tr)+'</b><span>'+esc(t.times)+'</span></div><div class="rbar">';
+ c.segs.forEach(function(g,i){var f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);tlh+='<div class="rsg2 q-'+hq(houses[i])+'" style="flex:'+(to-f)+';--i:'+i+'" title="'+esc(sname(g.sign))+'"><b>'+G(g.sign)+'</b><small>'+(i?hm(f):'00:00')+'</small></div>'});
+ tlh+='<i class="rnow" id="rfnow" style="left:'+nowPct(c,now).toFixed(2)+'%"></i></div><div class="rleg"><span class="q-good">'+esc(t.good)+'</span><span class="q-mid">'+esc(lang==='ne'?'सामान्य':'Neutral')+'</span><span class="q-bad">'+esc(t.bad)+'</span></div>';
+ R('rftl').innerHTML=tlh;
+ /* reading */
+ var cls=V.v==='ctr'?'bad':V.v,note=((((D.pages||{}).__horo||{}).days||{})[c.key]||{})[HZ[cur].k],rd='<header><span class="rbg">'+G(cur)+'</span><div><h2>'+esc(s.np+' ('+s.en+')')+'</h2><p>'+esc(s.trait[lang])+'</p><span class="rbd '+cls+'">'+esc(t[V.v])+'</span></div></header>';
+ if(note)rd+='<div class="rnote"><b>'+(lang==='ne'?'सम्पादकको टिप्पणी':'Editor’s note')+'</b><p>'+esc(note)+'</p></div>';
+ c.segs.forEach(function(g,i){var h=houses[i],f=Math.max(g.from,c.start),to=Math.min(g.to,c.end),sfx=lang==='ne'?'':(h===1?'st':h===2?'nd':h===3?'rd':'th');
+  var when=(c.segs.length>1?hm(f)+'–'+hm(to)+' · ':'')+(lang==='ne'?t.moonIn+' '+SIGNS[g.sign].np+' · '+s.np+'बाट '+h+' '+t.house:t.moonIn+' '+sname(g.sign)+' · '+h+sfx+' '+t.house+' '+s.tr);
+  rd+='<div class="rsq q-'+hq(h)+'" style="--i:'+i+'"><p class="rw">'+esc(when)+'</p><p>'+esc(HOUSE[lang][h-1])+'</p></div>'});
+ R('rfrd').innerHTML=rd;R('rfmt').textContent=t.method}
+function tick(){var r=document.getElementById('rf');if(!r)return;var now=Date.now();if(E.dateKey(now)!==key)render();else{var n=document.getElementById('rfnow'),c=getC(now);if(n)n.style.left=nowPct(c,now).toFixed(2)+'%'}}
+function init(){if(document.getElementById('rf'))render()}
+function chip(){var s=-1;try{s=parseInt(localStorage.getItem('rf-sign'),10)}catch(e){}if(!(s>=0&&s<12))return'✨ Horoscope';var V=verdictFor(getC(Date.now()),s);return G(s)+' '+SIGNS[s].tr+' <span class="rfd '+(V.v==='ctr'?'bad':V.v)+'" title="'+esc(UI.en[V.v])+'"></span>'}
+setInterval(tick,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)tick()});
+return{init:init,chip:chip,compute:compute,E:E,render:render,verdictFor:verdictFor}
+})();
+function rfPg(){document.title='Daily Rashifal — The Sujan Khadka';return '<div class="rf" id="rf"></div>'}
 /* ---------- Audio section ---------- */
 const AU=new Audio();AU.preload='none';let auId=null,auBad=null;
 const fmt=t=>{if(!isFinite(t)||t<0)return'–:––';t=Math.round(t);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
@@ -728,7 +1286,7 @@ async function auAddLink(){const t=$('#al_t').value.trim(),u=$('#al_u').value.tr
  const k=auKind(u);if(!k)return alert('This link is not supported. Use a YouTube, SoundCloud or Internet Archive link, or a direct https link to an MP3 / M4A / WAV file.');
  A.audios=A.audios||[];A.audios.push({id:'u'+Date.now(),title:t,desc:$('#al_d').value.trim(),url:u,date:new Date().toISOString(),status:'published'});
  if(await persist())go()}
-function putAudio(f,pg){return new Promise((ok,no)=>{const x=new XMLHttpRequest();x.open('POST','/api/admin/upload');x.setRequestHeader('content-type',f.type||'audio/mpeg');
+function putAudio(f,pg,dflt){return new Promise((ok,no)=>{const x=new XMLHttpRequest();x.open('POST','/api/admin/upload');x.setRequestHeader('content-type',f.type||dflt||'audio/mpeg');
  x.upload.onprogress=e=>{if(e.lengthComputable)pg(Math.round(e.loaded/e.total*100))};
  x.onload=()=>{if(x.status>=200&&x.status<300){try{ok(JSON.parse(x.responseText).url)}catch(e){no('the server gave an unexpected reply')}}else no('the server answered '+x.status)};
  x.onerror=()=>no('network error');x.send(f)})}
