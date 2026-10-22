@@ -44,6 +44,13 @@ const addFail = (ip, n) => caches.default.put(RL(ip), new Response(String(n), { 
 
 // ---- audio helpers ----
 const AUDIO_MAX = 10e6; // 10 MB per audio file (GitHub + Worker limits)
+const VIDEO_MAX = 10e6; // 10 MB per short video clip
+const VIDEO_MIME = { mp4: 'video/mp4', webm: 'video/webm' };
+function sniffVideo(u) {
+  if (String.fromCharCode(...u.subarray(4, 8)) === 'ftyp') return 'mp4';
+  if (u[0] === 0x1A && u[1] === 0x45 && u[2] === 0xDF && u[3] === 0xA3) return 'webm';
+  return null;
+}
 const AUDIO_MIME = { mp3: 'audio/mpeg', m4a: 'audio/mp4', wav: 'audio/wav', ogg: 'audio/ogg', flac: 'audio/flac', webm: 'audio/webm' };
 function sniffAudio(u) {
   const s = (a, b) => String.fromCharCode(...u.subarray(a, b));
@@ -75,8 +82,8 @@ async function handle({ request: req, env, next }) {
     const c = req.cf || {};
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
-  const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/');
-  if (!isApi && !isImg && !isAud) return next();
+  const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
+  if (!isApi && !isImg && !isAud && !isVid) return next();
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
   try {
     if (isImg) {
@@ -89,6 +96,21 @@ async function handle({ request: req, env, next }) {
       const res = new Response(o.body, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'public,max-age=31536000,immutable' } });
       await caches.default.put(ck, res.clone());
       return res;
+    }
+    if (isVid) {
+      const m = p.match(/^\/video\/([a-f0-9-]{36})\.(mp4|webm)$/);
+      if (!m || (r !== 'GET' && r !== 'HEAD')) return new Response('Not found', { status: 404 });
+      const type = VIDEO_MIME[m[2]], ck = new Request(new URL(req.url).origin + p);
+      let buf;
+      const hit = await caches.default.match(ck);
+      if (hit) buf = await hit.arrayBuffer();
+      else {
+        const o = await gh(env, `video/${m[1]}.${m[2]}`, { headers: { Accept: 'application/vnd.github.raw+json' } });
+        if (!o.ok) return new Response('Not found', { status: 404 });
+        buf = await o.arrayBuffer();
+        await caches.default.put(ck, new Response(buf, { headers: { 'content-type': type, 'cache-control': 'public,max-age=31536000,immutable' } }));
+      }
+      return sendAudio(req, buf, type);
     }
     if (isAud) {
       const m = p.match(/^\/audio\/([a-f0-9-]{36})\.(mp3|m4a|wav|ogg|flac|webm)$/);
@@ -151,6 +173,15 @@ async function handle({ request: req, env, next }) {
     if (p === '/api/admin/upload' && r === 'POST') {
       const buf = await req.arrayBuffer(), u = new Uint8Array(buf);
       const ct = (req.headers.get('content-type') || '').toLowerCase();
+      if (ct.startsWith('video/')) {
+        if (buf.byteLength > VIDEO_MAX) return J({ error: 'Video over 10 MB' }, 413);
+        const ext = sniffVideo(u);
+        if (!ext) return J({ error: 'Unsupported video format (use MP4 or WebM)' }, 400);
+        const id = crypto.randomUUID();
+        const w = await gh(env, `video/${id}.${ext}`, { method: 'PUT', body: JSON.stringify({ message: 'Add video', content: b64(buf) }) });
+        if (!w.ok) return J({ error: 'GitHub upload ' + w.status }, 502);
+        return J({ url: `/video/${id}.${ext}` });
+      }
       if (ct.startsWith('audio/')) {
         if (buf.byteLength > AUDIO_MAX) return J({ error: 'Audio over 10 MB' }, 413);
         const ext = sniffAudio(u);
