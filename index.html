@@ -1246,11 +1246,33 @@ function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElemen
  /* reading */
  var cls=V.v==='ctr'?'bad':V.v,note=((((D.pages||{}).__horo||{}).days||{})[c.key]||{})[HZ[cur].k],rd='<header><span class="rbg">'+G(cur)+'</span><div><h2>'+esc(s.np+' ('+s.en+')')+'</h2><p>'+esc(s.trait[lang])+'</p><span class="rbd '+cls+'">'+esc(t[V.v])+'</span><button type="button" class="rfs" id="rfsh">↗ '+(lang==='ne'?'साझा गर्नुहोस्':'Share')+'</button></div></header>';
  if(note)rd+='<div class="rnote"><b>'+(lang==='ne'?'सम्पादकको टिप्पणी':'Editor’s note')+'</b><p>'+esc(note)+'</p></div>';
+ var DI=dayIns(cur,c);rd+='<div class="rnote"><b>'+(lang==='ne'?'आज '+s.np+' राशिका लागि':'Today for '+s.tr)+'</b><p>'+esc(DI.day)+'</p><p>'+esc(DI.col+bestWin(c,V))+'</p></div>';
  c.segs.forEach(function(g,i){var h=houses[i],f=Math.max(g.from,c.start),to=Math.min(g.to,c.end),sfx=lang==='ne'?'':(h===1?'st':h===2?'nd':h===3?'rd':'th');
   var when=(c.segs.length>1?hm(f)+'–'+hm(to)+' · ':'')+(lang==='ne'?t.moonIn+' '+SIGNS[g.sign].np+' · '+s.np+'बाट '+h+' '+t.house:t.moonIn+' '+sname(g.sign)+' · '+h+sfx+' '+t.house+' '+s.tr);
   var el=els[i],bright=el>=84&&el<264,pk=lang==='ne'?(bright?'चन्द्रमा बलियो (उज्यालो पक्ष/पूर्णताको नजिक): फल पूर्ण रूपमा मिल्छ।':'चन्द्रमा कमजोर (कृष्ण अष्टमीदेखि शुक्ल सप्तमीसम्म): शुभ फल केही घट्छ।'):(bright?'Moon is strong (bright phase): results come in full.':'Moon is weak (dark phase, Krishna Ashtami to Shukla Saptami): good results are reduced.');
-   rd+='<div class="rsq q-'+hq(h,el)+'" style="--i:'+i+'"><p class="rw">'+esc(when)+'</p><p>'+esc(HOUSE[lang][h-1])+'</p><p class="rw">'+esc(pk)+'</p></div>'});
+   var I=ins(cur,g.sign,(f+to)/2);rd+='<div class="rsq q-'+hq(h,el)+'" style="--i:'+i+'"><p class="rw">'+esc(when+' · '+I.nkn)+'</p><p>'+esc(HOUSE[lang][h-1])+'</p><p>'+esc(I.fl+' '+I.rl)+'</p><p>'+esc(I.nk)+'</p><p class="rw">'+esc(pk)+'</p></div>'});
  R('rfrd').innerHTML=rd;var sb=R('rfsh');if(sb)sb.onclick=function(){openShare()}}
+/* ---- rashi-specific insight: sign ruler vs Moon-sign ruler, nakshatra ruler, day lord ---- */
+var PN={en:['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'],ne:['सूर्य','चन्द्र','मंगल','बुध','गुरु','शुक्र','शनि']},
+ LORD=[2,5,3,1,0,3,5,2,4,6,6,4],FR=[[1,2,4],[0,3],[0,1,4],[0,5],[0,1,2],[3,6],[3,5]],EN_=[[5,6],[],[3],[1],[3,5],[0,1],[0,1,2]],
+ WD={en:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],ne:['आइतबार','सोमबार','मंगलबार','बुधबार','बिहीबार','शुक्रबार','शनिबार']},
+ COLS={en:['orange or copper','white or silver','red','green','yellow','white or pink','blue or black'],ne:['सुन्तला वा ताँबे','सेतो वा चाँदी','रातो','हरियो','पहेंलो','सेतो वा गुलाबी','निलो वा कालो']},
+ RELT={en:{own:'is also your own ruler, so the day feels familiar and natural',friend:'is friendly to your ruler, so things flow with less effort',neutral:'is neutral to your ruler, so results depend on your own effort',enemy:'is unfriendly to your ruler, so expect some friction and go slowly'},
+  ne:{own:'तपाईंकै राशि स्वामी पनि हो, त्यसैले दिन परिचित र स्वाभाविक लाग्छ',friend:'तपाईंको राशि स्वामीको मित्र हो, त्यसैले काम सजिलो चल्छ',neutral:'तपाईंको राशि स्वामीसँग सम छ, त्यसैले फल तपाईंकै प्रयासमा भर पर्छ',enemy:'तपाईंको राशि स्वामीको शत्रु हो, त्यसैले केही अवरोध आउन सक्छ; ढिलो र होसियार भई अघि बढ्नुहोस्'}},
+ FLV={en:['Mood is proud and purposeful; you want recognition and clarity.','Mood is soft and sensitive; feelings, family and caring come first.','Mood is quick and energetic; good for action, but tempers can flare.','Mood is alert and talkative; good for study, messages and deals.','Mood is hopeful and generous; advice from elders and teachers helps.','Mood is gentle and pleasure-seeking; good for harmony, art and relationships.','Mood is serious and slow; patience and steady work pay better than shortcuts.'],
+  ne:['मन स्वाभिमानी र उद्देश्यपूर्ण रहन्छ; मान्यता र स्पष्टता चाहिन्छ।','मन कोमल र संवेदनशील रहन्छ; भावना, परिवार र स्याहारलाई प्राथमिकता मिल्छ।','मन छिटो र ऊर्जावान् रहन्छ; काम गर्न राम्रो, तर रीस उठ्न सक्छ।','मन सजग र बोल्न मन लाग्ने रहन्छ; अध्ययन, सन्देश र सम्झौताका लागि राम्रो।','मन आशावादी र उदार रहन्छ; ज्येष्ठ र गुरुको सल्लाह उपयोगी हुन्छ।','मन कोमल र सौन्दर्यप्रेमी रहन्छ; मेलमिलाप, कला र सम्बन्धका लागि राम्रो।','मन गम्भीर र ढिलो रहन्छ; धैर्य र निरन्तर कामले छोटो बाटोभन्दा राम्रो फल दिन्छ।']},
+ NKL=[['Ketu','केतु'],['Venus','शुक्र'],['Sun','सूर्य'],['Moon','चन्द्र'],['Mars','मंगल'],['Rahu','राहु'],['Jupiter','गुरु'],['Saturn','शनि'],['Mercury','बुध']],
+ NKT={en:['detachment, quiet focus and sudden changes of plan','comfort, affection and money matters','leadership, health and dealings with officials','emotions, home and the public mood','courage, property and competitive matters','unusual ideas, technology and confusion, so double-check details','learning, advice and good fortune','duty, delays and hard work, so go step by step','trade, speech, writing and travel'],
+  ne:['अलग्गिने भाव, एकान्त र अचानक योजना बदलिने स्थिति','सुख-सुविधा, स्नेह र धन सम्बन्धी कुरा','नेतृत्व, स्वास्थ्य र अधिकारीसँगका व्यवहार','भावना, घर र जनमत सम्बन्धी कुरा','साहस, सम्पत्ति र प्रतिस्पर्धासँग सम्बन्धित कुरा','असामान्य विचार, प्रविधि र अन्योल, त्यसैले विवरण दोहोर्‍याएर हेर्नुहोस्','अध्ययन, सल्लाह र सौभाग्य','कर्तव्य, ढिलाइ र कडा मेहनत, त्यसैले क्रमशः अघि बढ्नुहोस्','व्यापार, बोली, लेखन र यात्रा']};
+function rel(a,b){return a===b?'own':FR[a].indexOf(b)>-1?'friend':EN_[a].indexOf(b)>-1?'enemy':'neutral'}
+function ins(si,sg,mid){var ne=lang==='ne',L=ne?'ne':'en',ml=LORD[sg],r=rel(LORD[si],ml),nk=E.nakshatraInfo(mid),nl=nk.index%9,nn=ne?nk.np:nk.en;
+ return{nkn:nn,fl:FLV[L][ml],
+  rl:ne?'चन्द्रमा '+PN.ne[ml]+'को राशिमा छ। '+PN.ne[ml]+' '+RELT.ne[r]+'।':'The Moon is in a '+PN.en[ml]+'-ruled sign. '+PN.en[ml]+' '+RELT.en[r]+'.',
+  nk:ne?nn+' नक्षत्रका स्वामी '+NKL[nl][1]+': '+NKT.ne[nl]+'।':nn+' is ruled by '+NKL[nl][0]+': '+NKT.en[nl]+'.'}}
+function dayIns(si,c){var ne=lang==='ne',L=ne?'ne':'en',wd=new Date(c.key+'T12:00:00Z').getUTCDay(),nat=LORD[si],r=rel(nat,wd),col=(r==='own'||r==='friend')?wd:nat;
+ return{day:ne?'तपाईंको राशि स्वामी '+PN.ne[nat]+' हो। '+WD.ne[wd]+'को स्वामी '+PN.ne[wd]+'; '+PN.ne[wd]+' '+RELT.ne[r]+'।':'Your sign ruler is '+PN.en[nat]+'. '+WD.en[wd]+' is ruled by '+PN.en[wd]+'; '+PN.en[wd]+' '+RELT.en[r]+'.',
+  col:ne?'आजको लागि सहयोगी रङ: '+COLS.ne[col]+'।':'Helpful colour today: '+COLS.en[col]+'.'}}
+function bestWin(c,V){if(c.segs.length<2)return'';var b=-9,k=-1,q=hq(V.h[0],V.e[0]),diff=false;c.segs.forEach(function(g,i){var x=sc(V.h[i],V.e[i]);if(hq(V.h[i],V.e[i])!==q)diff=true;if(x>b){b=x;k=i}});if(!diff)return'';var g=c.segs[k],f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);return lang==='ne'?' दिनको राम्रो भाग: '+hm(f)+'–'+hm(to)+'।':' Better part of the day: '+hm(f)+'–'+hm(to)+'.'}
 function tick(){var r=document.getElementById('rf');if(!r)return;var now=Date.now();if(E.dateKey(now)!==key)render();else{var n=document.getElementById('rfnow'),c=getC(now);if(n)n.style.left=nowPct(c,now).toFixed(2)+'%'}}
 function init(){if(document.getElementById('rf'))render()}
 function chip(){var s=-1;try{s=parseInt(localStorage.getItem('rf-sign'),10)}catch(e){}if(!(s>=0&&s<12))return'✨ Horoscope';var V=verdictFor(getC(Date.now()),s);return G(s)+' '+SIGNS[s].tr+' <span class="rfd '+(V.v==='ctr'?'bad':V.v)+'" title="'+esc(UI.en[V.v])+'"></span>'}
@@ -1268,10 +1290,10 @@ function pr(t,a,d){return ez((t-a)/d)}
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function wrap(c,txt,mw,max){var ws=String(txt).split(' '),L=[],ln='';ws.forEach(function(w){var s=ln?ln+' '+w:w;if(c.measureText(s).width>mw&&ln){L.push(ln);ln=w}else ln=s});L.push(ln);if(L.length>max){L=L.slice(0,max);L[max-1]=L[max-1].replace(/[\s.,;।]*$/,'')+'…'}return L}
 function data(){var now=Date.now(),c=getC(now),t=UI[lang],V=verdictFor(c,cur),s=SIGNS[cur];
- return{np:s.np,en:s.en,g:G(cur),vl:t[V.v],q:V.v==='ctr'?'bad':V.v,date:dayLabel(now),title:lang==='ne'?'दैनिक राशिफल':'Daily Rashifal',
+ var DI=dayIns(cur,c),many=c.segs.length>1;return{day:DI.day+' '+DI.col,np:s.np,en:s.en,g:G(cur),vl:t[V.v],q:V.v==='ctr'?'bad':V.v,date:dayLabel(now),title:lang==='ne'?'दैनिक राशिफल':'Daily Rashifal',
   now:(now-c.start)/(c.end-c.start),url:location.origin+'/horoscope',
-  segs:c.segs.map(function(g,i){var f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);return{when:c.segs.length>1?hm(f)+'–'+hm(to):'',txt:HOUSE[lang][V.h[i]-1],q:hq(V.h[i],V.e[i]),w:to-f}})}}
-function stext(d){return d.g+' '+d.np+' ('+d.en+') · '+d.vl+'\n'+d.date+'\n\n'+d.segs.map(function(s){return(s.when?s.when+': ':'')+s.txt}).join('\n')+'\n\n'+d.url}
+  segs:c.segs.map(function(g,i){var f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);var I=ins(cur,g.sign,(f+to)/2),H=HOUSE[lang][V.h[i]-1];return{when:c.segs.length>1?hm(f)+'–'+hm(to):'',txt:many?H:H+' '+I.fl,full:H+' '+I.fl+' '+I.rl+' '+I.nk,q:hq(V.h[i],V.e[i]),w:to-f}})}}
+function stext(d){return d.g+' '+d.np+' ('+d.en+') · '+d.vl+'\n'+d.date+'\n\n'+d.segs.map(function(s){return(s.when?s.when+': ':'')+s.full}).join('\n')+'\n\n'+d.day+'\n\n'+d.url}
 function draw(c,t,d){
  var g=c.createRadialGradient(W/2,0,60,W/2,H*.35,H*.95);g.addColorStop(0,'#0d4aa8');g.addColorStop(.48,'#052f6b');g.addColorStop(1,'#021634');c.fillStyle=g;c.fillRect(0,0,W,H);
  c.textAlign='center';c.textBaseline='alphabetic';c.shadowBlur=0;
