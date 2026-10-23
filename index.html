@@ -369,7 +369,7 @@ function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2
  return `<div class="sec"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
 function shell(inner,cur){
  const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Videos','/videos'],['Horoscope','/horoscope'],['Games','/games.html']];
- return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/horoscope" id="rf-hz" class="hzb">${hzChip()}</a><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
+ return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
  <div id="mp"><h4>Sections</h4>${items.map(([t,h])=>`<a href="${h}">${t}</a>`).join('')}<a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a></div></div></div>
@@ -908,7 +908,7 @@ function horoPg(){document.title='Daily Horoscope — The Sujan Khadka';const k=
  <div class="hzfind"${hzVd()?' hidden':''}><span>Not sure of your sign?</span><select id="hz_m" aria-label="Birth month">${mo.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('')}</select><select id="hz_d" aria-label="Birth day">${Array.from({length:31},(_,i)=>`<option>${i+1}</option>`).join('')}</select><button class="bt o" onclick="hzFind()">Find my sign</button></div>
  <div class="hzgrid" role="radiogroup" aria-label="Choose your sign">${HZ.map((s,i)=>`<button class="hzsg" role="radio" aria-checked="false" data-i="${i}" onclick="hzShow(${i},0,true)"><span class="hzg">${s.g}</span><b>${hzNm(i)}</b><small>${s.ne}</small><em>${hzDt(i)}</em></button>`).join('')}</div>
  <div id="hzread" aria-live="polite"></div>
- <p class="hzdis">Moon phase, Moon sign, tithi and nakshatra are calculated from astronomy for the current moment. The daily readings follow the classical Moon-transit rule, with the Moon counted as a house from your sign. Astrology is a traditional belief and is not scientifically proven, so these readings are for guidance and entertainment only, not predictions, medical, legal or financial advice.</p></div>`}
+ <p class="hzdis" hidden style="display:none">Moon phase, Moon sign, tithi and nakshatra are calculated from astronomy for the current moment. The daily readings follow the classical Moon-transit rule, with the Moon counted as a house from your sign. Astrology is a traditional belief and is not scientifically proven, so these readings are for guidance and entertainment only, not predictions, medical, legal or financial advice.</p></div>`}
 let hzSi=-1,hzOff=0;
 function hzMode(v){try{localStorage.setItem('sk_zv',JSON.stringify(!!v))}catch(e){}go();const c=$('#hz');if(c)c.innerHTML=hzChip()}
 function hzStars(n){return `<span class="hz5" role="img" aria-label="${n} out of 5">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}" style="--i:${i}">★</i>`).join('')}</span>`}
@@ -1001,11 +1001,13 @@ var RashifalEngine = (function () {
   }
 
   function ayanamsa(ms) { // Lahiri, degrees
-    var years = (jdUT(ms) - 2451545.0) / 365.25;
-    return 23.857 + 0.0139697 * years;
+    var T = (jde(ms) - 2451545.0) / 36525;
+    return 23.857092 + (5028.796195 * T + 1.1054348 * T * T) / 3600;
   }
 
-  function moonSidereal(ms) { return norm(moonTropical(ms) - ayanamsa(ms)); }
+  function nutLon(ms) { var T = (jde(ms) - 2451545.0) / 36525, Om = 125.04452 - 1934.136261 * T;
+    return (-17.20 * Math.sin(Om * RAD) - 1.32 * Math.sin(2 * (280.4665 + 36000.7698 * T) * RAD)) / 3600; }
+  function moonSidereal(ms) { return norm(moonTropical(ms) - nutLon(ms) - ayanamsa(ms)); }
   function elongation(ms) { return norm(moonTropical(ms) - sunTropical(ms)); }
 
   // monotonic "unwrapped" quantities so crossings can be found by bisection
@@ -1188,13 +1190,17 @@ var hm=function(ms){var d=new Date(ms+NPT);return('0'+d.getUTCHours()).slice(-2)
 var dayLabel=function(ms){return new Intl.DateTimeFormat(lang==='ne'?'ne-NP':'en-GB',{timeZone:'Asia/Kathmandu',weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(ms))};
 var sname=function(i){return lang==='ne'?SIGNS[i].np:SIGNS[i].tr+' ('+SIGNS[i].en+')'};
 var endTxt=function(ms,c){var t=UI[lang];return t.ends+' '+hm(ms)+(ms>=c.end?' ('+t.tomorrow+')':'')};
-function compute(now){var start=E.nepalDayStart(now),end=start+E.DAY_MS,sr=E.sunrise(start),ref=now<sr?sr:now;
+function compute(now){var start=E.nepalDayStart(now),end=start+E.DAY_MS,sr=E.sunrise(start),ref=sr;
  return{key:E.dateKey(now),start:start,end:end,sunrise:sr,tithi:E.tithiInfo(ref),tithiEnd:E.tithiEnd(ref),nak:E.nakshatraInfo(ref),nakEnd:E.nakshatraEnd(ref),segs:E.moonSignSegments(start,end),stamp:now,ml:E.moonSidereal(now),el:E.elongation(now)}}
 function getC(now){if(!cache||cache.key!==E.dateKey(now)||now-cache.stamp>30*60000)cache=compute(now);return cache}
-function verdict(houses,durs){var total=0,good=0,bad8=0;for(var i=0;i<houses.length;i++){total+=durs[i];if(E.FAVOURABLE[houses[i]])good+=durs[i];if(houses[i]===8)bad8+=durs[i]}
- if(bad8>=2*3600000)return'ctr';var s=good/total;return s>=0.66?'good':(s<=0.34?'bad':'mixed')}
-var hq=function(h){return h===8?'bad':(E.FAVOURABLE[h]?'good':'mid')};
-function verdictFor(c,i){var h=[],d=[];c.segs.forEach(function(g){h.push(E.house(g.sign,i));d.push(g.to-g.from)});return{v:verdict(h,d),h:h}}
+function verdict(houses,durs,els){var total=0,sum=0,bad8=0;for(var i=0;i<houses.length;i++){total+=durs[i];sum+=sc(houses[i],els[i])*durs[i];if(houses[i]===8)bad8+=durs[i]}
+ if(bad8>=2*3600000)return'ctr';var s=sum/total;return s>=.5?'good':(s<=.05?'bad':'mixed')}
+/* Chandra bala: houses 1,3,6,7,10,11 favourable; 2,5,9 help only in the bright (Shukla) half; 4,12 poor; 8 Chandrashtama.
+   Moon is weak from Krishna Ashtami to Shukla Saptami (elongation 264deg..84deg): its good results are reduced. */
+var weakM=function(el){return el>=264||el<84};
+function sc(h,el){var b;if(h===8)return -1;if(E.FAVOURABLE[h])b=1;else if(h===2||h===5||h===9)b=(el<180)?.6:.2;else b=-.2;return b>0&&weakM(el)?b*.6:b}
+var hq=function(h,el){var x=sc(h,el);return x>=.5?'good':(x<=-.5?'bad':'mid')};
+function verdictFor(c,i){var h=[],d=[],e=[];c.segs.forEach(function(g){h.push(E.house(g.sign,i));d.push(g.to-g.from);e.push(E.elongation((Math.max(g.from,c.start)+Math.min(g.to,c.end))/2))});return{v:verdict(h,d,e),h:h,e:e}}
 function ringSvg(c){var g='';for(var i=0;i<12;i++){var a=(i*30+15-90)*RAD,b=(i*30-90)*RAD;
   g+='<text x="'+(160+131*Math.cos(a)).toFixed(1)+'" y="'+(160+131*Math.sin(a)+7).toFixed(1)+'" text-anchor="middle" data-i="'+i+'">'+G(i)+'</text><line x1="'+(160+112*Math.cos(b)).toFixed(1)+'" y1="'+(160+112*Math.sin(b)).toFixed(1)+'" x2="'+(160+150*Math.cos(b)).toFixed(1)+'" y2="'+(160+150*Math.sin(b)).toFixed(1)+'"/>'}
  var m=(c.ml-90)*RAD,moon=hzMoonSvg(c.el).replace('<svg viewBox','<svg x="97" y="97" width="126" height="126" viewBox');
@@ -1203,7 +1209,7 @@ var RAD=Math.PI/180;
 function nowPct(c,now){return Math.max(0,Math.min(100,(now-c.start)/E.DAY_MS*100))}
 function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElementById('rf');if(!r)return;key=c.key;document.documentElement.lang=lang==='ne'?'ne':'en';
  var R=function(id){return document.getElementById(id)};
- if(!r.dataset.b){r.dataset.b='1';r.innerHTML='<section class="rh"><div class="rsh"></div><div class="rhz" id="rfz"></div><div class="rht"><div class="rlg" role="group" aria-label="Language"><button type="button" id="rfen">English</button><button type="button" id="rfne">नेपाली</button></div><h1 id="rft"></h1><p id="rfd"></p><p class="rkt" id="rfk"></p></div></section><div class="rpc" id="rfpc"></div><div class="ral" id="rfal" hidden></div><div class="rtl" id="rftl"></div><div class="rpk" id="rfpk" role="group"></div><section class="rrd" id="rfrd" aria-live="polite"></section><p class="rmt" id="rfmt"></p>';
+ if(!r.dataset.b){r.dataset.b='1';r.innerHTML='<section class="rh"><div class="rsh"></div><div class="rhz" id="rfz"></div><div class="rht"><div class="rlg" role="group" aria-label="Language"><button type="button" id="rfen">English</button><button type="button" id="rfne">नेपाली</button></div><h1 id="rft"></h1><p id="rfd"></p><p class="rkt" id="rfk"></p></div></section><div class="rpc" id="rfpc"></div><div class="ral" id="rfal" hidden></div><div class="rtl" id="rftl"></div><div class="rpk" id="rfpk" role="group"></div><section class="rrd" id="rfrd" aria-live="polite"></section><p class="rmt" id="rfmt" hidden style="display:none"></p>';
   R('rfen').onclick=function(){lang='en';try{localStorage.setItem('rf-lang','en')}catch(e){}render()};R('rfne').onclick=function(){lang='ne';try{localStorage.setItem('rf-lang','ne')}catch(e){}render()}}
  if(r.dataset.k!==c.key+'|'+(c.stamp===cache.stamp?cache.stamp:'')){r.dataset.k=c.key+'|'+cache.stamp;R('rfz').innerHTML=ringSvg(c)}
  R('rft').textContent=t.title;R('rfd').textContent=dayLabel(now)+' · '+t.times+' · '+(lang==='ne'?'काठमाडौं':'Kathmandu');
@@ -1222,9 +1228,9 @@ function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElemen
  R('rfpk').innerHTML=SIGNS.map(function(s,i){return '<button type="button" class="rsg" style="--i:'+i+'" data-i="'+i+'" aria-pressed="'+(i===cur)+'"><span class="rg">'+G(i)+'</span><b>'+esc(s.np)+'</b><small>'+esc(lang==='ne'?s.tr:s.en)+'</small></button>'}).join('');
  R('rfpk').querySelectorAll('.rsg').forEach(function(b){b.onclick=function(){cur=+b.dataset.i;try{localStorage.setItem('rf-sign',String(cur))}catch(e){}render();var h=document.getElementById('rf-hz');if(h)h.innerHTML=chip();var rd=R('rfrd');if(rd)setTimeout(function(){rd.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'})},60)}});
  /* timeline of the day for the chosen rashi */
- var V=verdictFor(c,cur),s=SIGNS[cur],houses=V.h;
+ var V=verdictFor(c,cur),s=SIGNS[cur],houses=V.h,els=V.e;
  var tlh='<div class="rtt"><b>'+esc(lang==='ne'?'आजको चन्द्र गोचर · '+s.np:'Today’s Moon path · '+s.tr)+'</b><span>'+esc(t.times)+'</span></div><div class="rbar">';
- c.segs.forEach(function(g,i){var f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);tlh+='<div class="rsg2 q-'+hq(houses[i])+'" style="flex:'+(to-f)+';--i:'+i+'" title="'+esc(sname(g.sign))+'"><b>'+G(g.sign)+'</b><small>'+(i?hm(f):'00:00')+'</small></div>'});
+ c.segs.forEach(function(g,i){var f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);tlh+='<div class="rsg2 q-'+hq(houses[i],els[i])+'" style="flex:'+(to-f)+';--i:'+i+'" title="'+esc(sname(g.sign))+'"><b>'+G(g.sign)+'</b><small>'+(i?hm(f):'00:00')+'</small></div>'});
  tlh+='<i class="rnow" id="rfnow" style="left:'+nowPct(c,now).toFixed(2)+'%"></i></div><div class="rleg"><span class="q-good">'+esc(t.good)+'</span><span class="q-mid">'+esc(lang==='ne'?'सामान्य':'Neutral')+'</span><span class="q-bad">'+esc(t.bad)+'</span></div>';
  R('rftl').innerHTML=tlh;
  /* reading */
@@ -1232,8 +1238,9 @@ function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElemen
  if(note)rd+='<div class="rnote"><b>'+(lang==='ne'?'सम्पादकको टिप्पणी':'Editor’s note')+'</b><p>'+esc(note)+'</p></div>';
  c.segs.forEach(function(g,i){var h=houses[i],f=Math.max(g.from,c.start),to=Math.min(g.to,c.end),sfx=lang==='ne'?'':(h===1?'st':h===2?'nd':h===3?'rd':'th');
   var when=(c.segs.length>1?hm(f)+'–'+hm(to)+' · ':'')+(lang==='ne'?t.moonIn+' '+SIGNS[g.sign].np+' · '+s.np+'बाट '+h+' '+t.house:t.moonIn+' '+sname(g.sign)+' · '+h+sfx+' '+t.house+' '+s.tr);
-  rd+='<div class="rsq q-'+hq(h)+'" style="--i:'+i+'"><p class="rw">'+esc(when)+'</p><p>'+esc(HOUSE[lang][h-1])+'</p></div>'});
- R('rfrd').innerHTML=rd;R('rfmt').textContent=t.method}
+  var el=els[i],bright=el>=84&&el<264,pk=lang==='ne'?(bright?'चन्द्रमा बलियो (उज्यालो पक्ष/पूर्णताको नजिक): फल पूर्ण रूपमा मिल्छ।':'चन्द्रमा कमजोर (कृष्ण अष्टमीदेखि शुक्ल सप्तमीसम्म): शुभ फल केही घट्छ।'):(bright?'Moon is strong (bright phase): results come in full.':'Moon is weak (dark phase, Krishna Ashtami to Shukla Saptami): good results are reduced.');
+   rd+='<div class="rsq q-'+hq(h,el)+'" style="--i:'+i+'"><p class="rw">'+esc(when)+'</p><p>'+esc(HOUSE[lang][h-1])+'</p><p class="rw">'+esc(pk)+'</p></div>'});
+ R('rfrd').innerHTML=rd;}
 function tick(){var r=document.getElementById('rf');if(!r)return;var now=Date.now();if(E.dateKey(now)!==key)render();else{var n=document.getElementById('rfnow'),c=getC(now);if(n)n.style.left=nowPct(c,now).toFixed(2)+'%'}}
 function init(){if(document.getElementById('rf'))render()}
 function chip(){var s=-1;try{s=parseInt(localStorage.getItem('rf-sign'),10)}catch(e){}if(!(s>=0&&s<12))return'✨ Horoscope';var V=verdictFor(getC(Date.now()),s);return G(s)+' '+SIGNS[s].tr+' <span class="rfd '+(V.v==='ctr'?'bad':V.v)+'" title="'+esc(UI.en[V.v])+'"></span>'}
