@@ -344,6 +344,16 @@ blockquote{position:relative;background:linear-gradient(90deg,rgba(139,30,45,.07
 .rsq p{margin:2px 0;font:16.5px/1.65 Georgia,'Times New Roman','Noto Serif Devanagari',serif}.rsq .rw{font:600 13px system-ui,'Noto Sans Devanagari',sans-serif;color:var(--mu)}
 .rmt{margin:16px 4px 6px;font-size:12px;line-height:1.55;color:var(--mu)}
 .rfd{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:3px;vertical-align:middle}.rfd.good{background:#2e9e4f}.rfd.mixed{background:#d99a00}.rfd.bad{background:#c0392b}
+.rfs{margin:8px 0 0 8px;position:relative;overflow:hidden;border:0;border-radius:30px;padding:6px 16px;background:linear-gradient(135deg,#0d4aa8,#052f6b);color:#ffe500;font:700 13px system-ui,'Noto Sans Devanagari',sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(5,47,107,.35)}
+.rfs:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:rfsw 3.2s ease-in-out infinite}
+@keyframes rfsw{0%,60%{left:-60%}100%{left:130%}}
+.rsm{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(2,22,52,.84);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));animation:hup .3s ease both}
+.rsb2{position:relative;width:min(100%,400px);max-height:100%;overflow:auto;border-radius:20px;background:#021634;border:1px solid #2b4f86;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.rsb2 canvas{display:block;width:100%;height:auto;aspect-ratio:4/5;border-radius:14px}
+.rsa{display:flex;gap:8px;margin-top:10px}.rsa button{flex:1;border:1px solid #2b4f86;border-radius:12px;padding:11px 6px;background:#052f6b;color:#fff;font:700 13px system-ui,'Noto Sans Devanagari',sans-serif;cursor:pointer}.rsa button.p{background:#ffe500;color:#052f6b;border-color:#ffe500}.rsa button:disabled{opacity:.5}
+.rss{margin:8px 2px 0;min-height:18px;color:#cfe0ff;font:13px system-ui,sans-serif;text-align:center}
+.rsx{position:absolute;top:16px;right:16px;z-index:2;width:34px;height:34px;border-radius:50%;border:0;background:rgba(2,22,52,.7);color:#fff;font-size:22px;line-height:1;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.rfs:after{animation:none}}
 @media(prefers-reduced-motion:reduce){.rh:before,.rh:after,.rsh,.rfzs,.rfmk,.rc,.ral i,.rsg2,.rnow,.rsg,.rrd,.rbg,.rbd,.rsq{animation:none!important}}
 @media(prefers-reduced-motion:reduce){#pg,.hd img,.hd:after,#app,.ins{animation:none!important}.rv{opacity:1!important;transform:none!important;transition:none!important}.card:hover,footer a:hover{transform:none}}
 
@@ -1234,17 +1244,87 @@ function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElemen
  tlh+='<i class="rnow" id="rfnow" style="left:'+nowPct(c,now).toFixed(2)+'%"></i></div><div class="rleg"><span class="q-good">'+esc(t.good)+'</span><span class="q-mid">'+esc(lang==='ne'?'सामान्य':'Neutral')+'</span><span class="q-bad">'+esc(t.bad)+'</span></div>';
  R('rftl').innerHTML=tlh;
  /* reading */
- var cls=V.v==='ctr'?'bad':V.v,note=((((D.pages||{}).__horo||{}).days||{})[c.key]||{})[HZ[cur].k],rd='<header><span class="rbg">'+G(cur)+'</span><div><h2>'+esc(s.np+' ('+s.en+')')+'</h2><p>'+esc(s.trait[lang])+'</p><span class="rbd '+cls+'">'+esc(t[V.v])+'</span></div></header>';
+ var cls=V.v==='ctr'?'bad':V.v,note=((((D.pages||{}).__horo||{}).days||{})[c.key]||{})[HZ[cur].k],rd='<header><span class="rbg">'+G(cur)+'</span><div><h2>'+esc(s.np+' ('+s.en+')')+'</h2><p>'+esc(s.trait[lang])+'</p><span class="rbd '+cls+'">'+esc(t[V.v])+'</span><button type="button" class="rfs" id="rfsh">↗ '+(lang==='ne'?'साझा गर्नुहोस्':'Share')+'</button></div></header>';
  if(note)rd+='<div class="rnote"><b>'+(lang==='ne'?'सम्पादकको टिप्पणी':'Editor’s note')+'</b><p>'+esc(note)+'</p></div>';
  c.segs.forEach(function(g,i){var h=houses[i],f=Math.max(g.from,c.start),to=Math.min(g.to,c.end),sfx=lang==='ne'?'':(h===1?'st':h===2?'nd':h===3?'rd':'th');
   var when=(c.segs.length>1?hm(f)+'–'+hm(to)+' · ':'')+(lang==='ne'?t.moonIn+' '+SIGNS[g.sign].np+' · '+s.np+'बाट '+h+' '+t.house:t.moonIn+' '+sname(g.sign)+' · '+h+sfx+' '+t.house+' '+s.tr);
   var el=els[i],bright=el>=84&&el<264,pk=lang==='ne'?(bright?'चन्द्रमा बलियो (उज्यालो पक्ष/पूर्णताको नजिक): फल पूर्ण रूपमा मिल्छ।':'चन्द्रमा कमजोर (कृष्ण अष्टमीदेखि शुक्ल सप्तमीसम्म): शुभ फल केही घट्छ।'):(bright?'Moon is strong (bright phase): results come in full.':'Moon is weak (dark phase, Krishna Ashtami to Shukla Saptami): good results are reduced.');
    rd+='<div class="rsq q-'+hq(h,el)+'" style="--i:'+i+'"><p class="rw">'+esc(when)+'</p><p>'+esc(HOUSE[lang][h-1])+'</p><p class="rw">'+esc(pk)+'</p></div>'});
- R('rfrd').innerHTML=rd;}
+ R('rfrd').innerHTML=rd;var sb=R('rfsh');if(sb)sb.onclick=function(){openShare()}}
 function tick(){var r=document.getElementById('rf');if(!r)return;var now=Date.now();if(E.dateKey(now)!==key)render();else{var n=document.getElementById('rfnow'),c=getC(now);if(n)n.style.left=nowPct(c,now).toFixed(2)+'%'}}
 function init(){if(document.getElementById('rf'))render()}
 function chip(){var s=-1;try{s=parseInt(localStorage.getItem('rf-sign'),10)}catch(e){}if(!(s>=0&&s<12))return'✨ Horoscope';var V=verdictFor(getC(Date.now()),s);return G(s)+' '+SIGNS[s].tr+' <span class="rfd '+(V.v==='ctr'?'bad':V.v)+'" title="'+esc(UI.en[V.v])+'"></span>'}
 setInterval(tick,60000);document.addEventListener('visibilitychange',function(){if(!document.hidden)tick()});
+/* ---- Share: animated card (live preview, PNG, video) in site colours ---- */
+var openShare=(function(){
+var W=1080,H=1350,SANS='system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif',SERIF='Georgia,"Times New Roman","Noto Serif Devanagari",serif';
+var COL={good:'#2e9e4f',mixed:'#d99a00',mid:'#d99a00',bad:'#c0392b'};
+var ST=[],sd=7;function rn(){sd=(sd*16807)%2147483647;return sd/2147483647}
+for(var i=0;i<90;i++)ST.push({x:rn(),y:rn(),r:.8+rn()*2,sp:.8+rn()*2.4,ph:rn()*6.28});
+function cl(x){return Math.max(0,Math.min(1,x))}
+function ez(x){x=cl(x);return 1-Math.pow(1-x,3)}
+function bk(x){x=cl(x);var c=1.70158;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)}
+function pr(t,a,d){return ez((t-a)/d)}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function wrap(c,txt,mw,max){var ws=String(txt).split(' '),L=[],ln='';ws.forEach(function(w){var s=ln?ln+' '+w:w;if(c.measureText(s).width>mw&&ln){L.push(ln);ln=w}else ln=s});L.push(ln);if(L.length>max){L=L.slice(0,max);L[max-1]=L[max-1].replace(/[\s.,;।]*$/,'')+'…'}return L}
+function data(){var now=Date.now(),c=getC(now),t=UI[lang],V=verdictFor(c,cur),s=SIGNS[cur];
+ return{np:s.np,en:s.en,g:G(cur),vl:t[V.v],q:V.v==='ctr'?'bad':V.v,date:dayLabel(now),title:lang==='ne'?'दैनिक राशिफल':'Daily Rashifal',
+  now:(now-c.start)/(c.end-c.start),url:location.origin+'/horoscope',
+  segs:c.segs.map(function(g,i){var f=Math.max(g.from,c.start),to=Math.min(g.to,c.end);return{when:c.segs.length>1?hm(f)+'–'+hm(to):'',txt:HOUSE[lang][V.h[i]-1],q:hq(V.h[i],V.e[i]),w:to-f}})}}
+function stext(d){return d.g+' '+d.np+' ('+d.en+') · '+d.vl+'\n'+d.date+'\n\n'+d.segs.map(function(s){return(s.when?s.when+': ':'')+s.txt}).join('\n')+'\n\n'+d.url}
+function draw(c,t,d){
+ var g=c.createRadialGradient(W/2,0,60,W/2,H*.35,H*.95);g.addColorStop(0,'#0d4aa8');g.addColorStop(.48,'#052f6b');g.addColorStop(1,'#021634');c.fillStyle=g;c.fillRect(0,0,W,H);
+ c.textAlign='center';c.textBaseline='alphabetic';c.shadowBlur=0;
+ ST.forEach(function(s){c.globalAlpha=(.2+.8*Math.abs(Math.sin(t*s.sp+s.ph)))*.9;c.fillStyle='#fff';c.beginPath();c.arc(s.x*W,s.y*H,s.r,0,6.283);c.fill()});c.globalAlpha=1;
+ var ph=(t%3.6)/3.6;if(ph<.22){var k=ph/.22,x=W*(.1+.6*k),y=H*(.06+.14*k),gr=c.createLinearGradient(x-170,y-60,x,y);gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(1,'rgba(255,255,255,'+(1-k)+')');c.strokeStyle=gr;c.lineWidth=3;c.beginPath();c.moveTo(x-170,y-60);c.lineTo(x,y);c.stroke()}
+ var p=pr(t,.1,.7);c.globalAlpha=p;c.fillStyle='#ffe500';c.font='700 36px '+SANS;c.fillText(d.title,W/2,86-(1-p)*20);
+ c.fillStyle='rgba(255,255,255,.75)';c.font='500 28px '+SANS;c.fillText(d.date,W/2,130-(1-p)*20);c.globalAlpha=1;
+ var cx=W/2,cy=390;
+ c.save();c.globalAlpha=pr(t,.2,.8);c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=2;c.beginPath();c.arc(cx,cy,215,0,6.283);c.stroke();
+ c.setLineDash([4,20]);c.lineDashOffset=-t*24;c.strokeStyle='rgba(255,229,0,.55)';c.lineWidth=4;c.beginPath();c.arc(cx,cy,176,0,6.283);c.stroke();c.restore();
+ var a=t*.9-1.2,mx=cx+Math.cos(a)*215,my=cy+Math.sin(a)*215,mg=c.createRadialGradient(mx,my,0,mx,my,70);mg.addColorStop(0,'rgba(255,229,0,.55)');mg.addColorStop(1,'rgba(255,229,0,0)');
+ c.globalAlpha=pr(t,.5,.6);c.fillStyle=mg;c.beginPath();c.arc(mx,my,70,0,6.283);c.fill();c.fillStyle='#fff7c2';c.beginPath();c.arc(mx,my,24,0,6.283);c.fill();c.fillStyle='#021634';c.beginPath();c.arc(mx+11,my-5,20,0,6.283);c.fill();c.globalAlpha=1;
+ var sc=bk((t-.3)/.9);c.save();c.translate(cx,cy);c.scale(sc,sc);var cg=c.createRadialGradient(-40,-50,10,0,0,150);cg.addColorStop(0,'#0d4aa8');cg.addColorStop(1,'#052f6b');c.fillStyle=cg;c.beginPath();c.arc(0,0,146,0,6.283);c.fill();
+ c.strokeStyle='rgba(255,229,0,.6)';c.lineWidth=3;c.stroke();c.shadowColor='#ffe500';c.shadowBlur=24+10*Math.sin(t*2.4);c.fillStyle='#ffe500';c.textBaseline='middle';c.font='700 170px "Segoe UI Symbol","Apple Symbols","Noto Sans Symbols",'+SANS;c.fillText(d.g,0,8);c.restore();
+ c.shadowBlur=0;c.textBaseline='alphabetic';
+ p=pr(t,.9,.7);c.globalAlpha=p;c.fillStyle='#fff';c.font='700 84px '+SERIF;c.fillText(d.np,W/2,700+(1-p)*30);c.fillStyle='rgba(255,255,255,.78)';c.font='500 36px '+SANS;c.fillText(d.en,W/2,752+(1-p)*30);c.globalAlpha=1;
+ var vc=COL[d.q]||COL.mixed,vs=bk((t-1.2)/.6);c.save();c.translate(W/2,812);c.scale(vs,vs);c.font='700 32px '+SANS;var vw=c.measureText(d.vl).width+70;c.shadowColor=vc;c.shadowBlur=14+10*Math.sin(t*3);c.fillStyle=vc;rr(c,-vw/2,-30,vw,60,30);c.fill();c.shadowBlur=0;c.fillStyle='#fff';c.textBaseline='middle';c.fillText(d.vl,0,2);c.restore();c.textBaseline='alphabetic';
+ /* reading panel */
+ c.font='400 33px '+SERIF;c.textAlign='left';var many=d.segs.length>1,blocks=d.segs.map(function(s){return{s:s,L:wrap(c,s.txt,800,many?3:5)}});
+ var ph2=40,hh=ph2;blocks.forEach(function(b){hh+=(b.s.when?42:0)+b.L.length*46+18});hh+=ph2-34;var py=890;
+ p=pr(t,1.5,.7);c.globalAlpha=p;c.fillStyle='rgba(255,255,255,.08)';rr(c,70,py,W-140,hh,26);c.fill();c.strokeStyle='rgba(255,255,255,.2)';c.lineWidth=2;c.stroke();
+ var y=py+ph2+4;blocks.forEach(function(b,i){var q=pr(t,1.7+i*.5,.6);c.globalAlpha=q;var x=110+(1-q)*30,top=y-30;
+  c.fillStyle=COL[b.s.q]||COL.mixed;var bh=(b.s.when?42:0)+b.L.length*46-6;rr(c,98,top+(b.s.when?0:0),8,bh+6,4);c.fill();
+  if(b.s.when){c.fillStyle='#ffe500';c.font='700 28px '+SANS;c.fillText(b.s.when,x+14,y);y+=42}
+  c.fillStyle='#fff';c.font='400 33px '+SERIF;b.L.forEach(function(l){c.fillText(l,x+14,y+6);y+=46});y+=18});
+ c.globalAlpha=1;
+ /* day timeline */
+ var by=py+hh+34,bx=100,bw=W-200,gp=pr(t,2.2,.9),tot=d.segs.reduce(function(s,g){return s+g.w},0),cx2=bx;c.save();rr(c,bx,by,bw,22,11);c.clip();c.fillStyle='rgba(255,255,255,.12)';c.fillRect(bx,by,bw,22);
+ d.segs.forEach(function(g){var w=bw*g.w/tot*gp;c.fillStyle=COL[g.q]||COL.mixed;c.fillRect(cx2,by,w,22);cx2+=w});c.restore();
+ c.globalAlpha=gp;var nx=bx+bw*cl(d.now),pu=1+.25*Math.sin(t*4);c.fillStyle='#ffe500';c.shadowColor='#ffe500';c.shadowBlur=16;c.beginPath();c.arc(nx,by+11,11*pu,0,6.283);c.fill();c.shadowBlur=0;c.globalAlpha=1;
+ c.textAlign='center';p=pr(t,2.6,.7);c.globalAlpha=p;c.fillStyle='#ffe500';c.font='700 38px '+SERIF;c.fillText('The Sujan Khadka',W/2,H-62);c.fillStyle='rgba(255,255,255,.7)';c.font='500 26px '+SANS;c.fillText(d.url.replace(/^https?:\/\//,''),W/2,H-24);c.globalAlpha=1}
+function dl(f){var a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500)}
+return function(){
+ var d=data(),ne=lang==='ne',m=document.createElement('div'),raf=0;
+ var L=ne?{i:'🖼 फोटो',v:'🎬 भिडियो',t:'🔗 टेक्स्ट',x:'बन्द गर्नुहोस्',rec:'भिडियो बन्दैछ… ',sv:'उपकरणमा सुरक्षित भयो',cp:'कपी भयो',nv:'यो ब्राउजरमा भिडियो समर्थित छैन'}:{i:'🖼 Image',v:'🎬 Video',t:'🔗 Text',x:'Close',rec:'Recording video… ',sv:'Saved to your device',cp:'Copied to clipboard',nv:'Video is not supported in this browser'};
+ m.className='rsm';m.innerHTML='<div class="rsb2" role="dialog" aria-modal="true"><button type="button" class="rsx" aria-label="'+L.x+'">×</button><canvas width="'+W+'" height="'+H+'"></canvas><div class="rsa"><button type="button" class="p" data-a="i">'+L.i+'</button><button type="button" data-a="v">'+L.v+'</button><button type="button" data-a="t">'+L.t+'</button></div><p class="rss" aria-live="polite"></p></div>';
+ document.body.appendChild(m);var cv=m.querySelector('canvas'),ctx=cv.getContext('2d'),st=m.querySelector('.rss'),bs=m.querySelectorAll('.rsa button'),busy=false;
+ var t0=performance.now();function loop(){draw(ctx,(performance.now()-t0)/1000,d);raf=requestAnimationFrame(loop)}if(RM)draw(ctx,9,d);else loop();
+ function close(){cancelAnimationFrame(raf);document.removeEventListener('keydown',kd);m.remove()}function kd(e){if(e.key==='Escape')close()}document.addEventListener('keydown',kd);
+ m.addEventListener('click',function(e){if(e.target===m)close()});m.querySelector('.rsx').onclick=close;m.querySelector('.rsx').focus();
+ function send(f){var sh={files:[f],title:d.np+' · '+d.title,text:stext(d)};if(navigator.canShare&&navigator.canShare(sh)){navigator.share(sh).catch(function(){})}else{dl(f);st.textContent=L.sv}}
+ function lock(b){busy=b;bs.forEach(function(x){x.disabled=b})}
+ function img(){var c2=document.createElement('canvas');c2.width=W;c2.height=H;draw(c2.getContext('2d'),9,d);c2.toBlob(function(b){send(new File([b],'rashifal-'+d.en.toLowerCase()+'.png',{type:'image/png'}))},'image/png')}
+ function vid(){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){st.textContent=L.nv;return}
+  var mt=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'].filter(function(x){return MediaRecorder.isTypeSupported(x)})[0];if(!mt){st.textContent=L.nv;return}
+  var c3=document.createElement('canvas');c3.width=W;c3.height=H;var x3=c3.getContext('2d'),rc=new MediaRecorder(c3.captureStream(30),{mimeType:mt,videoBitsPerSecond:4000000}),ch=[],T=7000,s0=performance.now(),r2=0;lock(true);
+  rc.ondataavailable=function(e){if(e.data&&e.data.size)ch.push(e.data)};
+  rc.onstop=function(){cancelAnimationFrame(r2);lock(false);st.textContent='';var ext=mt.indexOf('mp4')>-1?'mp4':'webm';send(new File([new Blob(ch,{type:mt.split(';')[0]})],'rashifal-'+d.en.toLowerCase()+'.'+ext,{type:mt.split(';')[0]}))};
+  function f(){var e=performance.now()-s0;draw(x3,e/1000,d);st.textContent=L.rec+Math.min(100,Math.round(e/T*100))+'%';if(e<T)r2=requestAnimationFrame(f);else rc.stop()}rc.start();f()}
+ function txt(){var s=stext(d);if(navigator.share){navigator.share({title:d.np+' · '+d.title,text:s}).catch(function(){})}else if(navigator.clipboard){navigator.clipboard.writeText(s).then(function(){st.textContent=L.cp})}}
+ bs.forEach(function(b){b.onclick=function(){if(busy)return;st.textContent='';var a=b.dataset.a;if(a==='i')img();else if(a==='v')vid();else txt()}})}
+})();
+
 return{init:init,chip:chip,compute:compute,E:E,render:render,verdictFor:verdictFor}
 })();
 function rfPg(){document.title='Daily Rashifal — The Sujan Khadka';return '<div class="rf" id="rf"></div>'}
