@@ -121,7 +121,21 @@ function rtParseMetals(html) {
   return { fine, tejabi: tej, silver };
 }
 async function rtMetals() { return rtParseMetals(await rtGet('https://fenegosida.org/')); }
-async function ratesResponse() {
+async function ratesDebug() {
+  const rep = {};
+  try { const c = await rtCurrency(); rep.currency = { ok: 1, date: c.date, count: c.list.length }; } catch (e) { rep.currency = { ok: 0, error: String(e.message || e) }; }
+  let html = '';
+  try { html = await rtGet('https://fenegosida.org/'); rep.page = { ok: 1, bytes: html.length }; } catch (e) { rep.page = { ok: 0, error: String(e.message || e) }; }
+  if (html) {
+    try { rep.metals = { ok: 1, ...rtParseMetals(html) }; } catch (e) { rep.metals = { ok: 0, error: String(e.message || e) }; }
+    const text = asciiDigits(html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' '));
+    const i = text.search(/gold/i);
+    rep.hint = i < 0 ? 'The page text has no word "gold" (numbers may be loaded by script).' : text.slice(Math.max(0, i - 40), i + 360);
+  }
+  return J(rep, 200);
+}
+async function ratesResponse(req) {
+  if (req && new URL(req.url).searchParams.get('debug') === '1') return ratesDebug();
   const ck = new Request('https://rates.internal/v1'), sk = new Request('https://rates.internal/v1-stale');
   const hit = await caches.default.match(ck);
   if (hit) return new Response(hit.body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
@@ -145,7 +159,7 @@ async function handle({ request: req, env, next }) {
     const c = req.cf || {};
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
-  if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
+  if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) return next();
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
