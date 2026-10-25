@@ -392,6 +392,11 @@ blockquote{position:relative;background:linear-gradient(90deg,rgba(139,30,45,.07
 .mph{margin:14px 0 0;text-align:center;border-radius:26px;padding:16px 12px;color:#fff;background:linear-gradient(160deg,#0d4aa8,#052f6b 50%,#021634);box-shadow:0 14px 34px rgba(5,47,107,.35)}.mph h3{margin:0 0 6px;font:700 16px system-ui,'Noto Sans Devanagari',sans-serif;color:#ffe500}
 .mps{width:min(100%,250px);height:auto;display:block;margin:0 auto}.mpt{display:flex;flex-direction:column;gap:2px;margin-top:4px;font-family:system-ui,'Noto Sans Devanagari',sans-serif}.mpt b{font-size:20px;color:#ffe500;font-family:Georgia,'Noto Serif Devanagari',serif}.mpt span{font-size:13px;opacity:.85}
 .mpr{display:flex;justify-content:center;gap:6px;margin-top:12px}.mpm{width:36px;height:36px;opacity:.7}.mpm.on{opacity:1}
+.s3d{margin:14px 0 0;text-align:center;border-radius:26px;padding:16px 12px;color:#fff;background:linear-gradient(160deg,#0d3a8a,#052f6b 45%,#021634);box-shadow:0 14px 34px rgba(5,47,107,.35)}.s3d h3{margin:0 0 10px;font:700 16px system-ui,'Noto Sans Devanagari',sans-serif;color:#ffe500}
+.s3w{border-radius:18px;overflow:hidden;background:#010612;border:1px solid rgba(255,255,255,.14)}.s3w canvas{display:block;width:100%;height:min(64vh,380px);touch-action:none;cursor:grab;outline:none;-webkit-tap-highlight-color:transparent}.s3w canvas:active{cursor:grabbing}.s3w canvas:focus-visible{box-shadow:inset 0 0 0 2px #ffe500}
+.s3i{min-height:22px;margin-top:10px;font:15px system-ui,'Noto Sans Devanagari',sans-serif}.s3i b{color:#ffe500;font-family:Georgia,'Noto Serif Devanagari',serif;font-size:17px}
+.s3b{display:flex;gap:10px;align-items:center;margin-top:10px}.s3b input{flex:1;min-width:0;accent-color:#ffe500}.s3b button{flex:none;min-width:44px;height:38px;padding:0 14px;border:0;border-radius:19px;background:#ffe500;color:#052f6b;font:700 14px system-ui,'Noto Sans Devanagari',sans-serif;cursor:pointer}.s3b button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.s3h{margin:10px 0 0;font:12px system-ui,'Noto Sans Devanagari',sans-serif;opacity:.7}.s3dt{margin-top:4px;font:600 13px system-ui,'Noto Sans Devanagari',sans-serif;color:#ffe500}
 .mp-h{transform-box:fill-box;transform-origin:center;animation:mph 4s ease-in-out infinite}@keyframes mph{50%{opacity:.55;transform:scale(1.05)}}.mp-o{transform-origin:100px 100px;animation:gbs 40s linear infinite}.mp-cur{animation:mpc 1.8s ease-in-out infinite}@keyframes mpc{50%{stroke-opacity:.25}}
 @media(prefers-reduced-motion:reduce){.gb *,.rce *,.mph *{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.rh:before,.rh:after,.rsh,.rfzs,.rfmk,.rc,.ral i,.rsg2,.rnow,.rsg,.rrd,.rbg,.rbd,.rsq{animation:none!important}}
@@ -1296,7 +1301,7 @@ function render(){var now=Date.now(),c=getC(now),t=UI[lang],r=document.getElemen
  var cs=[];c.segs.forEach(function(g){var s8=(g.sign-7+12)%12;if(g.to-g.from>=30*60000&&cs.indexOf(s8)<0)cs.push(s8)});var al=R('rfal');
  if(cs.length){al.hidden=false;al.innerHTML='<i></i><span>'+esc(t.chandrashtama+': '+cs.map(function(i){return lang==='ne'?SIGNS[i].np:SIGNS[i].tr}).join(', '))+'</span>'}else al.hidden=true;
  /* rashi cards */
- var box=R('rfpk');box.className='rcw';box.removeAttribute('role');box.innerHTML=cardsHtml(c);phaseAnim();R('rftl').innerHTML='';var rr0=R('rfrd');rr0.innerHTML='';rr0.style.display='none';
+ var box=R('rfpk');box.className='rcw';box.removeAttribute('role');box.innerHTML=cardsHtml(c);phaseAnim();s3init();R('rftl').innerHTML='';var rr0=R('rfrd');rr0.innerHTML='';rr0.style.display='none';
  box.onclick=function(ev){var b=ev.target.closest('button');if(!b)return;var a=b.closest('.rcd');if(!a)return;var i=+a.dataset.i,ne=lang==='ne';
   if(b.classList.contains('rcm')){a.classList.toggle('open');b.textContent=a.classList.contains('open')?(ne?'कम हेर्नुहोस्':'See less'):(ne?'थप हेर्नुहोस्':'See more')}
   else if(b.classList.contains('rcs')){setCur(i);openShare()}}}
@@ -1495,10 +1500,92 @@ function phaseHtml(){var ne=lang==='ne',L=ne?'ne':'en',now=Date.now(),el=E.elong
  var st='';for(var i=0;i<8;i++)st+='<svg viewBox="0 0 44 44" class="mpm'+(i===ix?' on':'')+'" role="img" aria-label="'+esc(PHN[L][i])+'"><title>'+esc(PHN[L][i])+'</title><circle cx="22" cy="22" r="16" fill="#0b1d44" stroke="rgba(255,255,255,.22)"/><path d="'+moonPath(i*45,16,22,22)+'" fill="#f6edc0"/>'+(i===ix?'<circle class="mp-cur" cx="22" cy="22" r="20" fill="none" stroke="#ffe500" stroke-width="2"/>':'')+'</svg>';
  return'<section class="mph"><h3>'+(ne?'आजको चन्द्र कला':'Moon phase today')+'</h3>'+v+'<div class="mpt"><b>'+esc(nm)+'</b><span>'+k+'% '+(ne?'प्रकाशित':'illuminated')+' · '+esc(ne?ti.pakshaNp+' '+ti.np:ti.paksha+' '+ti.en)+'</span></div><div class="mpr">'+st+'</div></section>'}
 function phaseAnim(){var l=document.getElementById('mpl'),cp=document.getElementById('mpcp');if(!l||!cp||RM)return;var el=E.elongation(Date.now()),t0=performance.now();(function f(t){if(!l.isConnected)return;var k=Math.min(1,(t-t0)/1800),d=moonPath(el*(1-Math.pow(1-k,3)),70,100,100);l.setAttribute('d',d);cp.setAttribute('d',d);if(k<1)requestAnimationFrame(f)})(t0)}
+/* ---- 3D sky: rotatable celestial sphere drawn on a canvas from the planetary calculations ---- */
+var S3={yaw:null,pit:24,fov:125,off:0,auto:true,sel:1,play:false,raf:0,bd:null,fr:[],vis:true,hook:false},
+ S3C=['#ffd23f','#fff4c2','#ff6a4d','#7ee0a4','#ffb347','#ff9ed2','#9fb4ff','#b9a8d8','#9a8ab8'],
+ S3E=['#ff9a6b','#9bd88f','#9ad4ff','#7fb0ff'],
+ S3T={en:{h:'3D Sky',hint:'Drag to rotate · pinch or scroll to zoom · tap a planet',tap:'Tap a planet or the Moon',now:'Today',sky:'Sky on',live:'Sky now',alt:'Rotatable 3D sky showing the Sun, Moon and planets on the zodiac',play:'Play',pause:'Pause',off:'Days from today'},
+  ne:{h:'३D आकाश',hint:'घुमाउन तान्नुहोस् · जुम गर्न चिमोट्नुहोस् वा स्क्रोल गर्नुहोस् · ग्रहमा ट्याप गर्नुहोस्',tap:'कुनै ग्रह वा चन्द्रमामा ट्याप गर्नुहोस्',now:'आज',sky:'आकाश',live:'अहिलेको आकाश',alt:'सूर्य, चन्द्रमा र ग्रहहरू राशिचक्रमा देखाउने घुमाउन मिल्ने ३D आकाश',play:'चलाउनुहोस्',pause:'रोक्नुहोस्',off:'आजबाट दिन'}},
+ S3S=(function(){var a=1234567,o=[];function r(){a=(a+0x6D2B79F5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296}
+  for(var i=0;i<420;i++){var l=r()*6.283185,b=Math.asin(r()*2-1),m=r();o.push([Math.cos(b)*Math.cos(l),Math.cos(b)*Math.sin(l),Math.sin(b),m*m*m,r()*6.28])}return o})();
+function s3v(l,b){l*=Math.PI/180;b*=Math.PI/180;return[Math.cos(b)*Math.cos(l),Math.cos(b)*Math.sin(l),Math.sin(b)]}
+function s3lat(p,ms){if(p===1){var d=ms/86400000+2440587.5-2451545;return 5.128*Math.sin((93.272+13.22935*d)*Math.PI/180)}
+ if(p===0||p>=7)return 0;var T=(ms/86400000+2440587.5-2451545)/36525,ea=hel(2,T),pp=hel(PMAP[p],T);
+ return Math.atan2(pp[2]-ea[2],Math.hypot(pp[0]-ea[0],pp[1]-ea[1]))*180/Math.PI}
+function s3bodies(ms,keepR){var old=S3.bd;return[0,1,2,3,4,5,6,7,8].map(function(p){var l=lonP(p,ms),b=s3lat(p,ms);
+ return{p:p,l:l,b:b,s:Math.floor(l/30),r:keepR&&old?old[p].r:isR(p,ms),v:s3v(l,b)}})}
+function s3ms(){return Date.now()+S3.off*864e5}
+function s3html(){var T=S3T[lang==='ne'?'ne':'en'];
+ return'<section class="s3d"><h3>'+T.h+'</h3><div class="s3w"><canvas id="s3c" tabindex="0" role="img" aria-label="'+esc(T.alt)+'"></canvas></div><div class="s3i" id="s3i" aria-live="polite">'+T.tap+'</div><div class="s3b"><button type="button" id="s3p" aria-label="'+T.play+'">▶</button><input type="range" id="s3o" min="-45" max="45" step="1" value="'+S3.off+'" aria-label="'+T.off+'"><button type="button" id="s3n">'+T.now+'</button></div><p class="s3h">'+T.hint+'</p><div class="s3dt" id="s3dt"></div></section>'}
+function s3init(){var cv=document.getElementById('s3c');if(!cv)return;var ne=lang==='ne',T=S3T[ne?'ne':'en'],cx2=cv.getContext('2d'),info=document.getElementById('s3i'),dtl=document.getElementById('s3dt'),rng=document.getElementById('s3o'),pb=document.getElementById('s3p'),nb=document.getElementById('s3n');
+ if(S3.yaw===null)S3.yaw=lonP(1,Date.now());S3.bd=s3bodies(s3ms(),false);
+ var ptr={},drag=0,t0=0,last=0,W=0,H=0,dpr=1,mcv=document.createElement('canvas'),mx,mid,N=72;mcv.width=mcv.height=N;mx=mcv.getContext('2d');mid=mx.createImageData(N,N);
+ var MAR=[[-.3,.35,.3],[.15,.42,.2],[-.05,.08,.24],[.3,-.02,.18],[-.38,-.12,.15],[.1,-.38,.2],[.42,.22,.1]];
+ function clamp(x,a,b){return x<a?a:(x>b?b:x)}
+ function basis(){var y=S3.yaw*Math.PI/180,p=S3.pit*Math.PI/180,F=[Math.cos(p)*Math.cos(y),Math.cos(p)*Math.sin(y),Math.sin(p)],R=[Math.sin(y),-Math.cos(y),0],U=[R[1]*F[2]-R[2]*F[1],R[2]*F[0]-R[0]*F[2],R[0]*F[1]-R[1]*F[0]];return{F:F,R:R,U:U}}
+ function proj(v,B,f){var z=v[0]*B.F[0]+v[1]*B.F[1]+v[2]*B.F[2];if(z<=-.8)return null;var k=f/(1+z);return[W/2+(v[0]*B.R[0]+v[1]*B.R[1]+v[2]*B.R[2])*k,H/2-(v[0]*B.U[0]+v[1]*B.U[1]+v[2]*B.U[2])*k,z,k]}
+ function moonImg(w,s,B){var d1=B.R[0]*w[0]+B.R[1]*w[1]+B.R[2]*w[2],u=[B.R[0]-d1*w[0],B.R[1]-d1*w[1],B.R[2]-d1*w[2]],ul=Math.hypot(u[0],u[1],u[2])||1,d2=B.U[0]*w[0]+B.U[1]*w[1]+B.U[2]*w[2],v=[B.U[0]-d2*w[0],B.U[1]-d2*w[1],B.U[2]-d2*w[2]],vl=Math.hypot(v[0],v[1],v[2])||1;
+  u=[u[0]/ul,u[1]/ul,u[2]/ul];v=[v[0]/vl,v[1]/vl,v[2]/vl];var su=s[0]*u[0]+s[1]*u[1]+s[2]*u[2],sv=s[0]*v[0]+s[1]*v[1]+s[2]*v[2],sw=-(s[0]*w[0]+s[1]*w[1]+s[2]*w[2]),d=mid.data;
+  for(var py=0;py<N;py++)for(var px=0;px<N;px++){var a=(px+.5)/N*2-1,b=1-(py+.5)/N*2,q=a*a+b*b,i=(py*N+px)*4;if(q>=1){d[i+3]=0;continue}
+   var c=Math.sqrt(1-q),dp=a*su+b*sv+c*sw,lit=clamp((dp+.02)/.27,0,1);lit=lit*lit*(3-2*lit);var I=.05+.95*lit*(.62+.38*clamp(dp*1.2,0,1)),mr=0;
+   for(var m=0;m<MAR.length;m++){var da=a-MAR[m][0],db=b-MAR[m][1];mr+=Math.exp(-(da*da+db*db)/(MAR[m][2]*MAR[m][2]))*.24}
+   I*=(1-mr)*(.8+.2*c);var e=1-Math.sqrt(q),sh=1-lit;d[i]=clamp(252*I+8*sh,0,255);d[i+1]=clamp(243*I+12*sh,0,255);d[i+2]=clamp(214*I+22*sh,0,255);d[i+3]=Math.min(1,e*18)*255}
+  mx.putImageData(mid,0,0)}
+ function draw(t){var w=cv.clientWidth,h=cv.clientHeight;dpr=Math.min(2,window.devicePixelRatio||1);if(!w||!h)return;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}W=w;H=h;cx2.setTransform(dpr,0,0,dpr,0,0);
+  var g=cx2.createLinearGradient(0,0,0,H);g.addColorStop(0,'#010612');g.addColorStop(.55,'#04153a');g.addColorStop(1,'#0a2a66');cx2.fillStyle=g;cx2.fillRect(0,0,W,H);
+  var B=basis(),f=(H/2)/Math.tan(S3.fov*Math.PI/720),i,k,p0;
+  for(i=0;i<S3S.length;i++){var st=S3S[i];p0=proj(st,B,f);if(!p0)continue;var tw=RM?1:(.72+.28*Math.sin(t*.002+st[4])),sz=.7+st[3]*2.2;cx2.globalAlpha=Math.min(1,(.3+st[3]*.9)*tw);cx2.fillStyle='#fff';cx2.fillRect(p0[0]-sz/2,p0[1]-sz/2,sz,sz)}
+  cx2.globalAlpha=1;
+  /* zodiac ring */
+  for(i=0;i<12;i++){var a0=i*30;cx2.beginPath();var pen=false;for(k=0;k<=30;k++){p0=proj(s3v(a0+k,0),B,f);if(!p0){pen=false;continue}if(!pen){cx2.moveTo(p0[0],p0[1]);pen=true}else cx2.lineTo(p0[0],p0[1])}
+   cx2.strokeStyle=S3E[EL[i]];cx2.globalAlpha=.85;cx2.lineWidth=2.2;cx2.stroke();
+   var q1=proj(s3v(a0,-7),B,f),q2=proj(s3v(a0,7),B,f);if(q1&&q2){cx2.beginPath();cx2.moveTo(q1[0],q1[1]);cx2.lineTo(q2[0],q2[1]);cx2.strokeStyle='rgba(255,255,255,.35)';cx2.globalAlpha=1;cx2.lineWidth=1;cx2.stroke()}
+   for(k=5;k<30;k+=5){var t1=proj(s3v(a0+k,-1.3),B,f),t2=proj(s3v(a0+k,1.3),B,f);if(t1&&t2){cx2.beginPath();cx2.moveTo(t1[0],t1[1]);cx2.lineTo(t2[0],t2[1]);cx2.strokeStyle='rgba(255,255,255,.28)';cx2.lineWidth=1;cx2.stroke()}}
+   var gp=proj(s3v(a0+15,9.5),B,f);if(gp){cx2.globalAlpha=1;cx2.fillStyle=S3E[EL[i]];cx2.font='600 '+clamp(gp[3]*.058,12,30)+'px system-ui,sans-serif';cx2.textAlign='center';cx2.textBaseline='middle';cx2.fillText(G(i),gp[0],gp[1])}}
+  cx2.globalAlpha=1;
+  /* bodies, far to near so the Moon and Sun sit on top */
+  var bd=S3.bd,sun=bd[0].v,mn=bd[1],fr=[],ord=[7,8,6,4,3,2,5,0,1];
+  for(i=0;i<ord.length;i++){var b=bd[ord[i]],pp=proj(b.v,B,f);if(!pp)continue;var rad,col=S3C[b.p];
+   if(b.p===1){rad=clamp(pp[3]*.034,13,64);var fl=(1-(b.v[0]*sun[0]+b.v[1]*sun[1]+b.v[2]*sun[2]))/2,gl=cx2.createRadialGradient(pp[0],pp[1],rad*.8,pp[0],pp[1],rad*2.6);gl.addColorStop(0,'rgba(255,240,180,'+(.1+.4*fl)+')');gl.addColorStop(1,'rgba(255,240,180,0)');cx2.fillStyle=gl;cx2.fillRect(pp[0]-rad*3,pp[1]-rad*3,rad*6,rad*6);
+    moonImg(b.v,sun,B);cx2.drawImage(mcv,pp[0]-rad,pp[1]-rad,rad*2,rad*2)}
+   else if(b.p===0){rad=clamp(pp[3]*.03,11,42);var sg=cx2.createRadialGradient(pp[0],pp[1],rad*.4,pp[0],pp[1],rad*3.2);sg.addColorStop(0,'rgba(255,214,64,.85)');sg.addColorStop(.35,'rgba(255,170,30,.25)');sg.addColorStop(1,'rgba(255,170,30,0)');cx2.fillStyle=sg;cx2.fillRect(pp[0]-rad*3.4,pp[1]-rad*3.4,rad*6.8,rad*6.8);cx2.beginPath();cx2.arc(pp[0],pp[1],rad,0,6.283);cx2.fillStyle='#ffe27a';cx2.fill();cx2.beginPath();cx2.arc(pp[0],pp[1],rad*.72,0,6.283);cx2.fillStyle='#fff7d0';cx2.fill()}
+   else if(b.p>=7){rad=clamp(pp[3]*.011,4,9);cx2.beginPath();cx2.moveTo(pp[0],pp[1]-rad);cx2.lineTo(pp[0]+rad,pp[1]);cx2.lineTo(pp[0],pp[1]+rad);cx2.lineTo(pp[0]-rad,pp[1]);cx2.closePath();cx2.fillStyle=col;cx2.globalAlpha=.9;cx2.fill();cx2.globalAlpha=1}
+   else{rad=clamp(pp[3]*.013,4,11);var pg=cx2.createRadialGradient(pp[0],pp[1],0,pp[0],pp[1],rad*3.2);pg.addColorStop(0,col);pg.addColorStop(.3,col+'66');pg.addColorStop(1,col+'00');cx2.fillStyle=pg;cx2.fillRect(pp[0]-rad*3.4,pp[1]-rad*3.4,rad*6.8,rad*6.8);cx2.beginPath();cx2.arc(pp[0],pp[1],rad,0,6.283);cx2.fillStyle=col;cx2.fill();cx2.beginPath();cx2.arc(pp[0]-rad*.3,pp[1]-rad*.3,rad*.35,0,6.283);cx2.fillStyle='rgba(255,255,255,.7)';cx2.fill()}
+   if(S3.sel===b.p){cx2.beginPath();cx2.arc(pp[0],pp[1],rad+6,0,6.283);cx2.strokeStyle='#ffe500';cx2.lineWidth=1.6;cx2.setLineDash([4,4]);cx2.stroke();cx2.setLineDash([])}
+   cx2.font='600 12px system-ui,\'Noto Sans Devanagari\',sans-serif';cx2.textAlign='left';cx2.textBaseline='alphabetic';cx2.fillStyle='rgba(255,255,255,.92)';cx2.shadowColor='rgba(0,0,0,.8)';cx2.shadowBlur=4;cx2.fillText(pn(b.p)+(b.r&&b.p>1&&b.p<7?' ᴿ':''),pp[0]+rad+5,pp[1]-rad*.4);cx2.shadowBlur=0;
+   fr.push([b.p,pp[0],pp[1],rad])}
+  S3.fr=fr}
+ function showInfo(){var b=S3.bd[S3.sel];if(!b){info.textContent=T.tap;return}info.innerHTML='<b>'+esc(pn(b.p))+(b.r&&b.p>1&&b.p<7?' (R)':'')+'</b> · '+G(b.s)+' '+esc(ne?SIGNS[b.s].np:SIGNS[b.s].tr)+' '+dm(b.l)}
+ function showDate(){if(!S3.off){dtl.textContent=T.live}else{dtl.textContent=T.sky+' '+new Intl.DateTimeFormat(ne?'ne-NP':'en-GB',{day:'numeric',month:'short',year:'numeric'}).format(new Date(s3ms()))}}
+ function setOff(v,keepR){S3.off=v;S3.bd=s3bodies(s3ms(),keepR);rng.value=Math.round(v);showInfo();showDate()}
+ function frame(t){S3.raf=0;if(!cv.isConnected)return;var dt=Math.min(.1,(t-last)/1000||0);last=t;
+  if(S3.play){var v=S3.off+dt*5;if(v>45)v=-45;setOff(v,true)}
+  if(S3.auto&&!RM&&!drag)S3.yaw+=dt*2.2;draw(t);if(S3.vis&&!document.hidden&&(!RM||drag||S3.play))S3.raf=requestAnimationFrame(frame)}
+ function go(){if(!S3.raf)S3.raf=requestAnimationFrame(frame)}
+ S3.go=go;
+ function stopAuto(){S3.auto=false}
+ cv.addEventListener('pointerdown',function(e){cv.setPointerCapture(e.pointerId);ptr[e.pointerId]={x:e.clientX,y:e.clientY};drag=Object.keys(ptr).length;t0=performance.now();stopAuto();S3.moved=0;go()});
+ cv.addEventListener('pointermove',function(e){var q=ptr[e.pointerId];if(!q)return;var ids=Object.keys(ptr);
+  if(ids.length===2){var o=ids[0]==e.pointerId?ids[1]:ids[0],oq=ptr[o],d0=Math.hypot(q.x-oq.x,q.y-oq.y),d1=Math.hypot(e.clientX-oq.x,e.clientY-oq.y);if(d0>0)S3.fov=clamp(S3.fov*d0/d1,30,165);S3.moved=99}
+  else{var dx=e.clientX-q.x,dy=e.clientY-q.y,sc=S3.fov/(cv.clientHeight||300);S3.yaw+=dx*sc;S3.pit=clamp(S3.pit+dy*sc,-85,85);S3.moved+=Math.abs(dx)+Math.abs(dy)}
+  q.x=e.clientX;q.y=e.clientY;if(RM)draw(performance.now())});
+ function up(e){var q=ptr[e.pointerId];if(!q)return;delete ptr[e.pointerId];drag=Object.keys(ptr).length;
+  if(e.type==='pointerup'&&S3.moved<8&&performance.now()-t0<400){var r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,best=-1,bd=1e9;S3.fr.forEach(function(o){var d=Math.hypot(o[1]-x,o[2]-y);if(d<Math.max(26,o[3]+12)&&d<bd){bd=d;best=o[0]}});S3.sel=best;showInfo();if(RM)draw(performance.now())}}
+ cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ cv.addEventListener('wheel',function(e){e.preventDefault();stopAuto();S3.fov=clamp(S3.fov*Math.exp(e.deltaY*.0012),30,165);if(RM)draw(performance.now())},{passive:false});
+ cv.addEventListener('keydown',function(e){var s=S3.fov/12,h=1;if(e.key==='ArrowLeft')S3.yaw+=s;else if(e.key==='ArrowRight')S3.yaw-=s;else if(e.key==='ArrowUp')S3.pit=clamp(S3.pit+s,-85,85);else if(e.key==='ArrowDown')S3.pit=clamp(S3.pit-s,-85,85);else if(e.key==='+'||e.key==='=')S3.fov=clamp(S3.fov/1.15,30,165);else if(e.key==='-')S3.fov=clamp(S3.fov*1.15,30,165);else h=0;if(h){e.preventDefault();stopAuto();if(RM)draw(performance.now());else go()}});
+ rng.addEventListener('input',function(){S3.play=false;pb.textContent='▶';setOff(+rng.value,false);if(RM)draw(performance.now());else go()});
+ pb.addEventListener('click',function(){S3.play=!S3.play;pb.textContent=S3.play?'❚❚':'▶';pb.setAttribute('aria-label',S3.play?T.pause:T.play);go()});
+ nb.addEventListener('click',function(){S3.play=false;pb.textContent='▶';S3.yaw=lonP(1,Date.now());S3.pit=24;S3.fov=125;S3.sel=1;setOff(0,false);if(RM)draw(performance.now());else go()});
+ if('IntersectionObserver' in window){new IntersectionObserver(function(es){S3.vis=es[0].isIntersecting;if(S3.vis)go()},{threshold:.05}).observe(cv)}
+ if(!S3.hook){S3.hook=true;document.addEventListener('visibilitychange',function(){if(!document.hidden&&S3.go)S3.go()})}
+ pb.textContent=S3.play?'❚❚':'▶';showInfo();showDate();draw(performance.now());go()}
+
 function plTable(c){var ne=lang==='ne',PL=planetsDay(c),h='<details class="rpl"><summary>'+(ne?'आजका ग्रह स्थिति (निरयन, लाहिरी)':'Planet positions today (sidereal, Lahiri)')+'</summary>';
  PL.forEach(function(x){h+='<div class="rpr"><span>'+esc(pn(x.p))+(x.r?' (R)':'')+'</span><span>'+G(x.s)+' '+esc(ne?SIGNS[x.s].np:SIGNS[x.s].tr)+'</span><span>'+dm(x.l)+'</span></div>'});
  return h+'<p class="rw">'+(ne?'मध्याह्न स्थिति; राहु-केतु मध्यम नोड। ग्रह स्थिति मानक कक्षीय तत्त्वबाट गणना गरिएको (केही चाप-मिनेटसम्म शुद्ध); चन्द्रमा लामो चन्द्र श्रेणीबाट।':'Midday positions; Rahu/Ketu use the mean node. Planets are calculated from standard orbital elements (accurate to a few arc-minutes) and the Moon from a long lunar series.')+'</p></details>'}
-function cardsHtml(c){var t=UI[lang],ne=lang==='ne',h=skyHtml(c)+phaseHtml()+plTable(c),PLd=planetsDay(c);SIGNS.forEach(function(s,i){var r=sRead(i,c);h+='<article class="rcd el'+EL[i]+(i===cur?' mine':'')+'" style="--i:'+i+'" data-i="'+i+'"><div class="rce" aria-hidden="true">'+ELSVG[EL[i]]+'</div><div class="rch"><span class="rcg">'+G(i)+'</span><div><h3>'+esc(s.np)+' <small>'+esc(s.en)+'</small></h3><p class="rcl">'+esc(LET[i])+' · '+ELN[ne?'ne':'en'][EL[i]]+'</p></div><span class="rbd '+r.q+'">'+esc(t[r.v])+'</span></div><p class="rcp">'+esc(r.short)+'</p><div class="rcx">'+chartHtml(i,PLd)+r.more+'</div><div class="rcf"><button type="button" class="rcm">'+(ne?'थप हेर्नुहोस्':'See more')+'</button><button type="button" class="rcs">↗ '+(ne?'साझा गर्नुहोस्':'Share')+'</button></div></article>'});return h}
+function cardsHtml(c){var t=UI[lang],ne=lang==='ne',h=skyHtml(c)+s3html()+phaseHtml()+plTable(c),PLd=planetsDay(c);SIGNS.forEach(function(s,i){var r=sRead(i,c);h+='<article class="rcd el'+EL[i]+(i===cur?' mine':'')+'" style="--i:'+i+'" data-i="'+i+'"><div class="rce" aria-hidden="true">'+ELSVG[EL[i]]+'</div><div class="rch"><span class="rcg">'+G(i)+'</span><div><h3>'+esc(s.np)+' <small>'+esc(s.en)+'</small></h3><p class="rcl">'+esc(LET[i])+' · '+ELN[ne?'ne':'en'][EL[i]]+'</p></div><span class="rbd '+r.q+'">'+esc(t[r.v])+'</span></div><p class="rcp">'+esc(r.short)+'</p><div class="rcx">'+chartHtml(i,PLd)+r.more+'</div><div class="rcf"><button type="button" class="rcm">'+(ne?'थप हेर्नुहोस्':'See more')+'</button><button type="button" class="rcs">↗ '+(ne?'साझा गर्नुहोस्':'Share')+'</button></div></article>'});return h}
 function setCur(i){cur=i;try{localStorage.setItem('rf-sign',String(i))}catch(e){}}
 function tick(){var r=document.getElementById('rf');if(!r)return;var now=Date.now();if(E.dateKey(now)!==key)render();else{var n=document.getElementById('rfnow'),c=getC(now);if(n)n.style.left=nowPct(c,now).toFixed(2)+'%'}}
 function init(){if(document.getElementById('rf'))render()}
