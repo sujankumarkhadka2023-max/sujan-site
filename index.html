@@ -429,11 +429,11 @@ function ratesInit(){const el=document.getElementById('rtc');if(!el)return;
  tile=(a,b,c,k)=>`<div class="rtt${k?' '+k:''}"><span>${a}</span><b>${b}</b><small>${c}</small></div>`,
  show=d=>{if(!el.isConnected||!d)return;const m=d.metals,cu=d.cur;let g='',c='';
   if(m){if(m.fine)g+=tile('Fine gold · छापावाल सुन','Rs '+nf.format(m.fine),'per tola','au');if(m.tejabi)g+=tile('Tejabi gold · तेजाबी','Rs '+nf.format(m.tejabi),'per tola','au');if(m.silver)g+=tile('Silver · चाँदी','Rs '+nf.format(m.silver),'per tola','ag')}
-  if(cu&&cu.list&&cu.list.length){const t=x=>tile(esc(x.c)+(x.u>1?' · '+x.u:''),nf.format(x.b),'Sell '+nf.format(x.s));
+  if(cu&&cu.list&&cu.list.length){const t=x=>tile(esc(x.c)+(x.u>1?' · '+x.u:''),nf.format(x.b),cu.mid?'Market rate':'Sell '+nf.format(x.s));
    c=`<div class="rtg">${cu.list.slice(0,4).map(t).join('')}</div>`+(cu.list.length>4?`<details class="rtm"><summary>More currencies</summary><div class="rtg">${cu.list.slice(4).map(t).join('')}</div></details>`:'')}
   if(!g&&!c)return;
   const st=(d.curStale||d.metalsStale)?' · last known values':'';
-  el.innerHTML=`<div class="rth"><h2>Today's rates · आजको भाउ</h2><small>${cu?'Buy rates, '+dm(cu.date):''}</small></div>${g?`<div class="rtg">${g}</div>`:''}${c}<p class="rts">Nepal Rastra Bank · FENEGOSIDA${st}</p>`;el.hidden=false};
+  el.innerHTML=`<div class="rth"><h2>Today's rates · आजको भाउ</h2><small>${cu?(cu.mid?'Market rates, ':'Buy rates, ')+dm(cu.date):''}</small></div>${g?`<div class="rtg">${g}</div>`:''}${c}<p class="rts">${cu&&cu.mid?'Market exchange rates':'Nepal Rastra Bank'} · FENEGOSIDA${st}</p>`;el.hidden=false};
  try{const c=JSON.parse(sessionStorage.getItem('sk_rt')||'null');if(c&&Date.now()-c.t<6e5){show(c.d);return}}catch(e){}
  fetch('/api/rates').then(r=>r.ok?r.json():Promise.reject()).then(d=>{try{sessionStorage.setItem('sk_rt',JSON.stringify({t:Date.now(),d}))}catch(e){}show(d)}).catch(()=>{})}
 
