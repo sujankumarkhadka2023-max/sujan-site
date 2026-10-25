@@ -75,6 +75,69 @@ function sendAudio(req, buf, type) {
   return new Response(buf, { headers: { ...h, 'content-length': String(size) } });
 }
 
+// ---- /api/rates: official NRB currency rates + FENEGOSIDA gold & silver, cached at the edge ----
+const RT_CUR = ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'AED', 'QAR', 'SAR', 'MYR', 'JPY', 'CNY', 'KWD'];
+const npDay = (off = 0) => new Date(Date.now() + 20700000 + off * 864e5).toISOString().slice(0, 10);
+const asciiDigits = s => s.replace(/[०-९]/g, c => '०१२३४५६७८९'.indexOf(c));
+async function rtGet(url, ms = 7000) {
+  const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ac.signal, headers: { 'user-agent': 'Mozilla/5.0 (compatible; sujan-site/1.0)', accept: '*/*' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.text();
+  } finally { clearTimeout(t); }
+}
+async function rtCurrency() {
+  const j = JSON.parse(await rtGet(`https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${npDay(-6)}&to=${npDay(0)}`));
+  const pl = (j.data && j.data.payload) || j.payload || [];
+  if (!Array.isArray(pl) || !pl.length) throw new Error('no currency rates');
+  pl.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const d = pl[0], list = [];
+  for (const r of d.rates || []) {
+    const c = r.currency && r.currency.iso3, b = +String(r.buy).replace(/,/g, ''), s = +String(r.sell).replace(/,/g, '');
+    if (RT_CUR.includes(c) && b > 0 && s > 0) list.push({ c, u: +r.currency.unit || 1, b, s });
+  }
+  list.sort((a, b) => RT_CUR.indexOf(a.c) - RT_CUR.indexOf(b.c));
+  if (!list.length) throw new Error('no usable currencies');
+  return { date: String(d.date).slice(0, 10), list };
+}
+// Reads the visible text of the FENEGOSIDA page. Per tola is the larger of the per-tola / per-10-gram pair.
+function rtMetal(text, label, lo, hi) {
+  const re = new RegExp(label, 'gi');
+  let m;
+  while ((m = re.exec(text))) {
+    const seg = text.slice(m.index + m[0].length, m.index + m[0].length + 260).replace(/\([^)]*\)/g, ' ');
+    const nums = (seg.match(/\d{1,3}(?:,\d{2,3})+|\d{4,7}/g) || []).map(x => +x.replace(/,/g, '')).filter(n => n >= lo && n <= hi).slice(0, 2);
+    if (nums.length) return Math.max(...nums);
+  }
+  return 0;
+}
+function rtParseMetals(html) {
+  const text = asciiDigits(html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' '));
+  const fine = rtMetal(text, 'fine\\s*gold', 50000, 2000000), tej = rtMetal(text, 'tejabi', 50000, 2000000), silver = rtMetal(text, 'silver', 1000, 100000);
+  const gold = fine || tej;
+  if (!gold) throw new Error('no gold rate found');
+  if (silver && (gold / silver < 25 || gold / silver > 250)) throw new Error('rates failed sanity check');
+  return { fine, tejabi: tej, silver };
+}
+async function rtMetals() { return rtParseMetals(await rtGet('https://fenegosida.org/')); }
+async function ratesResponse() {
+  const ck = new Request('https://rates.internal/v1'), sk = new Request('https://rates.internal/v1-stale');
+  const hit = await caches.default.match(ck);
+  if (hit) return new Response(hit.body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
+  const stale = await caches.default.match(sk), old = stale ? await stale.json().catch(() => null) : null;
+  const [cu, mt] = await Promise.allSettled([rtCurrency(), rtMetals()]);
+  const out = { at: Date.now() };
+  if (cu.status === 'fulfilled') out.cur = cu.value; else if (old && old.cur) { out.cur = old.cur; out.curStale = 1; }
+  if (mt.status === 'fulfilled') out.metals = mt.value; else if (old && old.metals) { out.metals = old.metals; out.metalsStale = 1; }
+  if (!out.cur && !out.metals) return J({ error: 'Rates are unavailable right now.' }, 503);
+  const body = JSON.stringify(out), mk = age => new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=' + age } });
+  if (cu.status === 'fulfilled' && mt.status === 'fulfilled') await caches.default.put(ck, mk(900));
+  else await caches.default.put(ck, mk(120));
+  await caches.default.put(sk, mk(259200));
+  return new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
+}
+
 async function handle({ request: req, env, next }) {
   const p = new URL(req.url).pathname, r = req.method;
   // Visitor's approximate place from Cloudflare (free, no permission prompt) — used for the weather
@@ -82,6 +145,7 @@ async function handle({ request: req, env, next }) {
     const c = req.cf || {};
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
+  if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) return next();
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
