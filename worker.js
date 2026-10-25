@@ -87,7 +87,28 @@ async function rtGet(url, ms = 7000) {
     return await r.text();
   } finally { clearTimeout(t); }
 }
+const RT_NAMES = { 'indian rupee': 'INR', 'u.s. dollar': 'USD', 'european euro': 'EUR', 'uk pound sterling': 'GBP', 'australian dollar': 'AUD', 'uae dirham': 'AED', 'qatari riyal': 'QAR', 'saudi arabian riyal': 'SAR', 'malaysian ringgit': 'MYR', 'japanese yen': 'JPY', 'chinese yuan': 'CNY', 'kuwaity dinar': 'KWD', 'kuwaiti dinar': 'KWD' };
+// Fallback: the public NRB "download forex" page (server-rendered table: name, unit, buy, sell)
+async function rtCurrencyPage() {
+  const html = await rtGet('https://www.nrb.org.np/download-forex');
+  const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' ');
+  const dm = text.match(/\d{4}-\d{2}-\d{2}/), lower = text.toLowerCase(), list = [];
+  for (const [name, c] of Object.entries(RT_NAMES)) {
+    const i = lower.indexOf(name);
+    if (i < 0 || list.some(x => x.c === c)) continue;
+    const m = text.slice(i + name.length, i + name.length + 90).match(/(\d+)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)/);
+    if (!m) continue;
+    const u = +m[1], b = +m[2], s = +m[3];
+    if ([1, 10, 100].includes(u) && b > 0 && s >= b) list.push({ c, u, b, s });
+  }
+  list.sort((a, b) => RT_CUR.indexOf(a.c) - RT_CUR.indexOf(b.c));
+  if (!list.length) throw new Error('no currencies on page');
+  return { date: dm ? dm[0] : npDay(0), list };
+}
 async function rtCurrency() {
+  try { return await rtCurrencyApi(); } catch (e) { return await rtCurrencyPage(); }
+}
+async function rtCurrencyApi() {
   const j = JSON.parse(await rtGet(`https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${npDay(-6)}&to=${npDay(0)}`));
   const pl = (j.data && j.data.payload) || j.payload || [];
   if (!Array.isArray(pl) || !pl.length) throw new Error('no currency rates');
@@ -123,7 +144,7 @@ function rtParseMetals(html) {
 async function rtMetals() { return rtParseMetals(await rtGet('https://fenegosida.org/')); }
 async function ratesDebug() {
   const rep = {};
-  try { const c = await rtCurrency(); rep.currency = { ok: 1, date: c.date, count: c.list.length }; } catch (e) { rep.currency = { ok: 0, error: String(e.message || e) }; }
+  try { const c = await rtCurrencyApi(); rep.currency = { ok: 1, via: 'api', date: c.date, count: c.list.length }; } catch (e) { rep.currency = { ok: 0, api: String(e.message || e) }; try { const c = await rtCurrencyPage(); rep.currency = { ok: 1, via: 'page', date: c.date, count: c.list.length, api: rep.currency.api }; } catch (e2) { rep.currency.page = String(e2.message || e2); } }
   let html = '';
   try { html = await rtGet('https://fenegosida.org/'); rep.page = { ok: 1, bytes: html.length }; } catch (e) { rep.page = { ok: 0, error: String(e.message || e) }; }
   if (html) {
