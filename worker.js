@@ -75,41 +75,34 @@ function sendAudio(req, buf, type) {
   return new Response(buf, { headers: { ...h, 'content-length': String(size) } });
 }
 
-// ---- /api/rates: official NRB currency rates + FENEGOSIDA gold & silver, cached at the edge ----
+// ---- /api/rates: currency (NRB, else market rates) + gold & silver (FENEGOSIDA, else backups), cached at the edge ----
 const RT_CUR = ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'AED', 'QAR', 'SAR', 'MYR', 'JPY', 'CNY', 'KWD'];
+const RT_UNIT = { INR: 100, JPY: 10 };
 const npDay = (off = 0) => new Date(Date.now() + 20700000 + off * 864e5).toISOString().slice(0, 10);
 const asciiDigits = s => s.replace(/[०-९]/g, c => '०१२३४५६७८९'.indexOf(c));
-async function rtGet(url, ms = 7000) {
+const visText = h => asciiDigits(h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' '));
+async function rtGet(url, ms = 8000) {
   const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms);
   try {
-    const r = await fetch(url, { signal: ac.signal, headers: { 'user-agent': 'Mozilla/5.0 (compatible; sujan-site/1.0)', accept: '*/*' } });
+    const r = await fetch(url, { signal: ac.signal, headers: { 'user-agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124 Mobile Safari/537.36', accept: 'text/html,application/json;q=0.9,*/*;q=0.8', 'accept-language': 'en-US,en;q=0.9' } });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return await r.text();
   } finally { clearTimeout(t); }
 }
-const RT_NAMES = { 'indian rupee': 'INR', 'u.s. dollar': 'USD', 'european euro': 'EUR', 'uk pound sterling': 'GBP', 'australian dollar': 'AUD', 'uae dirham': 'AED', 'qatari riyal': 'QAR', 'saudi arabian riyal': 'SAR', 'malaysian ringgit': 'MYR', 'japanese yen': 'JPY', 'chinese yuan': 'CNY', 'kuwaity dinar': 'KWD', 'kuwaiti dinar': 'KWD' };
-// Fallback: the public NRB "download forex" page (server-rendered table: name, unit, buy, sell)
-async function rtCurrencyPage() {
-  const html = await rtGet('https://www.nrb.org.np/download-forex');
-  const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' ');
-  const dm = text.match(/\d{4}-\d{2}-\d{2}/), lower = text.toLowerCase(), list = [];
-  for (const [name, c] of Object.entries(RT_NAMES)) {
-    const i = lower.indexOf(name);
-    if (i < 0 || list.some(x => x.c === c)) continue;
-    const m = text.slice(i + name.length, i + name.length + 90).match(/(\d+)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)/);
-    if (!m) continue;
-    const u = +m[1], b = +m[2], s = +m[3];
-    if ([1, 10, 100].includes(u) && b > 0 && s >= b) list.push({ c, u, b, s });
+// follows tiny "redirect" pages (meta refresh or script redirect) that fetch() does not follow by itself
+async function rtGetFollow(url) {
+  let html = '';
+  for (let i = 0; i < 3; i++) {
+    html = await rtGet(url);
+    const m = html.length < 4000 && (html.match(/<meta[^>]+http-equiv=["']?refresh["']?[^>]*content=["'][^"']*url=\s*([^"'>\s]+)/i) || html.match(/location(?:\.href)?\s*=\s*["']([^"']+)["']/i) || html.match(/location\.replace\(\s*["']([^"']+)["']/i));
+    if (!m) return html;
+    url = new URL(m[1], url).href;
   }
-  list.sort((a, b) => RT_CUR.indexOf(a.c) - RT_CUR.indexOf(b.c));
-  if (!list.length) throw new Error('no currencies on page');
-  return { date: dm ? dm[0] : npDay(0), list };
+  return html;
 }
-async function rtCurrency() {
-  try { return await rtCurrencyApi(); } catch (e) { return await rtCurrencyPage(); }
-}
+/* ---- currency ---- */
 async function rtCurrencyApi() {
-  const j = JSON.parse(await rtGet(`https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${npDay(-6)}&to=${npDay(0)}`));
+  const j = JSON.parse(await rtGet(`https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${npDay(-6)}&to=${npDay(0)}`, 5000));
   const pl = (j.data && j.data.payload) || j.payload || [];
   if (!Array.isArray(pl) || !pl.length) throw new Error('no currency rates');
   pl.sort((a, b) => String(b.date).localeCompare(String(a.date)));
@@ -122,7 +115,53 @@ async function rtCurrencyApi() {
   if (!list.length) throw new Error('no usable currencies');
   return { date: String(d.date).slice(0, 10), list };
 }
-// Reads the visible text of the FENEGOSIDA page. Per tola is the larger of the per-tola / per-10-gram pair.
+const RT_NAMES = { 'indian rupee': 'INR', 'u.s. dollar': 'USD', 'european euro': 'EUR', 'uk pound sterling': 'GBP', 'australian dollar': 'AUD', 'uae dirham': 'AED', 'qatari riyal': 'QAR', 'saudi arabian riyal': 'SAR', 'malaysian ringgit': 'MYR', 'japanese yen': 'JPY', 'chinese yuan': 'CNY', 'kuwaity dinar': 'KWD', 'kuwaiti dinar': 'KWD' };
+async function rtCurrencyPage() {
+  const text = visText(await rtGet('https://www.nrb.org.np/download-forex', 5000)), dm = text.match(/\d{4}-\d{2}-\d{2}/), lower = text.toLowerCase(), list = [];
+  for (const [name, c] of Object.entries(RT_NAMES)) {
+    const i = lower.indexOf(name);
+    if (i < 0 || list.some(x => x.c === c)) continue;
+    const m = text.slice(i + name.length, i + name.length + 90).match(/(\d+)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)/);
+    if (!m) continue;
+    const u = +m[1], b = +m[2], s = +m[3];
+    if ([1, 10, 100].includes(u) && b > 0 && s >= b) list.push({ c, u, b, s });
+  }
+  list.sort((a, b) => RT_CUR.indexOf(a.c) - RT_CUR.indexOf(b.c));
+  if (!list.length) throw new Error('no currencies on page');
+  return { date: dm ? dm[0] : npDay(0), list };
+}
+// Backup when the bank's site cannot be reached: market mid-rates from free public feeds (not the official buy/sell)
+function rtFromPerUsd(per, date) {
+  const npr = per.NPR;
+  if (!(npr > 0)) throw new Error('no NPR rate');
+  const list = [];
+  for (const c of RT_CUR) {
+    const v = c === 'USD' ? 1 : per[c];
+    if (!(v > 0)) continue;
+    const u = RT_UNIT[c] || 1, x = Math.round(npr / v * u * 100) / 100;
+    list.push({ c, u, b: x, s: x });
+  }
+  return { date, list, mid: 1 };
+}
+async function rtCurrencyMarket() {
+  const tries = [
+    async () => { const j = JSON.parse(await rtGet('https://open.er-api.com/v6/latest/USD')); return rtFromPerUsd(j.rates || {}, npDay(0)); },
+    async () => { const j = JSON.parse(await rtGet('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json')), per = {}; for (const k in j.usd || {}) per[k.toUpperCase()] = j.usd[k]; return rtFromPerUsd(per, String(j.date || npDay(0)).slice(0, 10)); },
+    async () => { const j = JSON.parse(await rtGet('https://latest.currency-api.pages.dev/v1/currencies/usd.json')), per = {}; for (const k in j.usd || {}) per[k.toUpperCase()] = j.usd[k]; return rtFromPerUsd(per, String(j.date || npDay(0)).slice(0, 10)); }
+  ];
+  let err;
+  for (const f of tries) { try { return await f(); } catch (e) { err = e; } }
+  throw err;
+}
+async function rtCurrency() {
+  const market = rtCurrencyMarket();
+  market.catch(() => {});
+  try { return await Promise.any([rtCurrencyApi(), rtCurrencyPage()]); } catch (e) { return await market; }
+}
+/* ---- gold & silver ---- */
+const RT_GOLD = 'fine\\s*gold|gold\\s*[-(]?\\s*hallmark|hallmark\\s*gold|hallmark|chhapawal|छापावाल';
+const RT_TEJ = 'tejabi|tajabi|तेजाबी';
+const RT_SIL = 'silver|चाँदी';
 function rtMetal(text, label, lo, hi) {
   const re = new RegExp(label, 'gi');
   let m;
@@ -134,30 +173,43 @@ function rtMetal(text, label, lo, hi) {
   return 0;
 }
 function rtParseMetals(html) {
-  const text = asciiDigits(html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' '));
-  const fine = rtMetal(text, 'fine\\s*gold', 50000, 2000000), tej = rtMetal(text, 'tejabi', 50000, 2000000), silver = rtMetal(text, 'silver', 1000, 100000);
+  const text = visText(html);
+  const fine = rtMetal(text, RT_GOLD, 50000, 2000000), tej = rtMetal(text, RT_TEJ, 50000, 2000000), silver = rtMetal(text, RT_SIL, 1000, 100000);
   const gold = fine || tej;
   if (!gold) throw new Error('no gold rate found');
   if (silver && (gold / silver < 25 || gold / silver > 250)) throw new Error('rates failed sanity check');
   return { fine, tejabi: tej, silver };
 }
-async function rtMetals() { return rtParseMetals(await rtGet('https://fenegosida.org/')); }
+const RT_METAL_SRC = ['https://fenegosida.org/', 'https://www.fenegosida.org/', 'https://www.hamropatro.com/gold', 'https://www.ashesh.com.np/gold/'];
+async function rtMetals() {
+  const all = await Promise.allSettled(RT_METAL_SRC.map(async u => { const r = rtParseMetals(await rtGetFollow(u)); r.src = new URL(u).hostname; return r; }));
+  const ok = all.find(x => x.status === 'fulfilled');
+  if (ok) return ok.value;
+  throw all[0].reason || new Error('no source worked');
+}
+/* ---- response ---- */
 async function ratesDebug() {
-  const rep = {};
-  try { const c = await rtCurrencyApi(); rep.currency = { ok: 1, via: 'api', date: c.date, count: c.list.length }; } catch (e) { rep.currency = { ok: 0, api: String(e.message || e) }; try { const c = await rtCurrencyPage(); rep.currency = { ok: 1, via: 'page', date: c.date, count: c.list.length, api: rep.currency.api }; } catch (e2) { rep.currency.page = String(e2.message || e2); } }
-  let html = '';
-  try { html = await rtGet('https://fenegosida.org/'); rep.page = { ok: 1, bytes: html.length }; } catch (e) { rep.page = { ok: 0, error: String(e.message || e) }; }
-  if (html) {
-    try { rep.metals = { ok: 1, ...rtParseMetals(html) }; } catch (e) { rep.metals = { ok: 0, error: String(e.message || e) }; }
-    const text = asciiDigits(html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' '));
-    const i = text.search(/gold/i);
-    rep.hint = i < 0 ? 'The page text has no word "gold" (numbers may be loaded by script).' : text.slice(Math.max(0, i - 40), i + 360);
+  const rep = { currency: {}, metals: [] };
+  for (const [k, f] of [['api', rtCurrencyApi], ['page', rtCurrencyPage], ['market', rtCurrencyMarket]]) {
+    try { const c = await f(); rep.currency[k] = { ok: 1, date: c.date, count: c.list.length }; } catch (e) { rep.currency[k] = { ok: 0, error: String(e.message || e) }; }
+  }
+  for (const u of RT_METAL_SRC) {
+    const o = { url: u };
+    try {
+      const html = await rtGetFollow(u);
+      o.bytes = html.length;
+      try { Object.assign(o, { ok: 1 }, rtParseMetals(html)); } catch (e) { o.ok = 0; o.error = String(e.message || e); }
+      const t = visText(html), i = t.search(/gold|सुन/i);
+      o.hint = (i < 0 ? t : t.slice(Math.max(0, i - 40), i + 300)).slice(0, 360);
+      if (!o.ok && html.length < 1500) o.raw = html.slice(0, 600);
+    } catch (e) { o.ok = 0; o.error = String(e.message || e); }
+    rep.metals.push(o);
   }
   return J(rep, 200);
 }
 async function ratesResponse(req) {
   if (req && new URL(req.url).searchParams.get('debug') === '1') return ratesDebug();
-  const ck = new Request('https://rates.internal/v1'), sk = new Request('https://rates.internal/v1-stale');
+  const ck = new Request('https://rates.internal/v2'), sk = new Request('https://rates.internal/v2-stale');
   const hit = await caches.default.match(ck);
   if (hit) return new Response(hit.body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
   const stale = await caches.default.match(sk), old = stale ? await stale.json().catch(() => null) : null;
@@ -167,8 +219,7 @@ async function ratesResponse(req) {
   if (mt.status === 'fulfilled') out.metals = mt.value; else if (old && old.metals) { out.metals = old.metals; out.metalsStale = 1; }
   if (!out.cur && !out.metals) return J({ error: 'Rates are unavailable right now.' }, 503);
   const body = JSON.stringify(out), mk = age => new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=' + age } });
-  if (cu.status === 'fulfilled' && mt.status === 'fulfilled') await caches.default.put(ck, mk(900));
-  else await caches.default.put(ck, mk(120));
+  await caches.default.put(ck, mk(cu.status === 'fulfilled' && mt.status === 'fulfilled' ? 900 : 120));
   await caches.default.put(sk, mk(259200));
   return new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
 }
