@@ -397,6 +397,9 @@ blockquote{position:relative;background:linear-gradient(90deg,rgba(139,30,45,.07
 .s3i{min-height:22px;margin-top:10px;font:15px system-ui,'Noto Sans Devanagari',sans-serif}.s3i b{color:#ffe500;font-family:Georgia,'Noto Serif Devanagari',serif;font-size:17px}
 .s3b{display:flex;gap:10px;align-items:center;margin-top:10px}.s3b input{flex:1;min-width:0;accent-color:#ffe500}.s3b button{flex:none;min-width:44px;height:38px;padding:0 14px;border:0;border-radius:19px;background:#ffe500;color:#052f6b;font:700 14px system-ui,'Noto Sans Devanagari',sans-serif;cursor:pointer}.s3b button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .s3h{margin:10px 0 0;font:12px system-ui,'Noto Sans Devanagari',sans-serif;opacity:.7}.s3dt{margin-top:4px;font:600 13px system-ui,'Noto Sans Devanagari',sans-serif;color:#ffe500}
+.rtc{margin:26px 0;border:1px solid var(--ln);border-radius:14px;padding:14px 16px 12px}.rtc[hidden]{display:none}.rth{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}.rth h2{margin:0;font-size:17px}.rth small,.rts{color:var(--mu);font-size:12px}.rts{margin:10px 0 0}
+.rtg{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:10px;margin-bottom:10px}.rtt{border:1px solid var(--ln);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:2px}.rtt span{font-size:12px;color:var(--mu)}.rtt b{font-size:20px;line-height:1.2}.rtt small{font-size:12px;color:var(--mu)}.rtt.au{border-left:4px solid #c9a227}.rtt.ag{border-left:4px solid #8a97a6}
+.rtm summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--ac);margin:2px 0 10px}
 .mp-h{transform-box:fill-box;transform-origin:center;animation:mph 4s ease-in-out infinite}@keyframes mph{50%{opacity:.55;transform:scale(1.05)}}.mp-o{transform-origin:100px 100px;animation:gbs 40s linear infinite}.mp-cur{animation:mpc 1.8s ease-in-out infinite}@keyframes mpc{50%{stroke-opacity:.25}}
 @media(prefers-reduced-motion:reduce){.gb *,.rce *,.mph *{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.rh:before,.rh:after,.rsh,.rfzs,.rfmk,.rc,.ral i,.rsg2,.rnow,.rsg,.rrd,.rbg,.rbd,.rsq{animation:none!important}}
@@ -419,6 +422,21 @@ const slugify=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
 const api=(p,o={})=>fetch(p,o);
 
 /* ---------- public ---------- */
+/* ---------- live rates card: NRB currency + FENEGOSIDA gold & silver, from /api/rates ---------- */
+function ratesHtml(){return `<section class="rtc" id="rtc" aria-label="Today's rates" hidden></section>`}
+function ratesInit(){const el=document.getElementById('rtc');if(!el)return;
+ const nf=new Intl.NumberFormat('en-IN',{maximumFractionDigits:2}),dm=d=>{const t=new Date(d+'T00:00:00');return isNaN(t)?'':t.toLocaleDateString('en-GB',{day:'numeric',month:'short'})},
+ tile=(a,b,c,k)=>`<div class="rtt${k?' '+k:''}"><span>${a}</span><b>${b}</b><small>${c}</small></div>`,
+ show=d=>{if(!el.isConnected||!d)return;const m=d.metals,cu=d.cur;let g='',c='';
+  if(m){if(m.fine)g+=tile('Fine gold · छापावाल सुन','Rs '+nf.format(m.fine),'per tola','au');if(m.tejabi)g+=tile('Tejabi gold · तेजाबी','Rs '+nf.format(m.tejabi),'per tola','au');if(m.silver)g+=tile('Silver · चाँदी','Rs '+nf.format(m.silver),'per tola','ag')}
+  if(cu&&cu.list&&cu.list.length){const t=x=>tile(esc(x.c)+(x.u>1?' · '+x.u:''),nf.format(x.b),'Sell '+nf.format(x.s));
+   c=`<div class="rtg">${cu.list.slice(0,4).map(t).join('')}</div>`+(cu.list.length>4?`<details class="rtm"><summary>More currencies</summary><div class="rtg">${cu.list.slice(4).map(t).join('')}</div></details>`:'')}
+  if(!g&&!c)return;
+  const st=(d.curStale||d.metalsStale)?' · last known values':'';
+  el.innerHTML=`<div class="rth"><h2>Today's rates · आजको भाउ</h2><small>${cu?'Buy rates, '+dm(cu.date):''}</small></div>${g?`<div class="rtg">${g}</div>`:''}${c}<p class="rts">Nepal Rastra Bank · FENEGOSIDA${st}</p>`;el.hidden=false};
+ try{const c=JSON.parse(sessionStorage.getItem('sk_rt')||'null');if(c&&Date.now()-c.t<6e5){show(c.d);return}}catch(e){}
+ fetch('/api/rates').then(r=>r.ok?r.json():Promise.reject()).then(d=>{try{sessionStorage.setItem('sk_rt',JSON.stringify({t:Date.now(),d}))}catch(e){}show(d)}).catch(()=>{})}
+
 /* ---------- generated cover art: a unique abstract picture per title, used when a story has no photo ---------- */
 let _art=0;
 const ART_HUE={World:215,Opinion:338,History:28,'Culture & Lifestyle':168};
@@ -481,7 +499,7 @@ function home(){const L=live();if(!L.length)return `<div class="empty" style="pa
  let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
  const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
  let h=`<section class="lead"><div><div class="cat">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div><a class="sm" href="${url(lead)}">Read more <span class="ar">→</span></a></div>${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:`<a href="${url(lead)}" tabindex="-1" aria-hidden="true">${art(lead)}</a>`}</section>`;
- h+=bnHtml();
+ h+=ratesHtml();h+=bnHtml();
  if(sec.length)h+=`<div class="sec"><div class="g">${sec.map(card).join('')}</div></div>`;
  CATS.forEach(c=>h+=block(c,L.filter(a=>a.category===c),SL[c]));return h}
 function stats(L){let v=0;for(const k in (D.views||{}))v+=+D.views[k]||0;let g=0;try{g=+localStorage.getItem('sk_games_played')||0}catch(e){}
@@ -590,7 +608,7 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(p[0]!=='audio')auStop();
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);else if(p[0]==='videos')out=videoPg();else if(p[0]==='horoscope')out=rfPg();
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();hzInit();RF.init();if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();hzInit();RF.init();ratesInit();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
