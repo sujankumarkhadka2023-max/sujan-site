@@ -224,6 +224,83 @@ async function ratesResponse(req) {
   return new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
 }
 
+// ---- share previews: put each story's own title, summary and picture into the page for WhatsApp, Facebook, Messenger, X, Google ----
+const OG_SECT = { World: 'world', Opinion: 'opinion', History: 'history', 'Culture & Lifestyle': 'culture' };
+const OG_NAME = 'The Sujan Khadka';
+const OG_PAGES = {
+  '/': ['The Sujan Khadka', 'The Sujan Khadka — fewer sections, better stories.'],
+  '/world': ['World', 'World news and analysis from The Sujan Khadka.'],
+  '/opinion': ['Opinion', 'Opinion and commentary from The Sujan Khadka.'],
+  '/history': ['History', 'Stories from history, told by The Sujan Khadka.'],
+  '/culture': ['Culture & Lifestyle', 'Culture and lifestyle stories from The Sujan Khadka.'],
+  '/audio': ['Audio', 'Listen to audio from The Sujan Khadka.'],
+  '/videos': ['Videos', 'Watch videos from The Sujan Khadka.'],
+  '/horoscope': ['Daily Rashifal', "Today's tithi, nakshatra and Moon sign, with a reading for every rashi, calculated for Kathmandu."],
+  '/weather': ['Weather', 'Hourly and 7-day forecasts for Nepal and capital cities around the world.']
+};
+const ogEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function ogPlain(body) {
+  for (const para of String(body || '').split(/\n{2,}/)) {
+    let t = para.trim();
+    if (!t || /^(##|>|\[\[|!\[|<)/.test(t) || /^https?:\/\//.test(t)) continue;
+    t = t.replace(/<[^>]*>/g, ' ').replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '$1').replace(/[*_`#>]/g, '').replace(/\s+/g, ' ').trim();
+    if (t.length >= 30) return t;
+  }
+  return '';
+}
+const ogCut = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); if (s.length <= n) return s; const c = s.slice(0, n - 1), i = c.lastIndexOf(' '); return (i > n * 0.6 ? c.slice(0, i) : c).replace(/[ ,;:.\-–—]+$/, '') + '…'; };
+async function ogData(env, origin) {
+  const ck = new Request(origin + '/api/data'), hit = await caches.default.match(ck);
+  if (hit) return await hit.json();
+  const { db } = await readDb(env), now = Date.now();
+  const res = J({
+    articles: (db.articles || []).filter(a => a.status === 'published' && Date.parse(a.date) <= now),
+    home: db.home || [], pages: db.pages || {}, views: {},
+    audios: (db.audios || []).filter(a => a.status === 'published' && Date.parse(a.date) <= now)
+  }, 200, { 'cache-control': 'public,max-age=60' });
+  await caches.default.put(ck, res.clone());
+  return await res.json();
+}
+function ogMeta(o) {
+  const t = ogEsc(o.title), d = ogEsc(o.desc), u = ogEsc(o.url), im = ogEsc(o.image);
+  let h = `<link rel="canonical" href="${u}">` +
+    `<meta property="og:site_name" content="${OG_NAME}"><meta property="og:type" content="${o.article ? 'article' : 'website'}">` +
+    `<meta property="og:title" content="${t}"><meta property="og:description" content="${d}"><meta property="og:url" content="${u}">` +
+    `<meta property="og:image" content="${im}"><meta property="og:image:alt" content="${ogEsc(o.alt || o.title)}">` +
+    `<meta name="twitter:card" content="${o.cover ? 'summary_large_image' : 'summary'}"><meta name="twitter:title" content="${t}"><meta name="twitter:description" content="${d}"><meta name="twitter:image" content="${im}">`;
+  if (o.article) h += `<meta property="article:published_time" content="${ogEsc(o.published)}">${o.modified ? `<meta property="article:modified_time" content="${ogEsc(o.modified)}">` : ''}<meta property="article:section" content="${ogEsc(o.section)}">${o.author ? `<meta property="article:author" content="${ogEsc(o.author)}">` : ''}`;
+  if (o.ld) h += `<script id="ld" type="application/ld+json">${JSON.stringify(o.ld).replace(/</g, '\\u003c')}</script>`;
+  return h;
+}
+async function ogRewrite(req, env, res) {
+  const u = new URL(req.url), origin = u.origin, p = decodeURIComponent(u.pathname).replace(/\/+$/, '') || '/', icon = origin + '/icon-512.png';
+  let o = null, m;
+  if ((m = p.match(/^\/(world|opinion|history|culture)\/([^/]+)$/))) {
+    const a = ((await ogData(env, origin)).articles || []).find(x => x.slug === m[2] && OG_SECT[x.category] === m[1]);
+    if (a) {
+      const abs = origin + '/' + OG_SECT[a.category] + '/' + a.slug, cover = a.image && /^\/img\/[a-f0-9-]{36}$/.test(a.image) ? origin + a.image : '';
+      const desc = ogCut(a.seoDesc || a.subtitle || ogPlain(a.body) || OG_PAGES['/'][1], 200), title = ogCut(a.seoTitle || a.title, 110);
+      o = { article: 1, title, desc, url: abs, image: cover || icon, cover: !!cover, alt: a.imageCaption || a.title, published: a.date, modified: a.updated || '', section: a.category, author: a.author,
+        ld: { '@context': 'https://schema.org', '@type': 'NewsArticle', headline: ogCut(a.title, 110), description: desc, author: { '@type': 'Person', name: a.author || OG_NAME }, datePublished: a.date, dateModified: a.updated || a.date, image: [cover || icon], mainEntityOfPage: abs, publisher: { '@type': 'Organization', name: OG_NAME, logo: { '@type': 'ImageObject', url: icon } } } };
+    }
+  } else if ((m = p.match(/^\/listen\/([^/]+)$/))) {
+    const a = ((await ogData(env, origin)).audios || []).find(x => x.id === m[1]);
+    if (a) o = { title: ogCut(a.title, 110), desc: ogCut(a.desc || 'Listen on The Sujan Khadka.', 200), url: origin + '/listen/' + a.id, image: icon };
+  } else if (OG_PAGES[p]) {
+    o = { title: OG_PAGES[p][0], desc: OG_PAGES[p][1], url: origin + (p === '/' ? '' : p), image: icon };
+  }
+  if (!o) return res;
+  let html = await res.text();
+  const full = o.title === OG_NAME ? OG_NAME : o.title + ' — ' + OG_NAME;
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, '<title>' + ogEsc(full) + '</title>')
+    .replace(/<meta name="description" content="[^"]*">/i, '<meta name="description" content="' + ogEsc(o.desc) + '">')
+    .replace(/<\/head>/i, ogMeta(o) + '</head>');
+  const h = new Headers(res.headers);
+  ['content-length', 'content-encoding', 'etag'].forEach(k => h.delete(k));
+  h.set('cache-control', 'public, max-age=0, must-revalidate');
+  return new Response(html, { status: res.status, headers: h });
+}
+
 async function handle({ request: req, env, next }) {
   const p = new URL(req.url).pathname, r = req.method;
   // Visitor's approximate place from Cloudflare (free, no permission prompt) — used for the weather
@@ -233,7 +310,11 @@ async function handle({ request: req, env, next }) {
   }
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
-  if (!isApi && !isImg && !isAud && !isVid) return next();
+  if (!isApi && !isImg && !isAud && !isVid) {
+    const res = await next();
+    if (r === 'GET' && !/\.[a-z0-9]+$/i.test(p) && (res.headers.get('content-type') || '').includes('text/html')) { try { return await ogRewrite(req, env, res); } catch (e) { return res; } }
+    return res;
+  }
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
   try {
     if (isImg) {
