@@ -949,58 +949,18 @@ const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
 function chunks(t){const o=[];let c='';for(const x of (t.match(/[^.!?\u0964\n]+[.!?\u0964]*\s*/g)||[])){if((c+x).length>200&&c){o.push(c);c=''}c+=x}if(c.trim())o.push(c);return o}
 function ttsUi(){const e=$('#pl');if(!e)return;if(!('speechSynthesis' in window)){e.style.display='none';return}
- const paused=!tts.on&&tts.q.length>0;$('#bp').disabled=tts.on;$('#bz').disabled=!tts.on;$('#bs').disabled=!tts.on&&!paused;$('#pst').textContent=EL.msg||(tts.on?(EL.load&&tts.el?'Preparing audio…':'Playing…'):paused?'Paused':'Listen to this story')}
+ const paused=!tts.on&&tts.q.length>0;$('#bp').disabled=tts.on;$('#bz').disabled=!tts.on;$('#bs').disabled=!tts.on&&!paused;$('#pst').textContent=tts.on?'Playing…':paused?'Paused':'Listen to this story'}
 function ttsNext(id){if(!tts.on||id!==tts.id)return;if(tts.i>=tts.q.length){tts.on=false;tts.q=[];tts.i=0;ttsUi();return}
  const u=new SpeechSynthesisUtterance(tts.q[tts.i]);u.lang='en';
  u.onend=()=>{if(tts.on&&id===tts.id){tts.i++;ttsNext(id)}};
  u.onerror=e=>{if(id===tts.id&&tts.on&&e.error!=='canceled'&&e.error!=='interrupted'){tts.on=false;ttsUi()}};
  speechSynthesis.speak(u)}
-function ttsStop(){if(tts.el)elReset(tts);tts.on=false;tts.id++;tts.q=[];tts.i=0;if('speechSynthesis' in window)speechSynthesis.cancel();ttsUi()}
-function listen(a){
- if(a==='play'&&EL.ok!==false){if(tts.on)return;elBegin(tts,tts.text,ttsUi);return}
- if(a==='pause'&&tts.el){tts.on=false;tts.id++;if(EL.au)EL.au.pause();ttsUi();return}
- if(a==='stop'&&tts.el){ttsStop();return}
- if(!('speechSynthesis' in window))return alert('Listening is not supported in this browser.');
+function ttsStop(){tts.on=false;tts.id++;tts.q=[];tts.i=0;if('speechSynthesis' in window)speechSynthesis.cancel();ttsUi()}
+function listen(a){if(!('speechSynthesis' in window))return alert('Listening is not supported in this browser.');
  if(a==='play'){if(tts.on)return;if(!tts.q.length){tts.q=chunks(tts.text);tts.i=0}tts.on=true;speechSynthesis.cancel();ttsNext(++tts.id)}
  if(a==='pause'){tts.on=false;tts.id++;speechSynthesis.cancel()}
  if(a==='stop')ttsStop();ttsUi()}
 
-
-/* ---------- ElevenLabs voice: one fixed voice, audio made once per text on the server (/api/tts) ---------- */
-const EL={ok:null,au:null,S:null,q:[],i:0,pre:{},cur:-1,load:0,msg:'',t:0,retried:{}};
-function elChunks(text){const out=[];let c='';
- String(text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).forEach(par=>{
-  const ss=par.match(/[^.!?\u0964]+[.!?\u0964]*["')\]]*\s*/g)||[par];
-  ss.forEach(s=>{s=s.trim();if(!s)return;while(s.length>3800){const cut=s.lastIndexOf(' ',3800)||3800;if(c){out.push(c);c=''}out.push(s.slice(0,cut));s=s.slice(cut).trim()}
-   if(c&&(c+' '+s).length>3800){out.push(c);c=''}c=c?c+' '+s:s});
-  c+='\n'});
- if(c.trim())out.push(c.trim());return out.map(x=>x.trim()).filter(Boolean)}
-function elUrl(i){const t=EL.q[i];if(t==null)return Promise.reject(new Error('end'));
- return EL.pre[i]||(EL.pre[i]=fetch('/api/tts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text:t})}).then(async r=>{let d={};try{d=await r.json()}catch(e){}
-  if(!r.ok){const e=new Error(d.error||'Audio could not load.');e.status=r.status;e.setup=!!d.setup;throw e}EL.ok=true;return d.url}).catch(e=>{delete EL.pre[i];throw e}))}
-function elReset(S){if(EL.au){EL.au.onended=null;EL.au.onerror=null;try{EL.au.pause()}catch(e){}}EL.q=[];EL.i=0;EL.pre={};EL.cur=-1;EL.S=null;EL.load=0;EL.retried={};if(S){S.el=0;S.q=[];S.i=0;S.pf=0}}
-function elBegin(S,text,ui,from){
- if(!EL.au){EL.au=new Audio();EL.au.preload='auto';EL.au.addEventListener('timeupdate',()=>{if(EL.S===vox&&vox.on&&EL.au.duration&&EL.q.length){vox.pf=(EL.i+EL.au.currentTime/EL.au.duration)/EL.q.length;const n=Date.now();if(n-EL.t>400){EL.t=n;voxUi()}}})}
- const same=EL.S===S&&EL.q.length;
- if(!same){if(EL.S)elReset(EL.S);EL.S=S;EL.q=elChunks(text);EL.pre={};EL.i=0;EL.cur=-1;EL.retried={};S.total=EL.q.length;S.q=EL.q.map(t=>({t,p:0}))}
- let resume=false;if(from!=null){EL.i=from;EL.cur=-1}else if(same&&EL.cur===EL.i&&EL.au.src)resume=true;
- EL.msg='';S.el=1;S.on=true;S.id++;if(SYN)speechSynthesis.cancel();S.i=EL.i;ui();elNext(S,S.id,ui,resume)}
-async function elNext(S,id,ui,resume){
- if(!S.on||id!==S.id)return;const a=EL.au;
- if(EL.i>=EL.q.length){S.on=false;const was=EL.S===S;elReset(S);ui(true);return}
- a.playbackRate=S===vox?vox.rate:1;
- const go=()=>{a.onended=()=>{if(S.on&&id===S.id){EL.i++;S.i=EL.i;elNext(S,id,ui)}};
-  a.onerror=()=>{if(S.on&&id===S.id)elRetry(S,id,ui)};
-  const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{if(S.on&&id===S.id){S.on=false;ui()}})};
- if(resume){go();ui();return}
- EL.load=1;ui();let url;
- try{url=await elUrl(EL.i)}catch(e){EL.load=0;elFail(S,e,ui);return}
- EL.load=0;if(!S.on||id!==S.id)return;
- a.src=url;EL.cur=EL.i;go();ui();elUrl(EL.i+1).catch(()=>{})}
-function elRetry(S,id,ui){if(!EL.retried[EL.i]){EL.retried[EL.i]=1;delete EL.pre[EL.i];elNext(S,id,ui)}else{S.on=false;EL.msg='Audio could not be played. Please try again.';ui()}}
-function elFail(S,e,ui){
- if(e&&(e.setup||e.status===503)){EL.ok=false;elReset(S);S.on=false;ui();if(S===vox)voxToggle();else listen('play');return}
- S.on=false;EL.msg=(e&&e.message)||'Audio could not load.';ui()}
 
 /* ---------- Voice audio: text written in the portal is hidden and spoken ---------- */
 const vox={q:[],i:0,total:0,on:false,id:0,rate:1,mins:1};
@@ -1045,23 +1005,22 @@ function voxNext(id){if(!vox.on||id!==vox.id)return;
  u.onend=()=>{if(vox.on&&id===vox.id){setTimeout(()=>{if(vox.on&&id===vox.id){vox.i++;voxUi();voxNext(id)}},it.p/vox.rate)}};
  u.onerror=e=>{if(id===vox.id&&vox.on&&e.error!=='canceled'&&e.error!=='interrupted'){vox.on=false;voxUi()}};
  voxUi();speechSynthesis.speak(u)}
-function voxPlayFrom(i){if(vox.el){elBegin(vox,tts.text,voxUi,i);return}vox.i=i;vox.on=true;speechSynthesis.cancel();voxNext(++vox.id)}
-function voxToggle(){if(!SYN&&EL.ok===false)return alert('Audio is not supported in this browser.');
- if(vox.on){vox.on=false;vox.id++;if(SYN)speechSynthesis.cancel();if(vox.el&&EL.au)EL.au.pause();voxUi();return}
- if(EL.ok!==false){elBegin(vox,tts.text,voxUi);return}
+function voxPlayFrom(i){vox.i=i;vox.on=true;speechSynthesis.cancel();voxNext(++vox.id)}
+function voxToggle(){if(!SYN)return alert('Audio is not supported in this browser.');
+ if(vox.on){vox.on=false;vox.id++;speechSynthesis.cancel();voxUi();return}
  if(!vox.q.length){vox.q=voxChunks(tts.text);vox.i=0}vox.total=vox.q.length;voxPlayFrom(vox.i)}
-function voxStop(){if(vox.el)elReset(vox);vox.on=false;vox.id++;vox.q=[];vox.i=0;vox.total=0;if(SYN)speechSynthesis.cancel();voxUi()}
-function voxRate(x){vox.rate=x;if(vox.el){if(EL.au)EL.au.playbackRate=x;voxUi();return}if(vox.on)voxPlayFrom(vox.i);else voxUi()}
-function voxSeek(v){if(!vox.q.length)vox.q=voxChunks(tts.text);vox.total=vox.q.length;const i=Math.min(vox.total-1,Math.floor(v/1000*vox.total));if(vox.on)voxPlayFrom(i);else{vox.i=i;if(vox.el){EL.i=i;EL.cur=-1;vox.pf=0}voxUi()}}
+function voxStop(){vox.on=false;vox.id++;vox.q=[];vox.i=0;vox.total=0;if(SYN)speechSynthesis.cancel();voxUi()}
+function voxRate(x){vox.rate=x;if(vox.on)voxPlayFrom(vox.i);else voxUi()}
+function voxSeek(v){if(!vox.q.length)vox.q=voxChunks(tts.text);vox.total=vox.q.length;const i=Math.min(vox.total-1,Math.floor(v/1000*vox.total));if(vox.on)voxPlayFrom(i);else{vox.i=i;voxUi()}}
 function voxUi(done){const p=$('#vp');if(!p)return;
  if(!SYN){$('#vst').textContent='Audio is not supported in this browser';$('#vbig').disabled=true;return}
- const tot=vox.total||vox.q.length,pr=tot?(vox.el&&vox.pf?vox.pf:vox.i/tot):0;
+ const tot=vox.total||vox.q.length,pr=tot?vox.i/tot:0;
  p.classList.toggle('vplay',vox.on);$('#vbig').setAttribute('aria-label',vox.on?'Pause':'Play');
- $('#vst').textContent=EL.msg||(vox.on?(EL.load&&vox.el?'Preparing audio…':'Playing…'):done?'Finished — play again':vox.q.length&&vox.i>0?'Paused':'Tap play to listen');
+ $('#vst').textContent=vox.on?'Playing…':done?'Finished — play again':vox.q.length&&vox.i>0?'Paused':'Tap play to listen';
  if(done)$('#vseek').value=0;else if(document.activeElement!==$('#vseek'))$('#vseek').value=Math.round(pr*1000);
  const left=Math.max(1,Math.round(vox.mins*(1-pr)/vox.rate));$('#vtm').textContent=(vox.on||vox.i>0?left+' min left':'About '+Math.max(1,Math.round(vox.mins/vox.rate))+' min')+' · '+vox.rate+'×';
  p.querySelectorAll('.vsp button').forEach(b=>b.classList.toggle('on2',+b.dataset.r===vox.rate));
- const sel=$('#vvo'),vs=voxList();if(sel){sel.parentNode.style.display=vs.length>1&&EL.ok!==true?'':'none';
+ const sel=$('#vvo'),vs=voxList();if(sel){sel.parentNode.style.display=vs.length>1?'':'none';
   if(sel.options.length!==vs.length){sel.innerHTML=vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}</option>`).join('')}
   const cur=voxVoice();if(cur)sel.value=cur.name}}
 if(SYN&&speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',()=>voxUi());
