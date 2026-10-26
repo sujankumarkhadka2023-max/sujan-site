@@ -6,6 +6,25 @@
     "directory": "./",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/img/*"]
+    "run_worker_first": [
+      "/api/*",
+      "/img/*",
+      "/audio/*",
+      "/video/*",
+      "/",
+      "/world",
+      "/opinion",
+      "/history",
+      "/culture",
+      "/audio",
+      "/videos",
+      "/horoscope",
+      "/weather",
+      "/world/*",
+      "/opinion/*",
+      "/history/*",
+      "/culture/*",
+      "/listen/*"
+    ]
   }
 }
