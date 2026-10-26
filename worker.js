@@ -224,6 +224,79 @@ async function ratesResponse(req) {
   return new Response(body, { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=300' } });
 }
 
+// ---- /api/tts: article audio in one fixed ElevenLabs voice, made once per text and then reused ----
+const ttsInflight = new Map();
+function ttsCfg(env) {
+  return { voice: env.ELEVENLABS_VOICE_ID || 'CwhRBWXzGAHq8TQ4Fs17', model: env.ELEVENLABS_MODEL || 'eleven_multilingual_v2', stability: +(env.ELEVENLABS_STABILITY || 0.5), similarity: +(env.ELEVENLABS_SIMILARITY || 0.75), speed: +(env.ELEVENLABS_SPEED || 0.92) };
+}
+async function ttsKey(text, cfg) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify([text, cfg])));
+  return [...new Uint8Array(d)].slice(0, 16).map(x => x.toString(16).padStart(2, '0')).join('');
+}
+const ttsReq = (key, h) => new Request('https://tts.internal/' + key + '.mp3', h ? { headers: h } : undefined);
+async function ttsHas(env, key) {
+  if (env.TTS_BUCKET) return !!(await env.TTS_BUCKET.head('tts/' + key + '.mp3'));
+  return !!(await caches.default.match(ttsReq(key)));
+}
+async function ttsPut(env, key, buf) {
+  if (env.TTS_BUCKET) { await env.TTS_BUCKET.put('tts/' + key + '.mp3', buf, { httpMetadata: { contentType: 'audio/mpeg' } }); return; }
+  await caches.default.put(ttsReq(key), new Response(buf, { headers: { 'content-type': 'audio/mpeg', 'cache-control': 'public,max-age=2592000' } }));
+}
+async function ttsCount(name, ttl, add) {
+  const rq = new Request('https://tts.internal/c/' + name), hit = await caches.default.match(rq), n = hit ? (+(await hit.text()) || 0) : 0;
+  if (add) await caches.default.put(rq, new Response(String(n + add), { headers: { 'cache-control': 'max-age=' + ttl } }));
+  return n;
+}
+async function ttsPost(req, env) {
+  const o = req.headers.get('origin');
+  if (!o || o !== new URL(req.url).origin) return J({ error: 'Not allowed.' }, 403);
+  if (!env.ELEVENLABS_API_KEY) return J({ error: 'Article audio is not set up yet.', setup: true }, 503);
+  let b; try { b = await req.json(); } catch (e) { return J({ error: 'Bad request.' }, 400); }
+  const text = String((b && b.text) || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  if (!text) return J({ error: 'No text to read.' }, 400);
+  if (text.length > 4500) return J({ error: 'This part is too long.' }, 413);
+  const cfg = ttsCfg(env), key = await ttsKey(text, cfg), url = '/api/tts/' + key + '.mp3';
+  if (await ttsHas(env, key)) return J({ url });
+  const ip = req.headers.get('cf-connecting-ip') || 'x', min = Math.floor(Date.now() / 60000), day = new Date().toISOString().slice(0, 10), cap = +(env.TTS_DAILY_CHARS || 120000);
+  if ((await ttsCount('ip-' + ip + '-' + min, 90, 0)) >= 12) return J({ error: 'Too many requests. Please wait a minute.' }, 429);
+  if ((await ttsCount('day-' + day, 90000, 0)) + text.length > cap) return J({ error: 'Audio is resting for today. Please try again tomorrow.' }, 429);
+  await ttsCount('ip-' + ip + '-' + min, 90, 1);
+  await ttsCount('day-' + day, 90000, text.length);
+  if (!ttsInflight.has(key)) {
+    ttsInflight.set(key, (async () => {
+      const r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + encodeURIComponent(cfg.voice) + '?output_format=mp3_44100_128', {
+        method: 'POST',
+        headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'content-type': 'application/json', accept: 'audio/mpeg' },
+        body: JSON.stringify({ text, model_id: cfg.model, voice_settings: { stability: cfg.stability, similarity_boost: cfg.similarity, speed: cfg.speed } })
+      });
+      if (!r.ok) throw new Error('ElevenLabs ' + r.status + ' ' + (await r.text().catch(() => '')).slice(0, 200));
+      await ttsPut(env, key, await r.arrayBuffer());
+    })().finally(() => ttsInflight.delete(key)));
+  }
+  try { await ttsInflight.get(key); } catch (e) { console.log(String(e && e.message || e)); return J({ error: 'Audio could not be made right now.' }, 502); }
+  return J({ url });
+}
+async function ttsGet(req, env, key) {
+  const range = req.headers.get('range'), base = { 'content-type': 'audio/mpeg', 'accept-ranges': 'bytes', 'cache-control': 'public,max-age=31536000,immutable' };
+  if (env.TTS_BUCKET) {
+    const k = 'tts/' + key + '.mp3', head = await env.TTS_BUCKET.head(k);
+    if (!head) return new Response('Not found', { status: 404 });
+    const m = range && range.match(/^bytes=(\d*)-(\d*)$/);
+    if (m && (m[1] || m[2])) {
+      let a = m[1] === '' ? Math.max(0, head.size - +m[2]) : +m[1], z = m[1] === '' || m[2] === '' ? head.size - 1 : Math.min(+m[2], head.size - 1);
+      if (a > z || a >= head.size) return new Response('Range not satisfiable', { status: 416, headers: { 'content-range': 'bytes */' + head.size } });
+      const obj = await env.TTS_BUCKET.get(k, { range: { offset: a, length: z - a + 1 } });
+      return new Response(obj.body, { status: 206, headers: { ...base, 'content-range': 'bytes ' + a + '-' + z + '/' + head.size, 'content-length': String(z - a + 1) } });
+    }
+    const obj = await env.TTS_BUCKET.get(k);
+    return new Response(req.method === 'HEAD' ? null : obj.body, { headers: { ...base, 'content-length': String(head.size) } });
+  }
+  const hit = await caches.default.match(ttsReq(key, range ? { range } : undefined));
+  if (!hit) return new Response('Not found', { status: 404 });
+  const h = new Headers(hit.headers); for (const k in base) h.set(k, base[k]);
+  return new Response(hit.body, { status: hit.status, headers: h });
+}
+
 async function handle({ request: req, env, next }) {
   const p = new URL(req.url).pathname, r = req.method;
   // Visitor's approximate place from Cloudflare (free, no permission prompt) — used for the weather
@@ -232,6 +305,9 @@ async function handle({ request: req, env, next }) {
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
+  if (p === '/api/tts' && r === 'POST') { try { return await ttsPost(req, env); } catch (e) { return J({ error: 'Audio is unavailable right now.' }, 502); } }
+  if (p === '/api/tts/status' && r === 'GET') return J({ configured: !!env.ELEVENLABS_API_KEY, storage: env.TTS_BUCKET ? 'r2' : 'cache', voice: ttsCfg(env).voice, speed: ttsCfg(env).speed });
+  { const m = p.match(/^\/api\/tts\/([a-f0-9]{32})\.mp3$/); if (m && (r === 'GET' || r === 'HEAD')) { try { return await ttsGet(req, env, m[1]); } catch (e) { return new Response('Not found', { status: 404 }); } } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) return next();
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPO || !env.ADMIN_PASSWORD) return J({ error: 'Set ADMIN_PASSWORD, GITHUB_TOKEN and GITHUB_REPO in Cloudflare.' }, 503);
