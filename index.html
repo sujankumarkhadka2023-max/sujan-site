@@ -444,6 +444,27 @@ body:has(.arw) .w{max-width:none;padding-left:clamp(16px,3vw,56px);padding-right
 .arw{display:block}.arw article{max-width:none;margin:26px 0 10px}.arw article h1{font-size:clamp(30px,4vw,56px)}.arw .ars{margin-top:10px}
 .arw article p{font-size:clamp(18px,1.1vw + 11px,22px)}.arw article img{width:100%}
 @media(min-width:1000px){.arw{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:clamp(32px,4vw,64px);align-items:start}.arw .ars{margin-top:26px}.arw .ars .g{grid-template-columns:1fr}.arw .ars .sec{margin-top:0;margin-bottom:26px}}
+body:has(.tlp){overflow-x:clip}
+.tlh{background:linear-gradient(160deg,#0d3a8a,#052f6b 55%,#021634);color:#fff;width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding:26px max(16px,calc((100vw - 1100px)/2 + 16px)) 30px;box-sizing:border-box}.tlh h1{margin:0 0 8px;font-size:clamp(25px,4vw,40px);color:#ffe500;font-weight:800}.tlh p{margin:0;max-width:720px;font-size:17px;line-height:1.5;font-weight:600}
+.tlt{display:flex;gap:8px;margin:18px 0 6px;overflow-x:auto;padding-bottom:4px}.tlt button{flex:1;min-width:104px;padding:12px 10px;border:2px solid #052f6b;border-radius:12px;background:var(--bg);color:#052f6b;font:800 16px inherit;cursor:pointer;white-space:nowrap}.tlt button.on{background:#052f6b;color:#fff}.tlt button:focus-visible,.tlm button:focus-visible,.tlc2:focus-visible,.tlgo:focus-visible{outline:3px solid #ffe500;outline-offset:2px;box-shadow:0 0 0 5px #052f6b}
+:root[data-theme="dark"] .tlt button{border-color:#7aa7ff;color:#cfe0ff}:root[data-theme="dark"] .tlt button.on{background:#ffe500;color:#052f6b;border-color:#ffe500}
+.tlpn{display:none;margin:10px 0 40px}.tlpn.on{display:block}.tl2{display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:20px}@media(min-width:900px){.tl2{grid-template-columns:1fr 1fr;gap:28px;align-items:start}.tlsp{position:sticky;top:78px}}
+.tlcd{border:1px solid var(--ln);border-radius:16px;padding:18px 18px 16px;background:var(--bg)}.tlcd h2{margin:0 0 6px;font-size:22px}.tlcd h2 small{display:block;font-size:13px;color:var(--mu);font-weight:600;margin-top:2px}.tlcd h3{margin:14px 0 6px;font-size:16px;color:#ffe500}.tlsb{margin:0 0 10px;color:var(--mu);font-size:15px}
+.tlsp.tlcd{border:0;padding:0;background:none}
+.tlm{display:flex;gap:8px;margin:6px 0 4px}.tlm button{flex:1;padding:11px 8px;border:2px solid #052f6b;border-radius:10px;background:var(--bg);color:#052f6b;font:800 15px inherit;cursor:pointer}.tlm button.on{background:#052f6b;color:#fff}:root[data-theme="dark"] .tlm button{border-color:#7aa7ff;color:#cfe0ff}:root[data-theme="dark"] .tlm button.on{background:#ffe500;color:#052f6b;border-color:#ffe500}
+.tlf{display:block;margin:12px 0 0}.tlf>span{display:block;font-size:14px;font-weight:700;margin-bottom:5px}.tlf input,.tlf select{width:100%;box-sizing:border-box;padding:12px;font-size:18px;border:2px solid var(--ln);border-radius:10px;background:var(--bg);color:var(--tx)}.tlf input:focus,.tlf select:focus{outline:3px solid #ffe500;border-color:#052f6b}.tlr2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:420px){.tlr2 .tlr2{grid-template-columns:1fr}}
+.tlch{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.tlc2{padding:8px 13px;border:2px solid #052f6b;border-radius:20px;background:var(--bg);color:#052f6b;font:800 14px inherit;cursor:pointer}:root[data-theme="dark"] .tlc2{border-color:#7aa7ff;color:#cfe0ff}
+.tlo{background:linear-gradient(160deg,#0d3a8a,#052f6b 55%,#021634);color:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 12px 30px rgba(5,47,107,.3)}.tlo>small,.tlbig small{display:block;font-weight:700;font-size:15px}.tlo>strong,.tlbig strong{display:block;font-size:32px;line-height:1.2;margin:2px 0 10px;color:#ffe500;font-weight:800;overflow-wrap:anywhere}
+.tlrw{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.22);font-size:15px;font-weight:600}.tlrw b{font-weight:800;text-align:right}.tlgd{color:#7ff0a8}.tlbd{margin:0;font-weight:700}
+.tlcd:not(.tlsp) .tlrw{border-top:1px solid var(--ln)}.tlcd:not(.tlsp) .tlgd{color:#0a7d3a}
+.tlgo{display:block;width:100%;margin-top:12px;padding:13px;font:800 16px inherit;background:#ffe500;color:#052f6b;border:0;border-radius:12px;cursor:pointer}.tlsp .tlgo{margin-top:12px}
+.tlst{display:flex;align-items:center;gap:8px;font-weight:700;margin:4px 0 8px}.tlst i{width:12px;height:12px;border-radius:50%;background:#0a7d3a;flex:none}.tlst i.off{background:#d3200c}
+.tlbars{display:flex;align-items:flex-end;gap:4px;height:136px;margin-top:10px;overflow-x:auto}.tlb{flex:1;min-width:20px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.tlb i{display:block;width:100%;background:#ffe500;border-radius:4px 4px 0 0}.tlb span{font-size:11px;height:18px}
+.tlcd:not(.tlsp) .tlb i{background:#0d3a8a}
+.tlsplit{display:flex;height:16px;border-radius:8px;overflow:hidden;border:2px solid #fff;margin:6px 0 4px}.tlsplit i{background:#ffe500}.tlsplit u{background:#8fb5ff}.tlleg{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px}
+.tlslab{height:9px;background:#ffe500;border-radius:5px;margin:2px 0 6px}
+.tlw{overflow-x:auto;margin-top:8px}.tlw table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:330px}.tlw th,.tlw td{padding:7px 6px;text-align:right;border-bottom:1px solid rgba(255,255,255,.22)}.tlw th:first-child,.tlw td:first-child{text-align:left}.tlw th{font-weight:800;color:#ffe500}
+.tlrc{max-width:640px}.tln{margin:10px 0 0;color:var(--mu);font-size:13px;line-height:1.5}
 .mp-h{transform-box:fill-box;transform-origin:center;animation:mph 4s ease-in-out infinite}@keyframes mph{50%{opacity:.55;transform:scale(1.05)}}.mp-o{transform-origin:100px 100px;animation:gbs 40s linear infinite}.mp-cur{animation:mpc 1.8s ease-in-out infinite}@keyframes mpc{50%{stroke-opacity:.25}}
 @media(prefers-reduced-motion:reduce){.gb *,.rce *,.mph *{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.rh:before,.rh:after,.rsh,.rfzs,.rfmk,.rc,.ral i,.rsg2,.rnow,.rsg,.rrd,.rbg,.rbd,.rsq{animation:none!important}}
@@ -777,6 +798,130 @@ function wfInit(){const el=document.getElementById('wfp');if(!el)return;
   wfTm=setTimeout(async()=>{try{const j=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=6&language=en&format=json')).json();WF.res=(j.results||[]).map(r=>({n:r.name,a:[r.admin1,r.country].filter(Boolean).join(', '),lat:+r.latitude.toFixed(3),lon:+r.longitude.toFixed(3)}));const u=document.getElementById('wfr');if(u)u.innerHTML=WF.res.map((r,i)=>`<li><button type="button" data-act="pick" data-i="${i}">${esc(r.n)}<small>${esc(r.a)}</small></button></li>`).join('')}catch(x){}},300)});
  wfLoad()}
 
+/* ---------- Tools page (/tools): remittance, loan EMI, income tax (FY 2083/84) and savings calculators ---------- */
+const TL_COUNTRIES=[['Qatar','QAR'],['United Arab Emirates','AED'],['Saudi Arabia','SAR'],['Kuwait','KWD'],['Malaysia','MYR'],['South Korea','KRW'],['Japan','JPY'],['United States','USD'],['United Kingdom','GBP'],['Australia','AUD'],['Canada','CAD'],['Europe (Euro)','EUR'],['India','INR'],['Oman','OMR'],['Bahrain','BHD'],['Singapore','SGD'],['Hong Kong','HKD'],['China','CNY']];
+const TL={mode:'send',rates:null,stale:true,last:''};
+const tlI=id=>document.getElementById(id);
+const tlNum=id=>{const e=tlI(id);const n=parseFloat(e&&e.value);return isFinite(n)?n:0};
+const tlF=(n,d)=>(isFinite(n)?n:0).toLocaleString('en-IN',{minimumFractionDigits:d==null?2:d,maximumFractionDigits:d==null?2:d});
+const tlRs=(n,d)=>'Rs '+tlF(n,d==null?0:d);
+const tlTZ='Asia/Kathmandu',tlToday=()=>new Date().toLocaleDateString('en-CA',{timeZone:tlTZ});
+const tlStamp=d=>new Date(d).toLocaleString('en-GB',{timeZone:tlTZ,day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true})+' NPT';
+const tlSt={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function tlBars(v,l){const m=Math.max(...v,1);return '<div class="tlbars">'+v.map((x,i)=>`<div class="tlb"><i style="height:${Math.max(3,x/m*100)}px"></i><span>${esc(l[i])}</span></div>`).join('')+'</div>'}
+function tlTable(h,rows){return '<div class="tlw"><table><tr>'+h.map(x=>`<th>${x}</th>`).join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(x=>`<td>${x}</td>`).join('')+'</tr>').join('')+'</table></div>'}
+const tlLine=(a,b,c)=>`<div class="tlrw"><span>${a}</span><b${c?' class="'+c+'"':''}>${b}</b></div>`;
+const tlIn=(id,label,val,extra)=>`<label class="tlf" for="${id}"><span>${label}</span><input id="${id}" type="number" inputmode="decimal" step="any" value="${val}"${extra||''}></label>`;
+const tlSel=(id,label,opts)=>`<label class="tlf" for="${id}"><span>${label}</span><select id="${id}">${opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select></label>`;
+function toolsPg(){document.title='Money tools — The Sujan Khadka';
+ const chips=a=>'<div class="tlch">'+a.map(x=>`<button type="button" class="tlc2" data-p="${x.join(',')}">${x[0]}</button>`).join('')+'</div>';
+ return `<div class="tlp" id="tlp"><section class="tlh"><h1>Nepal Remittance &amp; Money Tools</h1><p>Daily exchange rates, loan EMI, income tax and savings. Everything is worked out on your phone, and nothing you type is sent anywhere.</p></section>
+<nav class="tlt" aria-label="Tools">${[['rem','Remittance'],['emi','Loan EMI'],['tax','Income tax'],['fd','Savings']].map((x,i)=>`<button type="button" data-t="${x[0]}"${i?'':' class="on"'}>${x[1]}</button>`).join('')}</nav>
+<div class="tlpn on" id="tp-rem"><div class="tl2"><section class="tlcd"><h2>Remittance calculator <small>रेमिट्यान्स</small></h2><p class="tlsb">See how many rupees arrive in Nepal, or how much to send.</p>
+ <div class="tlm" role="group" aria-label="What do you want to find"><button type="button" class="on" data-m="send">I send</button><button type="button" data-m="recv">Family needs</button></div>
+ ${tlSel('rc','Sending from',[])}${tlIn('ra',`<b id="rla">Amount to send</b>`,'1000','min="0"')}<div class="tlch" id="rch"></div>
+ <div class="tlr2">${tlIn('rfF','Flat fee (sending currency)','0','min="0"')}${tlIn('rfP','Fee percent (%)','0','min="0" step="0.1"')}</div>
+ ${tlIn('rcu','Use your company\'s own rate (optional) — Rs for 1 unit','','min="0" placeholder="Leave empty to use today\'s rate"')}
+ </section>
+ <section class="tlcd tlsp"><div class="tlo" aria-live="polite"><small id="rol">Your family receives</small><strong id="rox">-</strong>
+ <div id="rrw"></div></div><button type="button" class="tlgo" id="rsh">Share this result</button></section></div>
+ <div class="tl2"><section class="tlcd"><h2>Today's exchange rate</h2><div class="tlst"><i id="rdot"></i><span id="rst">Loading rates…</span></div><div id="rinfo"></div><button type="button" class="tlgo" id="rrf">Refresh rates now</button><p class="tln">Rates update every new day (Nepal time). Your bank or remittance company may give a slightly different rate.</p></section>
+ <section class="tlcd"><h2>Rate trend</h2><p class="tlsb" id="rtt">Last days for the selected country.</p><div id="rtr"></div></section></div>
+ <section class="tlcd"><h2>Rate card</h2><p class="tlsb">Rupees for 1 unit of each currency.</p><div class="tlrc" id="rcard"></div></section></div>
+<div class="tlpn" id="tp-emi"><div class="tl2"><section class="tlcd"><h2>Loan EMI calculator <small>किस्ता</small></h2><p class="tlsb">Monthly instalment, prepayment savings and the full schedule.</p>
+ ${chips([[11,20,'y','Home'],[12,7,'y','Vehicle'],[14,5,'y','Personal'],[10,10,'y','Education']]).replace(/>(\d+)<\/button>/g,(m,a)=>'>'+a+'</button>')}
+ ${tlIn('eP','Loan amount (Rs)','2500000')}<div class="tlr2">${tlIn('eR','Interest per year (%)','11','step="0.01"')}<div class="tlr2">${tlIn('eN','Time','10')}${tlSel('eU','&nbsp;',[['y','Years'],['m','Months']])}</div></div>
+ <div class="tlr2">${tlIn('eX','Extra payment per month (Rs)','0')}${tlIn('eF','Processing fee (%)','1','step="0.1"')}</div>
+ ${tlIn('eW','Monthly EMI I can afford (optional)','','placeholder="Find the biggest loan I can take"')}
+ </section><section class="tlcd tlsp"><div class="tlo" id="eo" aria-live="polite"></div></section></div></div>
+<div class="tlpn" id="tp-tax"><div class="tl2"><section class="tlcd"><h2>Income tax calculator <small>आयकर</small></h2><p class="tlsb">Nepal slabs with deductions and take-home pay.</p>
+ ${tlSel('tY','Fiscal year',[['83','2083/84 (current, from Shrawan 2083)'],['82','2082/83 (previous year)']])}
+ <div class="tlr2">${tlIn('tI','Income (Rs)','900000')}${tlSel('tPd','Income is',[['y','Per year'],['m','Per month']])}</div>
+ <div id="tSw" hidden>${tlSel('tS','Tax status (2082/83 only)',[['single','Unmarried (individual)'],['couple','Married (couple)']])}</div>
+ ${tlSel('tSSF','Social Security Fund (SSF)',[['0','I do not contribute to SSF'],['1','I contribute to SSF (1% slab waived)']])}
+ ${tlIn('tR','Retirement fund per year (CIT, SSF, EPF, pension)','0')}<div class="tlr2">${tlIn('tL','Life insurance per year','0')}${tlIn('tH','Health insurance per year','0')}</div>
+ <p class="tln" id="tnt"></p></section><section class="tlcd tlsp"><div class="tlo" id="to" aria-live="polite"></div></section></div></div>
+<div class="tlpn" id="tp-fd"><div class="tl2"><section class="tlcd"><h2>Savings calculator <small>बचत</small></h2><p class="tlsb">Fixed deposit or monthly recurring deposit, with tax and inflation.</p>
+ ${tlSel('fMode','Type',[['fd','Fixed deposit (one time)'],['rd','Recurring deposit (every month)']])}${tlIn('fP','<b id="fPL">Deposit amount (Rs)</b>','500000')}
+ <div class="tlr2">${tlIn('fR','Interest per year (%)','8','step="0.01"')}<div class="tlr2">${tlIn('fN','Time','5')}${tlSel('fU','&nbsp;',[['y','Years'],['m','Months']])}</div></div>
+ ${tlSel('fC','Interest added',[['4','Every 3 months'],['12','Every month'],['2','Every 6 months'],['1','Every year'],['0','Simple interest']])}
+ <div class="tlr2">${tlIn('fT','Tax on interest (%)','5','step="0.5"')}${tlIn('fI','Inflation per year (%)','5','step="0.1"')}</div>
+ <p class="tln">Banks in Nepal usually take 5% tax on interest for individuals. Change the box if your bank says otherwise.</p></section><section class="tlcd tlsp"><div class="tlo" id="fo" aria-live="polite"></div></section></div></div></div>`}
+/* ---- rates ---- */
+function tlCur(){const m=TL.rates&&TL.rates.map||{};return m}
+async function tlLoadRates(force){
+ const today=tlToday(),saved=tlSt.get('sk_tlr');
+ if(saved&&saved.day===today&&!force){TL.rates=saved;TL.stale=false;tlApply();return}
+ if(tlI('rst'))tlI('rst').textContent='Updating today\'s rates…';
+ let d=null;try{const r=await fetch('/api/rates'+(force?'?t='+Date.now():''));if(r.ok)d=await r.json()}catch(e){}
+ if(d&&d.cur&&d.cur.list&&d.cur.list.length){const map={};d.cur.list.forEach(x=>{if(x.u>0&&x.b>0)map[x.c]=x.b/x.u});
+  const o={day:today,map,date:d.cur.date,mid:!!d.cur.mid,checked:Date.now()};tlSt.set('sk_tlr',o);
+  const h=tlSt.get('sk_tlh')||{};h[today]=map;Object.keys(h).sort().slice(0,-8).forEach(k=>delete h[k]);tlSt.set('sk_tlh',h);TL.rates=o;TL.stale=!!(d.curStale)}
+ else if(saved){TL.rates=saved;TL.stale=true}else{TL.rates=null;TL.stale=true}
+ tlApply()}
+function tlApply(){const R=TL.rates,sel=tlI('rc');if(!sel)return;const keep=sel.value,have=R?Object.keys(R.map):[],cs=TL_COUNTRIES.filter(x=>!have.length||have.includes(x[1]));
+ sel.innerHTML=cs.map(x=>`<option value="${x[1]}">${esc(x[0])} (${x[1]})</option>`).join('');if(cs.some(x=>x[1]===keep))sel.value=keep;
+ const dot=tlI('rdot');if(dot)dot.className=TL.stale?'off':'';
+ tlI('rst').textContent=R?(TL.stale?'Offline: showing the last saved rates':'Today\'s rates are up to date'):'Rates could not be loaded. Type your company\'s rate below.';
+ tlI('rinfo').innerHTML=R?tlLine('Rate date',esc(R.date||'—'))+tlLine('Source',R.mid?'Market exchange rate (bank rate not available)':'Nepal Rastra Bank buying rate')+tlLine('Last checked',tlStamp(R.checked)):'';
+ tlI('rcard').innerHTML=R?TL_COUNTRIES.filter(x=>R.map[x[1]]).map(x=>tlLine('1 '+x[1]+' · '+esc(x[0]),'Rs '+tlF(R.map[x[1]],R.map[x[1]]<1?3:2))).join(''):'<p class="tln">No rates yet.</p>';
+ tlRem()}
+function tlRate(){const c=tlI('rc').value,own=tlNum('rcu'),m=tlCur();return own>0?own:(m[c]||0)}
+function tlTrend(c){const h=tlSt.get('sk_tlh')||{},ks=Object.keys(h).sort().filter(k=>h[k][c]),el=tlI('rtr');
+ if(ks.length<2){el.innerHTML='<p class="tln">The trend appears after two or more days of rates. Open this page each day.</p>';return}
+ const v=ks.map(k=>h[k][c]),ch=(v[v.length-1]/v[v.length-2]-1)*100;
+ el.innerHTML=tlLine('Change since the day before',(ch>=0?'+':'')+tlF(ch,2)+'%',ch>=0?'tlgd':'')+tlBars(v,ks.map(k=>k.slice(5)))}
+function tlRem(){const c=tlI('rc').value;if(!c)return;const r=tlRate(),flat=tlNum('rfF'),pct=Math.min(tlNum('rfP'),99),v=Math.max(0,tlNum('ra')),send_=TL.mode==='send';
+ tlI('rla').textContent=send_?'Amount to send ('+c+')':'Rupees your family needs (Rs)';tlI('rol').textContent=send_?'Your family receives':'You need to send';
+ const ch=tlI('rch');ch.innerHTML=(send_?[100,500,1000,5000]:[10000,25000,50000,100000]).map(x=>`<button type="button" class="tlc2" data-a="${x}">${tlF(x,0)}</button>`).join('');
+ if(!(r>0)){tlI('rox').textContent='—';tlI('rrw').innerHTML='<p class="tlbd">Rates are not available. Type your company\'s rate in the box on the left.</p>';TL.last='';tlTrend(c);return}
+ let send,net,recv;if(send_){send=v;net=Math.max(0,send-flat-send*pct/100);recv=net*r}else{recv=v;net=v/r;send=(net+flat)/(1-pct/100)}
+ const fee=send-net,rt='1 '+c+' = Rs '+tlF(r,r<1?3:2);
+ tlI('rox').textContent=send_?tlRs(recv,2):tlF(send)+' '+c;
+ tlI('rrw').innerHTML=tlLine('Rate used',rt)+tlLine('Total you pay',tlF(send)+' '+c)+tlLine('Total fees',tlF(fee)+' '+c)+tlLine('Amount converted',tlF(net)+' '+c);
+ TL.last='Send '+tlF(send)+' '+c+', family receives '+tlRs(recv,2)+' at '+rt+(TL.rates&&TL.rates.date?' (rates for '+TL.rates.date+')':'')+'. — The Sujan Khadka';tlTrend(c)}
+/* ---- EMI ---- */
+function tlAmort(P,r,n,ex){const emi=r?P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):P/n;let bal=P,rows=[],i=0,ti=0;while(bal>0.005&&i<1200){i++;const it=bal*r;let pr=emi-it+ex;if(pr>bal)pr=bal;bal-=pr;ti+=it;rows.push({i,it,pr,bal})}return{emi,rows,ti}}
+const tlML=n=>{const d=new Date();d.setMonth(d.getMonth()+n);return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'})};
+function tlEmi(){const el=tlI('eo');if(!el)return;const P=tlNum('eP'),r=tlNum('eR')/1200,n=Math.round(tlNum('eN')*(tlI('eU').value==='y'?12:1)),ex=tlNum('eX'),fee=P*tlNum('eF')/100,want=tlNum('eW');
+ if(P<=0||n<=0||n>600){el.innerHTML='<p class="tlbd">Enter the loan amount and a time up to 50 years.</p>';return}
+ const b=tlAmort(P,r,n,0),f=tlAmort(P,r,n,ex),total=P+b.ti+fee,pi=P/(P+b.ti)*100;
+ let h=`<div class="tlbig"><small>Monthly EMI</small><strong>${tlRs(b.emi)}</strong></div><div class="tlsplit"><i style="width:${pi}%"></i><u style="width:${100-pi}%"></u></div><div class="tlleg"><span>Principal ${tlF(pi,0)}%</span><span>Interest ${tlF(100-pi,0)}%</span></div>`+
+  tlLine('Total interest',tlRs(b.ti))+tlLine('Processing fee',tlRs(fee))+tlLine('Total you pay',tlRs(total))+tlLine('Loan ends',tlML(n));
+ if(ex>0)h+=`<h3>With extra payment</h3>`+tlLine('Loan ends',tlML(f.rows.length))+tlLine('Months saved',String(n-f.rows.length),'tlgd')+tlLine('Interest saved',tlRs(b.ti-f.ti),'tlgd');
+ if(want>0){const mx=r?want*(1-Math.pow(1+r,-n))/r:want*n;h+=tlLine('Biggest loan for '+tlRs(want)+' EMI',tlRs(mx))}
+ const rows=ex>0?f.rows:b.rows,yrs={};rows.forEach(x=>{const y=Math.ceil(x.i/12);yrs[y]=yrs[y]||{p:0,t:0,b:0};yrs[y].p+=x.pr;yrs[y].t+=x.it;yrs[y].b=x.bal});const ys=Object.keys(yrs);
+ h+=`<h3>Balance after each year</h3>`+tlBars(ys.map(y=>yrs[y].b),ys.map(y=>'Y'+y))+tlTable(['Year','Principal','Interest','Balance'],ys.map(y=>['Y'+y,tlF(yrs[y].p,0),tlF(yrs[y].t,0),tlF(yrs[y].b,0)]));
+ el.innerHTML=h}
+/* ---- income tax ---- */
+const TL_SL={83:{all:[[1e6,1],[5e5,10],[1e6,20],[15e5,27],[Infinity,29]]},82:{single:[[5e5,1],[2e5,10],[3e5,20],[1e6,30],[3e6,36],[Infinity,39]],couple:[[6e5,1],[2e5,10],[3e5,20],[9e5,30],[3e6,36],[Infinity,39]]}};
+function tlSlab(inc,sl,ssf){let left=inc,tax=0,rows=[],mg=0;sl.forEach((s,i)=>{if(left<=0)return;const rate=(i===0&&ssf)?0:s[1],part=Math.min(left,s[0]),t=part*rate/100;tax+=t;left-=part;mg=rate;rows.push({rate,part,t})});return{tax,rows,mg}}
+function tlTax(){const el=tlI('to');if(!el)return;const fy=tlI('tY').value;tlI('tSw').hidden=fy!=='82';
+ tlI('tnt').textContent=fy==='83'?'Slabs for the fiscal year that began on 1 Shrawan 2083 (mid-July 2026), the same for single and married people: 1% to Rs 10 lakh, then 10%, 20%, 27% and 29% above Rs 40 lakh. Deductions: retirement funds up to the lower of Rs 5 lakh or one-third of income, life insurance up to Rs 40,000, health insurance up to Rs 20,000. Confirm with the Inland Revenue Department for your own case.':'Slabs for the previous fiscal year 2082/83, with separate tables for unmarried and married people. Use this only to check last year. Confirm with the Inland Revenue Department.';
+ const inc=tlNum('tI')*(tlI('tPd').value==='m'?12:1);if(inc<=0){el.innerHTML='<p class="tlbd">Enter your income.</p>';return}
+ const sl=fy==='83'?TL_SL[83].all:TL_SL[82][tlI('tS').value],ssf=tlI('tSSF').value==='1',dR=Math.min(tlNum('tR'),inc/3,500000),dL=Math.min(tlNum('tL'),40000),dH=Math.min(tlNum('tH'),20000),ded=dR+dL+dH,
+  taxable=Math.max(0,inc-ded),a=tlSlab(taxable,sl,ssf),base=tlSlab(inc,sl,ssf).tax,take=inc-a.tax;
+ let h=`<div class="tlbig"><small>Yearly income tax</small><strong>${tlRs(a.tax)}</strong></div>`+tlLine('Monthly tax',tlRs(a.tax/12))+tlLine('Take-home per month',tlRs(take/12))+tlLine('Take-home per year',tlRs(take))+tlLine('Yearly income',tlRs(inc))+tlLine('Deductions allowed',tlRs(ded))+tlLine('Taxable income',tlRs(taxable))+tlLine('Average tax rate',tlF(a.tax/inc*100)+'%')+tlLine('Top slab you are in',a.mg+'%')+tlLine('Tax saved by deductions',tlRs(base-a.tax),'tlgd')+`<h3>Slab breakdown</h3>`;
+ a.rows.forEach(x=>{h+=tlLine(x.rate+'% on '+tlF(x.part,0),tlRs(x.t))+`<div class="tlslab" style="width:${Math.max(2,x.part/Math.max(taxable,1)*100)}%"></div>`});el.innerHTML=h}
+/* ---- savings ---- */
+function tlFd(){const el=tlI('fo');if(!el)return;const rd=tlI('fMode').value==='rd';tlI('fPL').textContent=rd?'Deposit every month (Rs)':'Deposit amount (Rs)';
+ const A=tlNum('fP'),r=tlNum('fR')/100,n=Math.round(tlNum('fN')*(tlI('fU').value==='y'?12:1)),m=+tlI('fC').value,tx=tlNum('fT')/100,inf=tlNum('fI')/100;
+ if(A<=0||n<=0||n>600){el.innerHTML='<p class="tlbd">Enter the amount and a time up to 50 years.</p>';return}
+ const mr=m?Math.pow(1+r/m,m/12)-1:0;let bal=0,dep=0,rows=[];
+ for(let k=1;k<=n;k++){if(rd){dep+=A;bal=(bal+A)*(1+(m?mr:r/12))}else{dep=A;bal=m?A*Math.pow(1+mr,k):A*(1+r*k/12)}if(k%12===0||k===n)rows.push({l:k%12===0?'Y'+k/12:k+'m',dep,bal})}
+ const intr=bal-dep,tax=intr*tx,net=bal-tax,real=net/Math.pow(1+inf,n/12),apy=m?Math.pow(1+r/m,m)-1:r;
+ el.innerHTML=`<div class="tlbig"><small>You receive at the end</small><strong>${tlRs(net)}</strong></div>`+tlLine('Total deposited',tlRs(dep))+tlLine('Interest earned',tlRs(intr))+tlLine('Tax on interest',tlRs(tax))+tlLine('Interest after tax',tlRs(intr-tax),'tlgd')+tlLine('Real yearly yield',tlF(apy*100)+'%')+tlLine('Value in today\'s money (after inflation)',tlRs(real))+`<h3>Growth by year</h3>`+tlBars(rows.map(x=>x.bal),rows.map(x=>x.l))+tlTable(['Year','Deposited','Interest','Balance'],rows.map(x=>[x.l,tlF(x.dep,0),tlF(x.bal-x.dep,0),tlF(x.bal,0)]))}
+function toolsInit(){const root=tlI('tlp');if(!root)return;
+ root.querySelectorAll('.tlt button').forEach(b=>b.addEventListener('click',()=>{root.querySelectorAll('.tlt button').forEach(x=>x.classList.toggle('on',x===b));root.querySelectorAll('.tlpn').forEach(p=>p.classList.toggle('on',p.id==='tp-'+b.dataset.t))}));
+ root.querySelectorAll('[data-m]').forEach(b=>b.addEventListener('click',()=>{TL.mode=b.dataset.m;root.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));tlI('ra').value=TL.mode==='send'?1000:50000;tlRem()}));
+ root.addEventListener('click',e=>{const a=e.target.closest('[data-a]');if(a){tlI('ra').value=a.dataset.a;tlRem();return}
+  const p=e.target.closest('[data-p]');if(p){const v=p.dataset.p.split(',');tlI('eR').value=v[0];tlI('eN').value=v[1];tlI('eU').value=v[2];tlEmi()}});
+ root.addEventListener('input',e=>{const id=e.target.id||'';if(/^(rc|ra|rfF|rfP|rcu)$/.test(id))tlRem();else if(/^e[A-Z]/.test(id))tlEmi();else if(/^t[A-Z]/.test(id))tlTax();else if(/^f[A-Z]/.test(id))tlFd()});
+ tlI('rsh').addEventListener('click',()=>{if(!TL.last)return;if(navigator.share)navigator.share({title:'Remittance',text:TL.last}).catch(()=>{});else if(navigator.clipboard){navigator.clipboard.writeText(TL.last);alert('Result copied.')}});
+ tlI('rrf').addEventListener('click',()=>tlLoadRates(true));
+ tlApply();tlEmi();tlTax();tlFd();tlLoadRates(false);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&tlI('tlp'))tlLoadRates(false)})}
+
 /* ---------- generated cover art: a unique abstract picture per title, used when a story has no photo ---------- */
 let _art=0;
 const ART_HUE={World:215,Opinion:338,History:28,'Culture & Lifestyle':168};
@@ -816,7 +961,7 @@ function card(a){const im=safeImg(a.thumb||a.image);return `<div class="card">${
 function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2><div class="empty">No stories published yet.</div></div>`;const n=limit[key+t]||4;
  return `<div class="sec"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
 function shell(inner,cur){
- const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Videos','/videos'],['Horoscope','/horoscope'],['Weather','/weather'],['Games','/games.html']];
+ const items=[['Home','/'],...CATS.map(c=>[c,'/'+SL[c]]),['Audio','/audio'],['Videos','/videos'],['Horoscope','/horoscope'],['Weather','/weather'],['Tools','/tools'],['Games','/games.html']];
  return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
  <div class="nb"><div class="w"><nav aria-label="Sections">${items.map(([t,h])=>`<a href="${h}" class="${cur===h?'on':''}">${t}</a>`).join('')}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
@@ -946,9 +1091,9 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(!ready){$('#app').innerHTML=shell(`${ready==='err'?'<div class="empty" style="padding:60px 0;text-align:center">Could not load stories. Please refresh.</div>':skeleton()}`,'/');return}
  let out,cur='/'+(p[0]||'');{const ord=['/',...CATS.map(c=>'/'+SL[c])],ni=ord.indexOf(cur),oi=ord.indexOf(lastCur);navDir=(oi<0||ni<0||ni===oi)?0:(ni>oi?36:-36);lastCur=cur}
  if(p[0]!=='audio')auStop();
- if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);else if(p[0]==='videos')out=videoPg();else if(p[0]==='horoscope')out=rfPg();else if(p[0]==='weather')out=wfPg();
+ if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);else if(p[0]==='videos')out=videoPg();else if(p[0]==='horoscope')out=rfPg();else if(p[0]==='weather')out=wfPg();else if(p[0]==='tools')out=toolsPg();
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();hzInit();RF.init();ratesInit();wfInit();if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();hzInit();RF.init();ratesInit();wfInit();toolsInit();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');swap(()=>{history.pushState(null,'',hr);go();scrollTo(0,0)})});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
