@@ -76,8 +76,8 @@ function sendAudio(req, buf, type) {
 }
 
 // ---- /api/rates: currency (NRB, else market rates) + gold & silver (FENEGOSIDA, else backups), cached at the edge ----
-const RT_CUR = ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'AED', 'QAR', 'SAR', 'MYR', 'JPY', 'CNY', 'KWD'];
-const RT_UNIT = { INR: 100, JPY: 10 };
+const RT_CUR = ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'AED', 'QAR', 'SAR', 'MYR', 'JPY', 'CNY', 'KWD', 'KRW', 'CAD', 'SGD', 'OMR', 'BHD', 'HKD'];
+const RT_UNIT = { INR: 100, JPY: 10, KRW: 100 };
 const npDay = (off = 0) => new Date(Date.now() + 20700000 + off * 864e5).toISOString().slice(0, 10);
 const asciiDigits = s => s.replace(/[०-९]/g, c => '०१२३४५६७८९'.indexOf(c));
 const visText = h => asciiDigits(h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' '));
@@ -115,7 +115,7 @@ async function rtCurrencyApi() {
   if (!list.length) throw new Error('no usable currencies');
   return { date: String(d.date).slice(0, 10), list };
 }
-const RT_NAMES = { 'indian rupee': 'INR', 'u.s. dollar': 'USD', 'european euro': 'EUR', 'uk pound sterling': 'GBP', 'australian dollar': 'AUD', 'uae dirham': 'AED', 'qatari riyal': 'QAR', 'saudi arabian riyal': 'SAR', 'malaysian ringgit': 'MYR', 'japanese yen': 'JPY', 'chinese yuan': 'CNY', 'kuwaity dinar': 'KWD', 'kuwaiti dinar': 'KWD' };
+const RT_NAMES = { 'indian rupee': 'INR', 'u.s. dollar': 'USD', 'european euro': 'EUR', 'uk pound sterling': 'GBP', 'australian dollar': 'AUD', 'uae dirham': 'AED', 'qatari riyal': 'QAR', 'saudi arabian riyal': 'SAR', 'malaysian ringgit': 'MYR', 'japanese yen': 'JPY', 'chinese yuan': 'CNY', 'kuwaity dinar': 'KWD', 'kuwaiti dinar': 'KWD', 'south korean won': 'KRW', 'canadian dollar': 'CAD', 'singapore dollar': 'SGD', 'omani rial': 'OMR', 'bahrain dinar': 'BHD', 'hong kong dollar': 'HKD' };
 async function rtCurrencyPage() {
   const text = visText(await rtGet('https://www.nrb.org.np/download-forex', 5000)), dm = text.match(/\d{4}-\d{2}-\d{2}/), lower = text.toLowerCase(), list = [];
   for (const [name, c] of Object.entries(RT_NAMES)) {
@@ -236,6 +236,7 @@ const OG_PAGES = {
   '/audio': ['Audio', 'Listen to audio from The Sujan Khadka.'],
   '/videos': ['Videos', 'Watch videos from The Sujan Khadka.'],
   '/horoscope': ['Daily Rashifal', "Today's tithi, nakshatra and Moon sign, with a reading for every rashi, calculated for Kathmandu."],
+  '/tools': ['Money tools', 'Remittance calculator, loan EMI, income tax and savings tools for Nepal.'],
   '/weather': ['Weather', 'Hourly and 7-day forecasts for Nepal and capital cities around the world.']
 };
 const ogEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
