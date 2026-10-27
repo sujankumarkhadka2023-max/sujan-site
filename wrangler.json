@@ -24,7 +24,8 @@
       "/opinion/*",
       "/history/*",
       "/culture/*",
-      "/listen/*"
+      "/listen/*",
+      "/tools"
     ]
   }
 }
