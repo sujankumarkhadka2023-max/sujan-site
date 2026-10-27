@@ -478,6 +478,156 @@ body .util, body .sm { font-weight: 600; }
 body h1, body h2, body h3, body h4, body strong, body b, nav a { font-weight: 700; }
 /* Embedded Trek Planner */
 #trekPlannerFrame { color-scheme: light; }
+
+/* ---------- unified modern blue theme and readable typography ---------- */
+:root{
+  --bg:#f4f8ff;
+  --tx:#10284c;
+  --mu:#405875;
+  --ac:#075ed6;
+  --ln:#cbdcf3;
+  --nv:#073b8c;
+  --sh:#075ed6;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0b1730;
+  --tx:#edf4ff;
+  --mu:#b8c9e2;
+  --ac:#70adff;
+  --ln:#29466f;
+  --nv:#061f4b;
+  --sh:#8bbcff;
+  color-scheme:dark;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1730;--tx:#edf4ff;--mu:#b8c9e2;--ac:#70adff;
+    --ln:#29466f;--nv:#061f4b;--sh:#8bbcff;color-scheme:dark;
+  }
+}
+/* One consistent, modern sans-serif system; keep article text comfortable to read. */
+body{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-weight:600;
+  line-height:1.65;
+  letter-spacing:.005em;
+}
+h1,h2,h3,h4,h5,h6,strong,b,nav a,.cat,.meta,.sm,label,button,
+input,select,textarea,.util,footer,.sec>h2,.pg .phd,.tkl,.hzlbl{
+  font-weight:750;
+}
+p,li,figcaption,.sub,.card p,.lead p,article p,.hzmain,.hzed p{
+  font-weight:550;
+}
+a{ text-decoration-thickness:1.5px; text-underline-offset:3px; }
+:focus-visible{outline-color:#1677ff!important;outline-offset:3px}
+.util{background:var(--bg);border-bottom-color:var(--ln)}
+.util .w>span:first-child,.util a,.util .thb,.wxb{color:var(--tx)}
+.hd,.nb,footer,.pl,.vp{background:var(--nv)}
+.nb{border-bottom-color:#2c68b8}
+nav a{font-family:inherit;font-weight:800;border-left-color:#2c68b8}
+nav a:hover,nav a.on{color:#dcecff}
+nav a.on::after{background:#8fc1ff}
+#mb,.pc button,#btt,.vbig,.vfc span{background:#dcecff;color:#073b8c}
+#mb i{background:#073b8c}
+#mp{background:var(--bg);color:var(--tx);border-color:var(--ln)}
+#mp h4,#mp a.fy{color:var(--ac)}
+.sec{border-top-color:var(--ac)}
+.sec>h2,.cat,.sm,.pg .phd,.stats .st b,.wxt{color:var(--ac)}
+.sec>h2:after{background:var(--ac)}
+.card{border-top-color:var(--ln)}
+.card h3{font-weight:800;letter-spacing:-.02em}
+.card p,.lead p,.meta,.empty,figcaption{color:var(--mu)}
+.lead h1,article h1,.pg h1{font-weight:850;letter-spacing:-.035em;line-height:1.12}
+article h2{font-weight:800;color:var(--tx)}
+article p{font-size:clamp(17px,1.35vw,19px);line-height:1.8;text-align:left;overflow-wrap:anywhere}
+.sub{color:var(--mu)}
+article .by{border-color:var(--ln)}
+article p a,.pg a{color:var(--ac)}
+blockquote{border-left-color:var(--ac);background:linear-gradient(90deg,rgba(7,94,214,.09),transparent)}
+.more,.bt,.shr,.thb{border-radius:8px}
+.more{border-color:var(--ac);color:var(--ac);font-weight:750}
+.bt{font-weight:750}
+.bt,.bt.d{background:var(--ac);border-color:var(--ac);color:#fff}
+.bt.o{background:transparent;color:var(--ac);border-color:var(--ac)}
+.ad input,.ad select,.ad textarea,.hzfind select{background:var(--bg);color:var(--tx);border-color:var(--ln);border-radius:8px}
+.ad label{color:var(--tx)}
+.row,.tabs,.ac,.aup,.tk,.rc{border-color:var(--ln)}
+.tkl{background:var(--ac)}
+.tkt a{color:var(--tx)}
+footer{color:#fff}
+footer h4,footer a.fy,footer .fb a{color:#dcecff}
+footer a{color:#e6efff}
+footer .meta,.ins span,.vfoot .meta{color:#d6e5ff}
+footer .meta{border-top-color:#5c8acb}
+.ins{border-color:#6a98d9;animation:none}
+.ins .bt{background:#dcecff;border-color:#dcecff;color:#073b8c}
+.vp{background:#073b8c;color:#fff}
+.vbig span,.pc button{color:#073b8c}
+.vsp button.on2{background:#dcecff;color:#073b8c;border-color:#dcecff}
+.vsh{border-color:#dcecff;color:#dcecff}
+.vsh:hover{background:#dcecff;color:#073b8c}
+.vvr select{background:#0b4a9f;color:#fff}
+.pl{border-color:#2c68b8}
+.hzhero{background:radial-gradient(120% 140% at 80% 0%,#1766c9 0%,#073b8c 55%,#061c43 100%)}
+.hzsg.on,.hzbig{background:linear-gradient(160deg,#073b8c,#1766c9);border-color:#8fc1ff}
+.hzsg .hzg,.hzb,.hzed b{color:var(--ac)!important}
+.hztabs button.on,.hzmode button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.hzed{border-left-color:var(--ac);background:rgba(7,94,214,.08)}
+.hzbar i{background:linear-gradient(90deg,#8fc1ff,#075ed6)}
+.hz5 i.on{color:#4389e8}
+.rh{background:radial-gradient(120% 90% at 50% 0%,#1766c9 0%,#073b8c 55%,#061c43 100%)}
+.rkt b{color:#dcecff}
+.rl g button[aria-pressed=true],.rlg button[aria-pressed=true]{background:#dcecff;color:#073b8c}
+.rc:hover{border-color:var(--ac)}
+.adbt{background:var(--ac);border-radius:8px}
+#intro{background:#073b8c}
+#intro circle{stroke:#dcecff}
+#pg{background:linear-gradient(90deg,#8fc1ff,var(--ac),#073b8c)}
+.vfc.vnt{background:linear-gradient(135deg,#073b8c,#1766c9)}
+.skl{background:linear-gradient(90deg,var(--ln) 25%,rgba(7,94,214,.16) 50%,var(--ln) 75%)}
+.hzlk div{background:rgba(7,94,214,.08)}
+/* Clearer tap targets and balanced spacing on phones. */
+button,input,select,textarea{font:inherit}
+button{font-weight:750}
+@media(max-width:760px){
+  body{font-size:16px}
+  .sec{margin-top:28px;padding-top:12px}
+  .sec>h2{font-size:13px;letter-spacing:.08em}
+  .lead h1{font-size:clamp(29px,8vw,40px)}
+  article h1,.pg h1{font-size:clamp(30px,8vw,44px)}
+  article p{font-size:17px;line-height:1.75}
+  nav a{font-family:inherit;font-weight:800}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+
+
+/* ---------- reference-matched editorial heading and section styling ---------- */
+:root{--bg:#ffffff;--tx:#171717;--mu:#555f70;--ac:#ff5848;--ln:#d8e0ed;--nv:#082d66;--sh:#082d66;color-scheme:light}
+body{background:#fff;color:#171717;font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.65;font-weight:400}
+.hd,.nb,header .nb,.nb .w{background:#082d66!important}
+.nb{border-bottom:3px solid #456b9c!important}
+nav a{color:#fff!important;font-family:Georgia,'Times New Roman',serif;font-weight:700!important;font-size:clamp(20px,3vw,30px)!important;line-height:1.1!important;padding:22px 18px 20px!important;border-left:1px solid #456b9c!important}
+nav a:first-child{padding-left:0!important;border-left:0!important}
+nav a:hover,nav a.on{color:#fff!important}
+nav a.on::after{height:6px!important;background:#ff5848!important}
+#mb{background:#ffe500!important;color:#082d66!important;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+#mb span,#mb i,#mb b{background:#082d66!important}
+main,main article,.pg,.article,.story{background:#fff;color:#171717}
+main article,main article p,main article li,main article blockquote{font-family:Georgia,'Times New Roman',serif!important;color:#171717!important;font-size:clamp(18px,2.2vw,22px)!important;line-height:1.62!important;font-weight:400!important}
+main article h1,main article h2,main article h3,main article h4,.pg h1,.pg h2,.pg h3{font-family:Georgia,'Times New Roman',serif!important;color:#111!important;font-weight:800!important;letter-spacing:-.025em;line-height:1.08!important;text-wrap:balance}
+main article h1,.pg h1{font-size:clamp(32px,5.2vw,48px)!important;margin:0 0 18px!important}
+main article h2,.pg h2{font-size:clamp(27px,4.2vw,36px)!important;margin:1.2em 0 .45em!important}
+main article h3,.pg h3{font-size:clamp(22px,3.3vw,28px)!important;margin:1em 0 .4em!important}
+main article h2:before{width:48px;height:4px;background:#ff5848!important;margin-bottom:12px!important}
+main article strong,main article b{font-weight:800!important;color:#111!important}
+main article .meta,main article small,.meta{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#58677b}
+button,.bt{font-weight:750}
+@media(max-width:600px){nav a{padding:18px 13px 17px!important;font-size:21px!important}main article,main article p,main article li,main article blockquote{font-size:19px!important;line-height:1.6!important}main article h1,.pg h1{font-size:clamp(30px,8vw,40px)!important}}
+
 </style></head><body>
 <div id="intro" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><text x="50" y="62" text-anchor="middle" font-size="34" font-weight="700" font-family="Georgia,serif">SK</text></svg><b>The Sujan Khadka</b></div>
 <div id="app"></div>
