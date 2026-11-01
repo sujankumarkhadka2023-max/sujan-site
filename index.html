@@ -63,7 +63,7 @@ footer .g{grid-template-columns:repeat(2,1fr);gap:16px}footer h4{margin:0 0 8px;
 .ad textarea{min-height:260px;font-family:Georgia,serif}.ad label{font-size:13px;font-weight:600;color:var(--mu)}
 .bt{padding:8px 14px;border:1px solid var(--tx);background:var(--tx);color:var(--bg);cursor:pointer;margin:2px;font-size:14px}.bt.o{background:none;color:var(--tx)}.bt.d{background:var(--ac);border-color:var(--ac);color:#fff}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--ln);flex-wrap:wrap}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.ck{display:flex;gap:8px;align-items:center}.ck input{width:auto;margin:0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.ad .tabs{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--ln);align-items:center}.ad .tabs .bt{margin:0}.ad .tabs .so{margin-left:auto}.ad h1{margin:6px 0}.ck{display:flex;gap:8px;align-items:center}.ck input{width:auto;margin:0}
 @media(max-width:760px){nav a{padding:16px 12px 14px}
 .lead,.g{grid-template-columns:1fr}footer{font-size:13px}footer .g{gap:10px;grid-template-columns:1fr 1fr}article p{font-size:16px;line-height:1.65;margin-bottom:1em}.lead{gap:12px}}
 .shr{display:inline-flex;align-items:center;gap:12px;margin:14px 0 20px;padding:10px 24px;border:1px solid var(--ln);border-radius:999px;background:none;color:var(--sh);font:700 19px system-ui,sans-serif;cursor:pointer}
@@ -605,6 +605,40 @@ a:hover{color:var(--ac)}
 #trekPlannerFrame { color-scheme: light; }
 </style>
 <style>
+#crp{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.65);display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto;font-family:system-ui,sans-serif}
+#crp .cb{background:var(--bg);color:var(--tx);padding:16px;border:1px solid var(--ln);margin:auto;max-width:100%;text-align:center}
+#crp h3{margin:0 0 4px;font-size:20px}
+#crp .cf{position:relative;overflow:hidden;touch-action:none;cursor:grab;background:#000;margin:10px auto;user-select:none}
+#crp .cf img{position:absolute;left:0;top:0;max-width:none;user-select:none;-webkit-user-drag:none}
+#crp .gd{position:absolute;inset:0;pointer-events:none;background:linear-gradient(#fff7,#fff7) 33.33% 0/1px 100% no-repeat,linear-gradient(#fff7,#fff7) 66.66% 0/1px 100% no-repeat,linear-gradient(#fff7,#fff7) 0 33.33%/100% 1px no-repeat,linear-gradient(#fff7,#fff7) 0 66.66%/100% 1px no-repeat;box-shadow:inset 0 0 0 2px #fff9}
+#crp .crz{display:flex;gap:10px;align-items:center;justify-content:center;font-size:14px;margin:6px 0}
+#crp .crz input{width:min(260px,60vw)}
+#crp #crpv{display:block;margin:6px auto 12px;background:#ddd;object-fit:cover}
+#crp .crb{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+</style>
+<style>
+.cprow{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--ln)}
+.cpa{display:flex;flex-wrap:wrap;gap:4px}.cpa .bt{margin:0}
+.cpb{font:700 11px system-ui;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:10px;color:#fff;vertical-align:middle}
+.cpb-live{background:#1a7f37}.cpb-scheduled{background:#b07900}.cpb-ended{background:#777}.cpb-off{background:#999}
+.cp2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cpsecs{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0 0 10px}
+.cpsel{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.cpsel select{width:auto;margin:0}
+.cpold{margin-top:16px}.cpold summary{cursor:pointer;padding:8px 0}
+.cbn{position:relative;margin:26px 0;border-radius:12px;overflow:hidden;background:var(--ln);font-family:system-ui,sans-serif}
+.cbn a{display:block;color:inherit;text-decoration:none}.cbn picture{display:block}.cbn img{display:block;width:100%;height:auto}
+.cbn .bnt{position:absolute;top:8px;left:8px;z-index:2;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(0,0,0,.65);color:#fff;padding:2px 7px;border-radius:4px}
+.cpt{display:flex;flex-direction:column;gap:3px;padding:12px 14px;background:var(--bg);color:var(--tx)}.cpt strong{font:700 17px/1.3 Georgia,serif}.cpt span{color:var(--mu);font-size:14px}.cpt em{font-style:normal;font-weight:700;color:var(--ac);font-size:14px}
+.adbox picture{display:block}
+.spb{margin:26px 0;padding:18px 20px;border:1px solid var(--ln);border-top:3px solid var(--ac);border-radius:6px;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif}
+.spb strong{display:block;font:700 20px/1.25 Georgia,serif;margin-bottom:6px}.spb p{margin:0 0 12px;color:var(--mu);line-height:1.5}
+#adm.cpbp{display:grid;place-items:center}.cpbw{width:min(520px,100%);display:grid;gap:12px;justify-items:center}.cpbw .cbn{width:100%;margin:0}
+#phv{position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.75);display:grid;place-items:center;padding:12px;overflow:auto}
+#phv .phb{display:grid;gap:8px;justify-items:center}
+#phv .phs{width:390px;max-width:100%;height:min(720px,78vh);border:10px solid #111;border-radius:34px;overflow:hidden;background:#fff}
+#phv iframe{width:100%;height:100%;border:0;display:block}
+@media(max-width:560px){.cp2{grid-template-columns:1fr}}
+</style>
+<style>
 #cns{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 #cns .cb{background:var(--bg,#fff);color:var(--tx,#171717);width:100%;max-width:460px;max-height:92vh;border-radius:10px;border:1px solid var(--ln,#ddd);box-shadow:0 10px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
 #cns .cs{overflow:auto;padding:22px 22px 8px;-webkit-overflow-scrolling:touch}
@@ -652,7 +686,7 @@ body.cnsopen{overflow:hidden}
   function draw(v){o.firstChild.innerHTML=v==='m'?manage(c):main();}
   draw('p')}
  window.cnsOpen=show;
- function start(){if(!get())show()}
+ function start(){if(!get()&&!/[?&]adprev=/.test(location.search))show()}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script>
@@ -1171,16 +1205,17 @@ function home(){const L=live();if(!L.length)return `<div class="empty" style="pa
  let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
  const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
  let h=`<section class="lead"><div><div class="cat k-${SL[lead.category]||''}">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div><a class="sm" href="${url(lead)}">Read more <span class="ar">→</span></a></div>${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:`<a href="${url(lead)}" tabindex="-1" aria-hidden="true">${art(lead)}</a>`}</section>`;
- h+=ratesHtml();h+=bnHtml();
+ h+=ratesHtml();h+=cpSlot(cpCtx());h+=bnHtml();
  if(sec.length)h+=`<div class="sec"><div class="g">${sec.map(card).join('')}</div></div>`;
  CATS.forEach(c=>h+=block(c,L.filter(a=>a.category===c),SL[c]));return h}
-function stats(L){let v=0;for(const k in (D.views||{}))v+=+D.views[k]||0;let g=0;try{g=+localStorage.getItem('sk_games_played')||0}catch(e){}
+function stats(L){let v=0;for(const k in (D.views||{}))if(k.slice(0,3)!=='ad:')v+=+D.views[k]||0;let g=0;try{g=+localStorage.getItem('sk_games_played')||0}catch(e){}
  const c=(n,l)=>`<div class="st"><b data-n="${n}">${n.toLocaleString()}</b><span>${l}</span></div>`;
  return `<div class="stats">${c(L.length,'Stories published')}${c(v,'Total reads')}${c(g,'Games played')}</div>`}
 function section(c){const L=live().filter(a=>a.category===c),k=SL[c];let h=`<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">${esc(c)}</h1>`;
  if(!L.length)return h+`<div class="empty">No stories published yet.</div>`;
  const fe=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean)[0]||L[0],im=safeImg(fe.image),rest=L.filter(a=>a!==fe);
  h+=`<section class="lead"><div><h1 style="font-size:34px"><a href="${url(fe)}">${esc(fe.title)}</a></h1><p>${esc(fe.subtitle)}</p><div class="meta">${esc(fe.author)} · ${fd(fe.date)}</div><a class="sm" href="${url(fe)}">Read more <span class="ar">→</span></a></div>${im?`<img class="ph" src="${im}" alt="${esc(fe.imageCaption||fe.title)}">`:art(fe)}</section>`;
+ h+=cpSlot(cpCtx());
  if(c==='World'){
   h+=block('Latest World News',rest.filter(a=>a.subcategory==='News'||!a.subcategory),k)}
  else if(c==='Culture & Lifestyle')h+=block('Culture',L.filter(a=>a.subcategory==='Culture'),k)+block('Lifestyle',L.filter(a=>a.subcategory==='Lifestyle'),k);
@@ -1204,7 +1239,7 @@ function articlePg(slug){const L=live(),a=L.find(x=>x.slug===slug);if(!a)return 
  ${im?`<figure class="hero" style="margin:0"><img style="display:block" src="${im}" alt="${esc(a.imageCaption||a.title)}"><figcaption>${esc(a.imageCaption)}</figcaption></figure>`:`<div style="margin:0 0 22px">${art(a,'aspect-ratio:16/7;border-radius:10px')}</div>`}
  ${body(a.body,(a.images||[]).slice(1))}${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}
 </article>
- <aside class="ars">${bnHtml()}${more.length?`<div class="sec"><h2>More on this story</h2><div class="g">${more.map(card).join('')}</div></div>`:''}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}</aside></div>`}
+ <aside class="ars">${cpSlot(cpCtx())}${bnHtml()}${more.length?`<div class="sec"><h2>More on this story</h2><div class="g">${more.map(card).join('')}</div></div>`:''}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}</aside></div>`}
 const DEF={about:'Hello, I\'m Sujan Kumar Khadka.\n\nI\'m a student and lifelong learner committed to personal growth, continuous learning, and professional development. I enjoy exploring new ideas, developing my skills, and discovering opportunities to grow both personally and professionally.\n\nThis website is my personal space on the internet, where I share news, opinion, and culture and lifestyle.\n\nI believe that consistency, curiosity, and a willingness to learn are essential for long-term success.\n\nMy goal is simple: to keep learning, keep improving, and create something meaningful along the way.\n\nThank you for visiting my website.\n\nLearning today. Building for tomorrow.',contact:'We would be glad to hear from you. Whether you have a question, a news tip, feedback or a correction, please write to us by email.\n\nEmail: sujankumarkhadka56@gmail.com\n\nWHAT YOU CAN WRITE TO US ABOUT\nNews tips and story ideas\nCorrections and feedback on our stories\nQuestions about the website\nPrivacy enquiries\n\nWHEN YOU WRITE\nPlease include a clear subject line and, if you are writing about a story, the link or headline. We read every message and reply as soon as we can.\n\nWe use your email address and message only to reply to you.',support:'The Sujan Khadka is independent, free to read and free of advertising. Your support helps us keep it that way. There are simple ways to help, and every one of them matters.\n\nREAD AND SHARE\nShare stories you value with friends, family and on social media. Word of mouth is the strongest support an independent site can have.\n\nTELL US WHAT YOU THINK\nHonest feedback makes our stories better. Tell us what you liked, what we missed and what you would like to read next.\n\nSEND A TIP OR A CORRECTION\nIf you know about a story we should cover, or you spot a mistake, please write to us. Our Contact page has the details.\n\nINSTALL THE APP\nAdd the site to your home screen from the footer of any page. Recent stories open even with a weak internet connection.\n\nThank you for reading and for being part of The Sujan Khadka.',privacy:"The Sujan Khadka respects your privacy. This page explains what information is handled when you use this website.\n\nWHAT WE COLLECT\nReaders do not need an account, and the site does not ask for your name, email or other personal details. If you email us, we use your email address and message only to reply.\n\nTECHNICAL DATA\nOur hosting provider, Cloudflare, processes technical data such as IP address and browser type to deliver the site and keep it secure. We do not use this data to identify individual readers.\n\nADVERTISING AND TRACKING\nThis site does not run advertising or third-party tracking scripts.\n\nEXTERNAL LINKS\nStories may link to other websites. We are not responsible for their privacy practices.\n\nQUESTIONS\nFor privacy questions, contact: sujankumarkhadka56@gmail.com\n\nWe may update this page from time to time. The latest version is always published here.",cookies:"This website does not use cookies to track readers.\n\nLOCAL STORAGE\nTo load faster, your browser may keep a copy of recently published stories on your device. This contains only public stories and no personal information. You can clear it at any time in your browser settings.\n\nSIGN-IN COOKIE\nA secure sign-in cookie is used only by the site developer to manage content. Readers never receive it.\n\nOTHER WEBSITES\nSites we link to may use their own cookies, which we do not control.\n\nQUESTIONS\nContact: sujankumarkhadka56@gmail.com",terms:"By using The Sujan Khadka you agree to these terms.\n\nCONTENT\nStories, text and images published here belong to The Sujan Khadka unless stated otherwise. You may share links and quote short extracts with credit and a link back. Please do not republish full stories or images without written permission.\n\nOPINION AND ACCURACY\nWe aim to be accurate and fair. Opinion pieces reflect the views of their authors. Content is for general information and is not professional advice. If you find an error, please email us.\n\nUSE OF THE SITE\nPlease do not misuse the site, try to disrupt it, or try to reach areas that are not public.\n\nLINKS\nWe may link to other websites and are not responsible for their content.\n\nCHANGES\nWe may update these terms or the site at any time.\n\nCONTACT\nsujankumarkhadka56@gmail.com"};
 const link=t=>esc(t).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g,m=>`<a href="mailto:${m}">${m}</a>`);
 const FX={
@@ -1220,12 +1255,12 @@ async function doLogin(){const r=await api('/api/login',{method:'POST',headers:{
 async function persist(){const body=JSON.stringify(A);if(body.length>SITE_LIMIT){alert('Not saved: the site is too full ('+body.length.toLocaleString()+' characters; the limit is '+SITE_LIMIT.toLocaleString()+' for all articles, pages and audio together). Shorten or remove some text, then save again.');return false}
  const r=await api('/api/admin/db',{method:'PUT',headers:{'content-type':'application/json'},body});if(!r.ok){if(r.status===413){alert('Not saved: this is too large for the server.');return false}alert('Save failed ('+r.status+'). Sign in again.');adm=null;go();return false}return true}
 function adminView(){const T=(k,t)=>`<button class="bt ${tab===k?'':'o'}" onclick="tab='${k}';ed=null;go()">${t}</button>`;
- let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}${T('videos','Videos')}${T('horo','Horoscope')}${T('ad','Advertising')}<button class="bt o" onclick="logout()">Sign out</button></div>`;
- h+=stats(A.articles.filter(a=>a.status==='published'));
+ let h=`<div class="ad"><h1>Newsroom</h1><div class="tabs">${T('articles','Articles')}${T('home','Homepage')}${T('pages','Pages')}${T('audio','Audio')}${T('videos','Videos')}${T('ad','Advertising')}<button class="bt o so" onclick="logout()">Sign out</button></div>`;
+ if(tab==='horo')tab='articles';
+ if(tab==='articles'||tab==='home')h+=stats(A.articles.filter(a=>a.status==='published'));
  if(tab==='articles')h+=ed?editor():list();
  if(tab==='home')h+=`<p class="meta">Featured stories in order: first is the lead, next four are secondary.</p>`+(A.home.length?A.home.map((id,i)=>{const a=A.articles.find(x=>x.id===id);return a?`<div class="row"><span>${i+1}. ${esc(a.title)}</span><span><button class="bt o" onclick="mv(${i},-1)">↑</button><button class="bt o" onclick="mv(${i},1)">↓</button><button class="bt o" onclick="feat('${id}')">Remove</button></span></div>`:''}).join(''):'<div class="empty">Nothing featured. Latest stories are used.</div>');
  if(tab==='videos')h+=videosTab();
- if(tab==='horo')h+=hzTab();
  if(tab==='ad')h+=adTab();
  if(tab==='audio')h+=audioTab();
  if(tab==='pages')h+=Object.keys(PG).map(k=>`<label>${PG[k]}</label><textarea style="min-height:110px" id="pg_${k}">${esc(A.pages[k]||DEF[k]||'')}</textarea>`).join('')+`<button class="bt" onclick="savePages()">Save pages</button>`;
@@ -1257,10 +1292,10 @@ async function sv(st){sync();const a=ed,prev=a.status;if(!a.title||!a.body)retur
  const i=A.home.indexOf(a.id);if(a.featured&&i<0)A.home.unshift(a.id);if(!a.featured&&i>=0)A.home.splice(i,1);
  if(await persist()){ed=null;go()}}
 const jpg=(i,w,q)=>new Promise(ok=>{const s=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',q)});
-const norm=(i,w,h,q)=>new Promise(ok=>{const r=Math.max(w/i.width,h/i.height),sw=Math.min(i.width,w/r),sh=Math.min(i.height,h/r);let src=i,cx=(i.width-sw)/2,cy=(i.height-sh)*.35,cw=sw,ch=sh;
+const norm=(i,w,h,q,crop,plain)=>new Promise(ok=>{const r=Math.max(w/i.width,h/i.height),sw=Math.min(i.width,w/r),sh=Math.min(i.height,h/r);let src=i,cx=(i.width-sw)/2,cy=(i.height-sh)*.35,cw=sw,ch=sh;if(crop){cx=crop.x;cy=crop.y;cw=crop.w;ch=crop.h}
  while(cw/2>w){const t=document.createElement('canvas');t.width=Math.round(cw/2);t.height=Math.round(ch/2);const u=t.getContext('2d');u.imageSmoothingQuality='high';u.drawImage(src,cx,cy,cw,ch,0,0,t.width,t.height);src=t;cx=0;cy=0;cw=t.width;ch=t.height}
  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,cx,cy,cw,ch,0,0,w,h);
- try{const d=x.getImageData(0,0,w,h),p=d.data,n=w*h,hist=new Uint32Array(256);for(let k=0;k<p.length;k+=4)hist[(p[k]*.299+p[k+1]*.587+p[k+2]*.114)|0]++;
+ if(!plain)try{const d=x.getImageData(0,0,w,h),p=d.data,n=w*h,hist=new Uint32Array(256);for(let k=0;k<p.length;k+=4)hist[(p[k]*.299+p[k+1]*.587+p[k+2]*.114)|0]++;
  let a=0,lo=0,hi=255;for(let v=0;v<256;v++){a+=hist[v];if(a<n*.01)lo=v;if(a<=n*.99)hi=v}lo=Math.min(lo,110);hi=Math.max(hi,170);const s=255/(hi-lo),lut=new Float32Array(256);let sum=0;
  for(let v=0;v<256;v++){lut[v]=Math.max(0,Math.min(255,(v-lo)*s*.7+v*.3));sum+=hist[v]*lut[v]}
  const m=Math.max(.05,Math.min(.95,sum/n/255)),g=Math.max(.55,Math.min(1.7,Math.log(.46)/Math.log(m)));for(let v=0;v<256;v++)lut[v]=255*Math.pow(lut[v]/255,g);
@@ -1269,10 +1304,37 @@ const norm=(i,w,h,q)=>new Promise(ok=>{const r=Math.max(w/i.width,h/i.height),sw
  const A=.45;for(let yy=1;yy<h-1;yy++)for(let xx=1;xx<w-1;xx++){const k=(yy*w+xx)*4;for(let ch2=0;ch2<3;ch2++){const j=k+ch2,bl=(o[j-4]+o[j+4]+o[j-w*4]+o[j+w*4])*.125+o[j]*.5;p[j]=o[j]+(o[j]-bl)*A}p[k+3]=255}x.putImageData(d,0,0)}catch(e){}
  c.toBlob(ok,'image/jpeg',q)});
 const put=async b=>{const x=await api('/api/admin/upload',{method:'POST',headers:{'content-type':'image/jpeg'},body:b});if(!x.ok)throw 0;return (await x.json()).url};
-const up=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=async()=>{try{const a=await norm(i,1600,900,.86),b=await norm(i,800,450,.84),url=await put(a);ok({url,thumb:await put(b)})}catch(e){no(e)}};i.onerror=no;i.src=r.result};r.readAsDataURL(f)});
+const up=(f,crop)=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=async()=>{try{const a=await norm(i,1600,900,.86,crop),b=await norm(i,800,450,.84,crop),url=await put(a);ok({url,thumb:await put(b)})}catch(e){no(e)}};i.onerror=no;i.src=r.result};r.readAsDataURL(f)});
 async function addImgs(files){sync();const max=MULTI.includes(ed.category||'World')?5:1;ed.images=ed.images||[];const left=max-ed.images.length;if(left<1)return;
  if(files.length>left)alert('Only '+left+' more allowed.');
- for(const f of [...files].slice(0,left)){try{ed.images.push({...await up(f),caption:''})}catch(e){alert('Upload failed')}}go()}
+ for(const f of [...files].slice(0,left)){const crop=await cropPick(f);if(crop===false)continue;try{ed.images.push({...await up(f,crop||undefined),caption:''})}catch(e){alert('Upload failed')}}go()}
+/* 16:9 crop tool: choose what shows in the wide frame and preview the finished Guardian-style result before uploading */
+function cropPick(f,ar,plain){ar=ar||16/9;return new Promise(res=>{
+ const url=URL.createObjectURL(f),im=new Image();
+ im.onerror=()=>{URL.revokeObjectURL(url);res(null)};
+ im.onload=()=>{
+  const iw=im.naturalWidth,ih=im.naturalHeight,o=document.createElement('div');o.id='crp';
+  const fw=Math.max(200,Math.min(innerWidth-56,640,Math.round(innerHeight*.5*ar))),fh=Math.round(fw/ar),s0=Math.max(fw/iw,fh/ih);
+  let z=1,ox=-(iw*s0-fw)/2,oy=-(ih*s0-fh)*.35,tm=0,pu='';
+  o.innerHTML=`<div class="cb" role="dialog" aria-modal="true" aria-label="Crop image"><h3>Crop to ${ar>1?'16:9':ar<1?'4:5':'1:1'}</h3><p class="meta">${plain?'Drag the photo to choose what shows. Ad photos keep their original colours.':'Drag the photo to choose what shows. Every article image uses this same wide frame, like the Guardian.'}</p><div class="cf" style="width:${fw}px;height:${fh}px"><img src="${url}" alt="" draggable="false"><i class="gd"></i></div><label class="crz">Zoom <input type="range" id="crz" min="1" max="4" step="0.01" value="1"></label><div class="meta">Finished result, as readers will see it:</div><img id="crpv" alt="" style="width:${Math.round(fw*.6)}px;height:${Math.round(fw*.6/ar)}px"><div class="crb"><button class="bt" id="cr_ok">Use this crop</button><button class="bt o" id="cr_auto">Auto crop</button><button class="bt o" id="cr_x">Cancel</button></div></div>`;
+  document.body.appendChild(o);
+  const img=o.querySelector('.cf img'),fr=o.querySelector('.cf'),pv=o.querySelector('#crpv'),zr=o.querySelector('#crz'),sc=()=>s0*z;
+  const clamp=()=>{ox=Math.min(0,Math.max(fw-iw*sc(),ox));oy=Math.min(0,Math.max(fh-ih*sc(),oy))};
+  const paint=()=>{clamp();img.style.width=iw*sc()+'px';img.style.height=ih*sc()+'px';img.style.transform=`translate(${ox}px,${oy}px)`};
+  const rect=()=>{const x=Math.max(0,-ox/sc()),y=Math.max(0,-oy/sc());return{x,y,w:Math.min(iw-x,fw/sc()),h:Math.min(ih-y,fh/sc())}};
+  const prev=()=>{clearTimeout(tm);tm=setTimeout(async()=>{try{const b=await norm(im,ar<1?360:480,Math.round((ar<1?360:480)/ar),.8,rect(),plain);if(!o.isConnected)return;const u=URL.createObjectURL(b);if(pu)URL.revokeObjectURL(pu);pu=u;pv.src=u}catch(e){}},120)};
+  const close=v=>{clearTimeout(tm);document.removeEventListener('keydown',kd);if(pu)URL.revokeObjectURL(pu);URL.revokeObjectURL(url);o.remove();res(v)};
+  const kd=e=>{if(e.key==='Escape')close(false)};document.addEventListener('keydown',kd);
+  const setZ=nz=>{const cx=(-ox+fw/2)/sc(),cy=(-oy+fh/2)/sc();z=Math.min(4,Math.max(1,nz));ox=fw/2-cx*sc();oy=fh/2-cy*sc();zr.value=z;paint();prev()};
+  let d=null;
+  fr.addEventListener('pointerdown',e=>{d={x:e.clientX,y:e.clientY,ox,oy};fr.setPointerCapture(e.pointerId);fr.style.cursor='grabbing'});
+  fr.addEventListener('pointermove',e=>{if(!d)return;ox=d.ox+e.clientX-d.x;oy=d.oy+e.clientY-d.y;paint()});
+  const end=()=>{if(d){d=null;fr.style.cursor='';prev()}};fr.addEventListener('pointerup',end);fr.addEventListener('pointercancel',end);
+  fr.addEventListener('wheel',e=>{e.preventDefault();setZ(z*(e.deltaY<0?1.08:.93))},{passive:false});
+  zr.addEventListener('input',()=>setZ(+zr.value));
+  o.querySelector('#cr_ok').onclick=()=>close(rect());o.querySelector('#cr_auto').onclick=()=>close(null);o.querySelector('#cr_x').onclick=()=>close(false);
+  paint();prev();o.querySelector('#cr_ok').focus({preventScroll:true})};
+ im.src=url})}
 function rmImg(i){sync();ed.images.splice(i,1);go()}
 async function pub(id){const a=A.articles.find(x=>x.id===id);a.status=a.status==='published'?'draft':'published';await persist();go()}
 async function feat(id){const a=A.articles.find(x=>x.id===id);a.featured=!a.featured;const i=A.home.indexOf(id);if(a.featured&&i<0)A.home.push(id);if(!a.featured&&i>=0)A.home.splice(i,1);await persist();go()}
@@ -1291,7 +1353,7 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(p[0]!=='audio')auStop();
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);else if(p[0]==='videos')out=videoPg();else if(p[0]==='horoscope')out=rfPg();else if(p[0]==='weather')out=wfPg();else if(p[0]==='tools')out=toolsPg();else if(p[0]==='resume')out='<section class="sec"><h2>Resume Builder</h2><iframe id="resumeFrame" title="LARCO resume builder" style="display:block;width:100%;min-height:600px;height:calc(100vh - 150px);border:0;border-radius:12px;background:#000"></iframe></section>';else if(p[0]==='trek-planner')out='<section class="sec"><h2>Trek Planner</h2><iframe id="trekPlannerFrame" title="Nepal Trek Planner" style="display:block;width:100%;min-height:700px;height:calc(100vh - 180px);border:0;border-radius:12px;background:var(--bg)"></iframe></section>';
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);if(p[0]==='trek-planner'){const tf=document.getElementById('trekPlannerFrame');if(tf)tf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(TREK_PLANNER_B64),c=>c.charCodeAt(0)));}if(p[0]==='resume'){const rf=document.getElementById('resumeFrame');if(rf)rf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(RESUME_B64),c=>c.charCodeAt(0)))}ttsUi();voxUi();insUi();thUi();bnStart();motion();bodyStat(true);imgFx();hzInit();RF.init();ratesInit();wfInit();toolsInit();if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);if(p[0]==='trek-planner'){const tf=document.getElementById('trekPlannerFrame');if(tf)tf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(TREK_PLANNER_B64),c=>c.charCodeAt(0)));}if(p[0]==='resume'){const rf=document.getElementById('resumeFrame');if(rf)rf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(RESUME_B64),c=>c.charCodeAt(0)))}ttsUi();voxUi();insUi();thUi();bnStart();cpTick();motion();bodyStat(true);imgFx();hzInit();RF.init();ratesInit();wfInit();toolsInit();if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');if(hr===location.pathname+location.search){scrollTo(0,0);const mp=$('#mp');if(mp)mp.classList.remove('open');return}document.querySelectorAll('.nb nav a.on').forEach(x=>x.classList.remove('on'));if(a.closest('nav'))a.classList.add('on');history.pushState(null,'',hr);go();scrollTo(0,0)});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
@@ -1404,7 +1466,7 @@ function adShow(o,preview){if(!o||document.getElementById('adm'))return;
  if(n){adCt=setInterval(()=>{n--;if(n>0){x.textContent=n;x.setAttribute('aria-label','You can close this in '+n+' seconds')}else{clearInterval(adCt);delete d.dataset.lock;x.disabled=false;x.textContent='✕';x.setAttribute('aria-label','Close advertisement');x.focus({preventScroll:true})}},1000)}else x.focus({preventScroll:true});if(ph.length>1)bnStart()}
 let adFresh=false;
 function adSet(){const o=(D.pages||{}).__ad||{},ph=(D.pages||{}).__ads||{},items=(ph.items||[]).filter(x=>safeImg(x.img)),po={on:!!(ph.on&&ph.pop&&items.length),ver:'p'+(ph.ver||'0'),freq:ph.freq,items};return{o,po,cfg:o.on?o:po.on?po:null}}
-function adInit(fresh){if(!pub_())return;if(window.cnsDone&&!cnsDone()){cnsWait(()=>adInit(fresh));return}const{o,po,cfg}=adSet(),cur=document.getElementById('adm');
+function adInit(fresh){if(!pub_()||CPV)return;if(window.cnsDone&&!cnsDone()){cnsWait(()=>adInit(fresh));return}const{o,po,cfg}=adSet(),cur=document.getElementById('adm');
  if(fresh&&cur&&cur.dataset.ver&&cur.dataset.ver!==(cfg?String(cfg.ver||'0'):'')){adClose();adTried=false}
  if(adTried)return;const pick=adDue(o)?o:adDue(po)?po:null;
  if(!pick){if(fresh)adTried=true;return}
@@ -1414,7 +1476,7 @@ function adInit(fresh){if(!pub_())return;if(window.cnsDone&&!cnsDone()){cnsWait(
   adMark(pick);adShow(pick)},document.documentElement.classList.contains('noi')?150:2150)}
 /* portal tab */
 const adVals=()=>({on:$('#ad_on').checked,img:adDraft?adDraft.img:'',title:$('#ad_t').value.trim(),text:$('#ad_x').value.trim(),btn:$('#ad_b').value.trim(),link:$('#ad_l').value.trim(),freq:$('#ad_f').value});
-function adTab(){return adPopupTab()+bnTab()}
+function adTab(){return cpTab()+(cpEd?'':'<details class="cpold"><summary><strong>Original single popup and photo banner</strong> (still working)</summary>'+adPopupTab()+bnTab()+'</details>')}
 function adPopupTab(){const o=adDraft||(A.pages||{}).__ad||{};if(!adDraft)adDraft={img:o.img||''};
  return `<div class="aup"><strong>Popup advertisement</strong><p class="meta">The popup appears when someone opens the website. For the first 5 seconds a countdown shows. After that, visitors can close it only with the ✕ button or the Esc key, then see the site as usual.</p>
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ad_on" ${o.on?'checked':''} style="width:auto"> Show the popup to visitors</label>
@@ -1431,6 +1493,126 @@ function adPreview(){adShow(adVals(),true)}
 async function adSave(){const v=adVals();if(v.link&&!/^https?:\/\//i.test(v.link))return alert('The link must start with https://');
  if(!v.img&&!v.title&&!v.text)return alert('Add an image, a title or some text first.');
  A.pages=A.pages||{};A.pages.__ad={...v,ver:Date.now().toString(36)};adDraft=null;if(await persist()){alert('Saved. The popup is '+(v.on?'ON':'OFF')+'.');go()}}
+
+/* ---------- Campaigns: several ads with dates, placement, labels, counters, reports ---------- */
+function cpPub(){return location.pathname.split('/')[1]!=='developer'}
+const CPV=(()=>{try{return new URLSearchParams(location.search).get('adprev')||''}catch(e){return''}})();
+const CP=()=>((D.pages||{}).__camps)||{items:[]};
+const cpToday=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const cpLabel=c=>['Sponsored','Partner content'].includes(c.label)?c.label:'Advertisement';
+const cpHttp=u=>/^https?:\/\//i.test(u||'')?u:'';
+function cpState(c,t){t=t||cpToday();if(!c.on)return'off';if(c.start&&t<c.start)return'scheduled';if(c.end&&t>c.end)return'ended';return'live'}
+function cpCtx(){const p=location.pathname.split('/').filter(Boolean),cat=CATS.find(x=>SL[x]===p[0]);return{page:!p.length?'home':cat?(p[1]?'article':'section'):'other',cat:cat||''}}
+function cpWhere(c,x){const w=c.where||'all';if(w==='all')return true;if(w==='home')return x.page==='home';if(w==='articles')return x.page==='article';if(w==='sections')return !!x.cat&&(c.secs||[]).includes(x.cat);return true}
+function cpGet(k){let a=0,b=0;try{a=+localStorage.getItem(k)||0}catch(e){}try{b=+sessionStorage.getItem(k)||0}catch(e){}return Math.max(a,b)}
+function cpSet(k,v){try{localStorage.setItem(k,v)}catch(e){}try{sessionStorage.setItem(k,v)}catch(e){}}
+function cpDue(c){const f=c.freq||'visit',k='sk_cp_'+c.id;if(f==='always')return true;if(f==='day')return Date.now()-cpGet(k)>864e5;try{return !sessionStorage.getItem(k)}catch(e){return true}}
+function cpMark(c){const k='sk_cp_'+c.id;if(c.freq==='day')cpSet(k,Date.now());else try{sessionStorage.setItem(k,'1')}catch(e){}cpSet('sk_cp_last',Date.now())}
+function cpTrack(id,t){if(CPV||!cpPub()||!id)return;try{api('/api/view',{method:'POST',body:JSON.stringify({id:'ad:'+id+':'+t+':'+cpToday()})}).catch(()=>{})}catch(e){}}
+function cpImg(c){const d=safeImg(c.imgD),m=safeImg(c.imgM),s=d||m;if(!s)return'';return `<picture>${d&&m?`<source media="(max-width:700px)" srcset="${m}">`:''}<img src="${s}" alt="${esc(c.title||'Advertisement')}" loading="lazy" decoding="async"></picture>`}
+function cpBanner(c){const lk=cpHttp(c.link),tx=(c.title||c.text)?`<div class="cpt">${c.title?`<strong>${esc(c.title)}</strong>`:''}${c.text?`<span>${esc(c.text)}</span>`:''}${lk&&c.btn?`<em>${esc(c.btn)}</em>`:''}</div>`:'',inner=`<span class="bnt">${esc(cpLabel(c))}</span>${cpImg(c)}${tx}`;
+ return `<div class="cbn" data-cid="${esc(c.id)}" aria-label="${esc(cpLabel(c))}">${lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored" data-cc="${esc(c.id)}">${inner}</a>`:inner}</div>`}
+function cpSupport(x){const s=CP().support;if(!s||!s.on)return'';const w=s.where||'all';if(w==='home'&&x.page!=='home')return'';if(w==='articles'&&x.page!=='article')return'';const lk=cpHttp(s.link);
+ return `<aside class="spb"><strong>${esc(s.title||'Support our work')}</strong>${s.text?`<p>${esc(s.text)}</p>`:''}${lk?`<a class="adbt" href="${esc(lk)}" target="_blank" rel="noopener noreferrer">${esc(s.btn||'Support us')}</a>`:''}</aside>`}
+function cpSlot(x){const S=CP(),L=(S.items||[]).filter(c=>c.kind==='banner'&&(CPV?c.id===CPV:cpState(c)==='live'&&cpWhere(c,x)));let h='';
+ if(L.length)h+=cpBanner(L[Math.floor(Math.random()*L.length)]);
+ if(!CPV&&S.support&&S.support.on&&(!L.length||S.support.mode==='always'))h+=cpSupport(x);return h}
+let cpIO=null,cpT=null,cpLast='';
+function cpObserve(){if(CPV||!('IntersectionObserver' in window))return;if(!cpIO)cpIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>=.5){cpIO.unobserve(e.target);cpTrack(e.target.dataset.cid,'v')}}),{threshold:[.5]});
+ document.querySelectorAll('.cbn[data-cid]').forEach(b=>cpIO.observe(b))}
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('[data-cc]');if(a)cpTrack(a.dataset.cc,'c')},true);
+function cpN(){try{return +sessionStorage.getItem('sk_pgn')||0}catch(e){return 9}}
+function cpTick(){if(!cpPub())return;if(location.pathname!==cpLast){cpLast=location.pathname;try{sessionStorage.setItem('sk_pgn',cpN()+1)}catch(e){}}
+ cpObserve();clearTimeout(cpT);cpT=setTimeout(cpPopup,2300)}
+function cpPopup(){if(!cpPub()||document.getElementById('adm'))return;if(!CPV&&window.cnsDone&&!cnsDone()){cnsWait(cpPopup);return}
+ const S=CP(),x=cpCtx(),L=(S.items||[]).filter(c=>c.kind==='popup'&&(CPV?c.id===CPV:cpState(c)==='live'&&cpWhere(c,x)&&cpDue(c)));if(!L.length)return;
+ if(!CPV){if(S.skipFirst!==false&&cpN()<2)return;if(S.lim!==false&&Date.now()-cpGet('sk_cp_last')<864e5)return}
+ const c=L[Math.floor(Math.random()*L.length)];if(!CPV)cpMark(c);cpShow(c)}
+function cpShow(c,preview){if(!c||document.getElementById('adm'))return;const lk=cpHttp(c.link),im=cpImg(c);if(!im&&!c.title&&!c.text)return;
+ const d=document.createElement('div');d.id='adm';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label',cpLabel(c));d.dataset.ver='cp'+c.id;
+ let n=(preview||CPV)?0:AD_LOCK;if(n)d.dataset.lock='1';
+ d.innerHTML=`<div class="adbox"><button class="adx" ${n?'disabled':''} aria-label="${n?'You can close this in '+n+' seconds':'Close advertisement'}">${n||'✕'}</button><div class="adtag">${esc(cpLabel(c))}</div>${im?(lk?`<a href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored" data-cc="${esc(c.id)}">${im}</a>`:im):''}<div class="adbd${im?'':' noimg'}">${c.title?`<h2>${esc(c.title)}</h2>`:''}${c.text?`<p>${esc(c.text)}</p>`:''}${lk?`<a class="adbt" href="${esc(lk)}" target="_blank" rel="noopener noreferrer sponsored" data-cc="${esc(c.id)}">${esc(c.btn||'Learn more')}</a>`:''}</div></div>`;
+ d.addEventListener('click',e=>{if(e.target.closest('.adx')&&!d.dataset.lock){cpTrack(c.id,'x');adClose()}else if(e.target===d&&preview)adClose()});
+ document.body.appendChild(d);document.body.style.overflow='hidden';document.addEventListener('keydown',adKey);const x=d.querySelector('.adx');cpTrack(c.id,'v');
+ if(n){adCt=setInterval(()=>{n--;if(n>0){x.textContent=n;x.setAttribute('aria-label','You can close this in '+n+' seconds')}else{clearInterval(adCt);delete d.dataset.lock;x.disabled=false;x.textContent='✕';x.setAttribute('aria-label','Close advertisement');x.focus({preventScroll:true})}},1000)}else x.focus({preventScroll:true})}
+
+/* ---- developer portal: campaigns ---- */
+let cpEd=null,cpRange=7,cpSel='all';
+const cpId=()=>'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function cpSum(id){const o={v:0,c:0,x:0,days:{}},V=D.views||{},p='ad:'+id+':';for(const k in V){if(k.indexOf(p)!==0)continue;const q=k.split(':'),t=q[2],d=q[3],n=+V[k]||0;if(t!=='v'&&t!=='c'&&t!=='x')continue;o[t]+=n;(o.days[d]=o.days[d]||{v:0,c:0,x:0})[t]+=n}return o}
+const cpPct=(c,v)=>v?(c/v*100).toFixed(1)+'%':'—';
+function cpDays(n){const a=[];for(let i=n-1;i>=0;i--){const d=new Date(Date.now()-i*864e5);a.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'))}return a}
+function cpChart(ids,n){const days=cpDays(n),S=ids.map(cpSum),v=days.map(d=>S.reduce((s,o)=>s+((o.days[d]||{}).v||0),0)),c=days.map(d=>S.reduce((s,o)=>s+((o.days[d]||{}).c||0),0)),mx=Math.max(1,...v);
+ if(!v.some(Boolean)&&!c.some(Boolean))return '<p class="meta">No views counted in the last '+n+' days yet.</p>';
+ const W=600,H=150,bw=W/n,bars=days.map((d,i)=>{const hv=v[i]/mx*H,hc=c[i]/mx*H;return `<g><title>${d}: ${v[i]} views, ${c[i]} clicks</title><rect x="${(i*bw+bw*.12).toFixed(1)}" y="${(H-hv).toFixed(1)}" width="${(bw*.76).toFixed(1)}" height="${hv.toFixed(1)}" fill="#052962" opacity=".85"/><rect x="${(i*bw+bw*.28).toFixed(1)}" y="${(H-hc).toFixed(1)}" width="${(bw*.44).toFixed(1)}" height="${hc.toFixed(1)}" fill="#c70000"/></g>`}).join('');
+ return `<svg viewBox="0 0 ${W} ${H+4}" style="width:100%;height:auto;max-height:200px" role="img" aria-label="Views and clicks per day">${bars}</svg><div class="meta" style="display:flex;justify-content:space-between"><span>${days[0]}</span><span><b style="color:#052962">■</b> views (highest ${mx}) &nbsp; <b style="color:#c70000">■</b> clicks</span><span>${days[n-1]}</span></div>`}
+const cpStLabel={live:'Live',scheduled:'Scheduled',ended:'Ended',off:'Off'};
+const cpWh=c=>({all:'All pages',home:'Home page only',articles:'Article pages only',sections:'Sections: '+((c.secs||[]).join(', ')||'none chosen')}[c.where||'all']);
+function cpTab(){A.pages=A.pages||{};const S=A.pages.__camps=A.pages.__camps||{items:[]};S.items=S.items||[];if(cpEd)return cpForm();
+ const rows=S.items.map(c=>{const st=cpState(c),m=cpSum(c.id),adv=c.adv||{};
+  return `<div class="cprow"><div><strong>${esc(c.name||'Untitled')}</strong> <span class="cpb cpb-${st}">${cpStLabel[st]}</span><br><span class="meta">${c.kind==='popup'?'Popup':'Banner'} · ${esc(cpLabel(c))} · ${c.start||'now'} → ${c.end||'no end date'} · ${esc(cpWh(c))}${adv.name?' · '+esc(adv.name):''}${adv.price?' · '+esc(adv.price)+(adv.paid?' (paid)':' (unpaid)'):''}</span><br><span class="meta">Views <b>${m.v}</b> · Clicks <b>${m.c}</b> · Click rate <b>${cpPct(m.c,m.v)}</b>${c.kind==='popup'?' · Closed '+m.x:''}</span></div>
+  <div class="cpa"><button class="bt o" onclick="cpEdit('${c.id}')">Edit</button><button class="bt o" onclick="cpToggle('${c.id}')">${c.on?'Switch off':'Switch on'}</button><button class="bt o" onclick="cpPhone('${c.id}')">Preview on phone</button><button class="bt o" onclick="cpReport('${c.id}')">Report</button><button class="bt o" onclick="cpDup('${c.id}')">Duplicate</button><button class="bt d" onclick="cpDel('${c.id}')">Delete</button></div></div>`}).join('');
+ const sel=`<select id="cp_sel" onchange="cpSel=this.value;go()"><option value="all">All campaigns</option>${S.items.map(c=>`<option value="${c.id}" ${cpSel===c.id?'selected':''}>${esc(c.name||'Untitled')}</option>`).join('')}</select>`,ids=cpSel==='all'||!S.items.some(c=>c.id===cpSel)?S.items.map(c=>c.id):[cpSel];
+ const sp=S.support||{};
+ return `<div class="aup"><strong>Ad campaigns</strong><p class="meta">Each campaign is one ad (a popup or a banner) with its own dates, pages, label and advertiser. Several can run at the same time. They switch on and off by themselves on the start and end dates.</p>
+ <button class="bt" onclick="cpEd=cpNew();go()">New campaign</button>${rows||'<div class="empty">No campaigns yet.</div>'}</div>
+ <div class="aup"><strong>Results</strong><p class="meta">Counted when readers see an ad, tap it, or close a popup. <button class="bt o" onclick="cpRefresh()">Refresh counts</button> <button class="bt o" onclick="cpTest()">Test the counter</button></p>
+ <div class="cpsel">${sel}<select onchange="cpRange=+this.value;go()"><option value="7" ${cpRange===7?'selected':''}>Last 7 days</option><option value="30" ${cpRange===30?'selected':''}>Last 30 days</option></select></div>${cpChart(ids,cpRange)}</div>
+ <div class="aup"><strong>Popup rules for readers</strong><label class="ck"><input type="checkbox" id="cp_lim" ${S.lim!==false?'checked':''}> Show at most one campaign popup per visitor per day</label><label class="ck"><input type="checkbox" id="cp_sf" ${S.skipFirst!==false?'checked':''}> Never show a popup on the first page a visitor opens (it appears after they open a second page)</label><button class="bt" onclick="cpRules()">Save rules</button></div>
+ <div class="aup"><strong>Support-us box</strong><p class="meta">A small box asking for donations or subscriptions. It shows in the same places as banner ads.</p>
+ <label class="ck"><input type="checkbox" id="sp_on" ${sp.on?'checked':''}> Show the support box</label><label class="ck"><input type="checkbox" id="sp_idle" ${sp.mode!=='always'?'checked':''}> Only when no paid banner is running on that page</label>
+ <label>Heading</label><input id="sp_t" value="${esc(sp.title||'Support independent journalism')}"><label>Text</label><textarea id="sp_x" style="min-height:70px">${esc(sp.text||'')}</textarea>
+ <label>Button text</label><input id="sp_b" value="${esc(sp.btn||'Support us')}"><label>Button link (https://…)</label><input id="sp_l" type="url" value="${esc(sp.link||'')}" placeholder="https://…">
+ <label>Where</label><select id="sp_w"><option value="all" ${(sp.where||'all')==='all'?'selected':''}>Home, sections and articles</option><option value="home" ${sp.where==='home'?'selected':''}>Home page only</option><option value="articles" ${sp.where==='articles'?'selected':''}>Article pages only</option></select>
+ <div style="margin-top:12px"><button class="bt" onclick="cpSupSave()">Save support box</button></div></div>`}
+function cpNew(){return{id:cpId(),name:'',kind:'banner',on:true,start:cpToday(),end:'',where:'all',secs:[],label:'Advertisement',imgD:'',imgM:'',title:'',text:'',btn:'Learn more',link:'',freq:'visit',adv:{name:'',contact:'',price:'',paid:false}}}
+function cpEdit(id){const c=A.pages.__camps.items.find(x=>x.id===id);if(c){cpEd=JSON.parse(JSON.stringify(c));cpEd.adv=cpEd.adv||{};cpEd.secs=cpEd.secs||[];cpEd._ex=1;go()}}
+function cpKeep(){if(!$('#cp_n')||!cpEd)return;Object.assign(cpEd,{name:$('#cp_n').value.trim(),on:$('#cp_on').checked,start:$('#cp_s').value,end:$('#cp_e').value,where:$('#cp_w').value,secs:CATS.filter((c,i)=>$('#cp_sec'+i)&&$('#cp_sec'+i).checked),label:$('#cp_lb').value,title:$('#cp_t').value.trim(),text:$('#cp_x').value.trim(),btn:$('#cp_b').value.trim(),link:$('#cp_l').value.trim(),adv:{name:$('#cp_an').value.trim(),contact:$('#cp_ac').value.trim(),price:$('#cp_ap').value.trim(),paid:$('#cp_apd').checked}});if($('#cp_f'))cpEd.freq=$('#cp_f').value}
+function cpForm(){const c=cpEd,o=(arr,v)=>arr.map(([k,t])=>`<option value="${k}" ${k===v?'selected':''}>${t}</option>`).join(''),im=(k,t,hint)=>`<label>${t} <span class="meta">${hint}</span></label>${c[k]?`<img src="${esc(c[k])}" alt="" style="max-width:${k==='imgD'?'260px':'130px'};display:block;margin:6px 0;border:1px solid var(--ln)">`:''}<input type="file" accept="image/*" onchange="cpUp('${k}',this.files[0]);this.value=''">${c[k]?`<button class="bt o" onclick="cpKeep();cpEd.${k}='';go()">Remove</button>`:''}`;
+ return `<div class="aup"><strong>${c._ex?'Edit campaign':'New campaign'}</strong>
+ <label>Campaign name (only you see this)</label><input id="cp_n" value="${esc(c.name)}" placeholder="e.g. Himalayan Bank – November">
+ <label>Type</label><select id="cp_k" onchange="cpKeep();cpEd.kind=this.value;go()">${o([['banner','Banner (shown inside pages)'],['popup','Popup (opens over the page)']],c.kind)}</select>
+ <label class="ck"><input type="checkbox" id="cp_on" ${c.on?'checked':''}> Switched on</label>
+ <div class="cp2"><div><label>Start date</label><input type="date" id="cp_s" value="${esc(c.start||'')}"></div><div><label>End date (last day it shows)</label><input type="date" id="cp_e" value="${esc(c.end||'')}"></div></div>
+ <label>Where it shows</label><select id="cp_w">${o([['all','All pages'],['home','Home page only'],['articles','Article pages only'],['sections','Only these sections (and their articles)']],c.where||'all')}</select>
+ <div class="cpsecs">${CATS.map((s,i)=>`<label class="ck"><input type="checkbox" id="cp_sec${i}" ${(c.secs||[]).includes(s)?'checked':''}> ${esc(s)}</label>`).join('')}</div>
+ <label>Label shown on the ad</label><select id="cp_lb">${o([['Advertisement','Advertisement'],['Sponsored','Sponsored'],['Partner content','Partner content']],cpLabel(c))}</select>
+ ${im('imgD','Computer image','Wide 16:9. You can crop it before it uploads.')}
+ ${im('imgM','Phone image (optional)',c.kind==='popup'?'Tall 4:5. If empty, phones use the computer image.':'Square 1:1. If empty, phones use the computer image.')}
+ <label>Title (optional)</label><input id="cp_t" value="${esc(c.title)}"><label>Text (optional)</label><textarea id="cp_x" style="min-height:80px">${esc(c.text)}</textarea>
+ <label>Button text</label><input id="cp_b" value="${esc(c.btn==null?'Learn more':c.btn)}"><label>Link when tapped (https://…)</label><input id="cp_l" type="url" inputmode="url" value="${esc(c.link)}" placeholder="https://…">
+ ${c.kind==='popup'?`<label>How often to show it to the same visitor</label><select id="cp_f">${o([['visit','Once per visit'],['day','Once per day'],['always','Every time a page is opened']],c.freq||'visit')}</select>`:''}
+ <strong style="display:block;margin-top:14px">Advertiser (only you see this)</strong>
+ <label>Name</label><input id="cp_an" value="${esc((c.adv||{}).name||'')}"><label>Contact (phone or email)</label><input id="cp_ac" value="${esc((c.adv||{}).contact||'')}"><label>Price agreed</label><input id="cp_ap" value="${esc((c.adv||{}).price||'')}" placeholder="e.g. Rs 15,000"><label class="ck"><input type="checkbox" id="cp_apd" ${(c.adv||{}).paid?'checked':''}> Paid</label>
+ <div style="margin-top:12px"><button class="bt" onclick="cpSave()">Save campaign</button><button class="bt o" onclick="cpPrev()">Preview</button>${c._ex?'<button class="bt o" onclick="cpKeep();cpPhone(cpEd.id)">Preview on phone</button>':''}<button class="bt o" onclick="cpEd=null;go()">Cancel</button></div></div>`}
+function cpPrev(){cpKeep();const c=cpEd;if(c.kind==='popup')cpShow(c,true);else{const d=document.createElement('div');d.id='adm';d.className='full cpbp';d.innerHTML=`<div class="cpbw">${cpBanner(c)}<button class="bt" onclick="document.getElementById('adm').remove();document.body.style.overflow=''">Close preview</button></div>`;document.body.appendChild(d);document.body.style.overflow='hidden'}}
+async function cpUp(k,f){if(!f)return;cpKeep();const ar=k==='imgD'?16/9:(cpEd.kind==='popup'?4/5:1),W=ar>1?1280:ar<1?960:1000,H=Math.round(W/ar),crop=await cropPick(f,ar,true);if(crop===false){go();return}
+ try{const src=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});cpEd[k]=await put(await norm(i,W,H,.86,crop||undefined,true))}catch(e){alert('Image upload failed')}go()}
+async function cpSave(){cpKeep();const c=cpEd;if(c.link&&!cpHttp(c.link))return alert('The link must start with https://');if(!c.imgD&&!c.imgM&&!c.title&&!c.text)return alert('Add an image, a title or some text first.');
+ if(c.start&&c.end&&c.end<c.start)return alert('The end date is before the start date.');if(c.where==='sections'&&!c.secs.length)return alert('Choose at least one section, or pick another place.');
+ const x={...c};delete x._ex;x.name=x.name||'Untitled campaign';const L=A.pages.__camps.items,i=L.findIndex(y=>y.id===x.id);if(i<0)L.push(x);else L[i]=x;
+ if(await persist()){cpEd=null;alert('Saved.');go()}}
+async function cpToggle(id){const c=A.pages.__camps.items.find(x=>x.id===id);if(!c)return;c.on=!c.on;if(await persist())go()}
+async function cpDup(id){const c=A.pages.__camps.items.find(x=>x.id===id);if(!c)return;const n=JSON.parse(JSON.stringify(c));n.id=cpId();n.name=(c.name||'Untitled')+' (copy)';n.on=false;A.pages.__camps.items.push(n);if(await persist())go()}
+async function cpDel(id){const c=A.pages.__camps.items.find(x=>x.id===id);if(!c||!confirm('Delete "'+(c.name||'Untitled')+'"? Its counts stay on the server but will no longer be shown.'))return;A.pages.__camps.items=A.pages.__camps.items.filter(x=>x.id!==id);if(await persist())go()}
+async function cpRules(){const S=A.pages.__camps;S.lim=$('#cp_lim').checked;S.skipFirst=$('#cp_sf').checked;if(await persist())alert('Saved.')}
+async function cpSupSave(){const l=$('#sp_l').value.trim();if(l&&!cpHttp(l))return alert('The link must start with https://');A.pages.__camps.support={on:$('#sp_on').checked,mode:$('#sp_idle').checked?'idle':'always',title:$('#sp_t').value.trim(),text:$('#sp_x').value.trim(),btn:$('#sp_b').value.trim(),link:l,where:$('#sp_w').value};if(await persist())alert('Saved.')}
+async function cpRefresh(){try{const d=await(await fetch('/api/data',{cache:'no-store'})).json();if(d&&d.views)D.views=d.views;go()}catch(e){alert('Could not refresh the counts.')}}
+async function cpTest(){const id='ad:test:v:'+cpToday();try{await api('/api/view',{method:'POST',body:JSON.stringify({id})});await new Promise(r=>setTimeout(r,600));const d=await(await fetch('/api/data',{cache:'no-store'})).json();
+ alert(d&&d.views&&d.views[id]?'The counter works. Views, clicks and closes will be counted.':'The server did not keep the test count. Counters will stay at zero until the server accepts view ids that start with "ad:". Ask whoever set up the server to allow this.')}catch(e){alert('The test failed. Check your connection.')}}
+function cpPhone(id){const c=((A.pages||{}).__camps||{items:[]}).items.find(x=>x.id===id);if(!c)return alert('Save the campaign first, then preview it on a phone.');
+ const d=document.createElement('div');d.id='phv';d.innerHTML=`<div class="phb"><div class="phs"><iframe src="/?adprev=${encodeURIComponent(id)}" title="Phone preview"></iframe></div><p class="meta" style="color:#ddd">${c.kind==='popup'?'The saved popup opens by itself in a moment.':'The saved banner is on the home page. Scroll down inside the phone.'}</p><button class="bt" onclick="document.getElementById('phv').remove()">Close</button></div>`;d.addEventListener('click',e=>{if(e.target===d)d.remove()});document.body.appendChild(d)}
+function cpReport(id){const c=A.pages.__camps.items.find(x=>x.id===id);if(!c)return;const m=cpSum(id),adv=c.adv||{},e=s=>String(s==null?'':s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])),ds=Object.keys(m.days).sort();
+ const rows=ds.map(d=>`<tr><td>${d}</td><td>${m.days[d].v}</td><td>${m.days[d].c}</td><td>${cpPct(m.days[d].c,m.days[d].v)}</td>${c.kind==='popup'?`<td>${m.days[d].x}</td>`:''}</tr>`).join('');
+ const h=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ad report – ${e(c.name)}</title><style>body{font:15px/1.5 system-ui,sans-serif;max-width:760px;margin:0 auto;padding:24px;color:#171717}h1{font:700 26px Georgia,serif;margin:0 0 4px}.m{color:#666}.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}.g div{border:1px solid #ddd;padding:12px;border-radius:8px}.g b{display:block;font-size:26px}table{width:100%;border-collapse:collapse;margin-top:10px}td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}img{max-width:100%;border:1px solid #ddd}button{padding:9px 16px;font:inherit;cursor:pointer}@media print{button{display:none}}</style></head><body>
+ <h1>Advertising report</h1><div class="m">${e(adv.name?adv.name+' · ':'')}${e(c.name||'Untitled campaign')}</div>
+ <p>${e(c.kind==='popup'?'Popup':'Banner')} · labelled “${e(cpLabel(c))}” · ${e(c.start||'start not set')} to ${e(c.end||'no end date')} · ${e(cpWh(c))}</p>
+ <div class="g"><div><b>${m.v}</b>Times seen</div><div><b>${m.c}</b>Clicks</div><div><b>${cpPct(m.c,m.v)}</b>Click rate</div>${c.kind==='popup'?`<div><b>${m.x}</b>Closed</div>`:''}</div>
+ ${(c.imgD||c.imgM)?`<p><img src="${e(c.imgD||c.imgM)}" alt="" style="max-width:320px"></p>`:''}
+ <h3>Day by day</h3>${rows?`<table><tr><th>Date</th><th>Seen</th><th>Clicks</th><th>Click rate</th>${c.kind==='popup'?'<th>Closed</th>':''}</tr>${rows}</table>`:'<p class="m">No counts recorded yet.</p>'}
+ <p class="m">Report made ${new Date().toLocaleString()} from ${e(location.host)}. “Seen” means the ad was on a reader’s screen (banners: at least half visible; popups: opened).</p><button onclick="print()">Print or save as PDF</button> <button onclick="dl()">Download CSV</button>
+ <script>function dl(){var r=[["Date","Seen","Clicks","Click rate"${c.kind==='popup'?',"Closed"':''}]];${JSON.stringify(ds.map(d=>[d,m.days[d].v,m.days[d].c,cpPct(m.days[d].c,m.days[d].v)].concat(c.kind==='popup'?[m.days[d].x]:[])))}.forEach(function(x){r.push(x)});var t=r.map(function(x){return x.join(",")}).join("\\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));a.download="ad-report.csv";a.click()}<\/script></body></html>`;
+ const u=URL.createObjectURL(new Blob([h],{type:'text/html'}));if(!window.open(u,'_blank'))location.href=u}
 
 /* ---------- Photo banner ads: upload photos only, shown as a slideshow on Home and under articles ---------- */
 let bnDraft=null,bnT=null;
