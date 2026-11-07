@@ -703,6 +703,146 @@ a:hover{color:var(--ac)}
 .fsg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 16px}.fsg>div{min-width:0}footer .fpl{display:inline-block;width:auto;color:#fff;background:linear-gradient(160deg,#0d4aa8,#052962 60%,#021634);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 14px;margin:0 0 6px;font:700 16px/1.3 system-ui,sans-serif}footer a.fpl:hover{color:#ffe500}
 .ffy{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.2)}.ffy a.fy{display:inline-block}
 @media(max-width:560px){.fsg{gap:14px 10px}.fsg a.fy{font-size:11px;letter-spacing:.4px;padding:5px 0;overflow-wrap:anywhere}footer .fpl{font-size:14px;padding:3px 11px}}
+/* ---------- Guardian-style look ---------- */
+:root{--bg:#fff;--tx:#121212;--mu:#5e5e5e;--ln:#dcdcdc;--ac:#c70000;--lk:#0077b6;--pl:#f6f6f6}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#121212;--tx:#ededed;--mu:#a8a8a8;--ln:#3a3a3a;--lk:#6cb8e6;--pl:#1c1c1c}}
+:root[data-theme=dark]{--bg:#121212;--tx:#ededed;--mu:#a8a8a8;--ln:#3a3a3a;--lk:#6cb8e6;--pl:#1c1c1c}
+body{font:17px/1.5 Georgia,'Times New Roman',serif;-webkit-font-smoothing:antialiased}
+.w{max-width:1260px;padding:0 20px}
+h1,h2,h3{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.01em;line-height:1.12}
+.sec{margin:28px 0 0;border-top:1px solid var(--ln);padding-top:0;position:relative}
+.sec:before{content:'';position:absolute;left:0;top:-1px;width:100%;height:4px;background:var(--nv)}
+.sec>h2{display:inline-block;margin:0 0 14px;padding:6px 0 0;font:900 22px/1.1 Georgia,serif;text-transform:none;letter-spacing:-.01em;color:var(--nv)}
+:root[data-theme=dark] .sec>h2{color:#8fb4ff}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .sec>h2{color:#8fb4ff}}
+.cat{font:700 13px/1.2 system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--ac)}
+.meta{font:12px/1.4 system-ui,sans-serif;color:var(--mu)}
+.lead{grid-template-columns:2fr 1fr;gap:20px;margin-top:16px;padding-bottom:16px;border-bottom:1px solid var(--ln)}
+.lead :is(h1,h2){font-size:clamp(28px,4.2vw,42px);font-weight:700;line-height:1.1;margin:6px 0 8px}
+.lead p{font:400 17px/1.35 system-ui,sans-serif;color:var(--tx);margin:0 0 8px}
+.g{gap:0}
+.g .card{border-top:1px solid var(--ln);border-left:1px solid var(--ln);padding:8px 10px 14px}
+.g .card:first-child{border-left:0;padding-left:0}
+.card h3{font:700 18px/1.2 Georgia,serif;margin:6px 0 6px}.card h3 a:hover,.lead a:hover h1,.lead a:hover h2{text-decoration:underline;color:var(--ac)}
+.card p{font:14.5px/1.35 system-ui,sans-serif;color:var(--tx)}
+.ph{aspect-ratio:5/3}
+article{max-width:680px}
+article h1{font-weight:700;font-size:clamp(30px,5vw,44px);line-height:1.1}
+.sub{font:400 19px/1.35 system-ui,sans-serif;color:var(--tx)}
+article p{font-size:18px;line-height:1.6;text-align:left;hyphens:manual;-webkit-hyphens:manual}
+article p a,.pg a{color:var(--lk);text-decoration:underline;text-underline-offset:3px}
+blockquote{border-left:0;border-top:1px solid var(--ac);padding:10px 0 0;color:var(--ac);font-size:24px;font-style:normal;font-weight:700}
+.nb{border-bottom:1px solid #2b4f86}
+footer{background:var(--nv);border-top:0}
+@media(max-width:760px){.w{padding:0 14px}.g .card{border-left:0;padding:10px 0 12px}.lead{grid-template-columns:1fr}article p{font-size:17px}.card h3{font-size:19px}}
+/* ---------- Guardian-style detail pass: white page, section colours, square images, pill buttons ---------- */
+:root{--bg:#fff;--ln:#dcdcdc;--mu:#707070;--tx:#121212;--ks:#c70000}
+::selection{background:#ffe500;color:#052962}
+.cat,.cat a{color:var(--ks)}
+.k-world,.k-history,.a-world,.a-history{--ks:#c70000}
+.k-opinion,.a-opinion{--ks:#e05e00}
+.k-culture,.a-culture{--ks:#a1845c}
+.k-lifestyle,.a-lifestyle{--ks:#bb3b80}
+.k-audio,.k-videos,.k-listen,.a-audio,.a-videos{--ks:#0084c6}
+:root:not([data-theme=light]) .k-opinion{--ks:#e05e00}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--ks:#ff5a5a}:root:not([data-theme=light]) .k-opinion{--ks:#ff9a4a}:root:not([data-theme=light]) .k-culture{--ks:#d8b583}:root:not([data-theme=light]) .k-lifestyle{--ks:#f08cc0}:root:not([data-theme=light]) .k-audio,:root:not([data-theme=light]) .k-videos{--ks:#5cb8ee}}
+:root[data-theme=dark]{--ks:#ff5a5a}:root[data-theme=dark] .k-opinion{--ks:#ff9a4a}:root[data-theme=dark] .k-culture{--ks:#d8b583}:root[data-theme=dark] .k-lifestyle{--ks:#f08cc0}:root[data-theme=dark] .k-audio,:root[data-theme=dark] .k-videos{--ks:#5cb8ee}
+.cat{font-size:12px;letter-spacing:.4px}
+article .by strong,article .by a{color:var(--ks)}
+article>.cat,article .cat{font-size:13px}
+.sec>h2:after{display:none}
+/* square images and cards, like a newspaper front page */
+.ph,.lead img,.arw article img,article figure img,article img,.card img{border-radius:0!important}
+.meta,.cat,.sm,figcaption{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+figcaption{font-size:12.5px;color:var(--mu);border-bottom:1px solid var(--ln)}
+/* article links: dark text, thin grey underline that turns navy on hover */
+article p a,.pg a{color:var(--tx);text-decoration:underline;text-decoration-color:#bdbdbd;text-decoration-thickness:1px;text-underline-offset:3px}
+article p a:hover,.pg a:hover{color:var(--nv);text-decoration-color:var(--nv)}
+:root[data-theme=dark] article p a:hover{color:#ffe500}
+/* pill buttons */
+.more{border:1px solid var(--nv);color:var(--nv);border-radius:999px;font:700 15px system-ui,sans-serif;padding:10px 26px}
+.more:hover{background:var(--nv);color:#fff}
+:root[data-theme=dark] .more{border-color:#fff;color:#fff}
+/* article standfirst and pull quote */
+article .sub{font-weight:400!important;font-size:20px;color:var(--tx)}
+blockquote{color:var(--ks);border-top:1px solid var(--ks);padding-top:8px;position:relative}
+/* ---------- Footer in the newspaper style: navy, columns split by thin lines, serif titles, yellow "Back to top" pill ---------- */
+footer{padding:0 0 calc(28px + env(safe-area-inset-bottom,0px));border-top:0}
+footer .w{padding-top:22px}
+.fsg{gap:0;border-top:1px solid #506991;padding-top:0}
+.fsg>div{padding:14px 16px 18px;border-left:1px solid #506991}.fsg>div:first-child{border-left:0;padding-left:0}
+footer .fpl{display:block;background:none;border:0;border-radius:0;padding:0;margin:0 0 10px;font:700 18px/1.2 Georgia,'Times New Roman',serif;color:#fff}
+footer .fsg a.fy{display:block;text-transform:none;letter-spacing:0;font:400 15px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#ffe500;padding:5px 0}
+footer .fsg a.fy:hover{color:#fff;text-decoration:underline}
+.ffy{margin-top:0;padding:14px 0;border-top:1px solid #506991;gap:6px 0}
+.ffy a.fy{text-transform:none;letter-spacing:0;font:400 14px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#ffe500;padding:2px 14px 2px 0;margin-right:14px;border-right:1px solid #506991}
+.ffy a.fy:last-child{border-right:0}
+footer .ins{box-shadow:none;background:none;border:0;border-top:1px solid #506991;border-radius:0;padding:14px 0;margin-top:0}
+footer .meta.fb{border-top:1px solid #506991;margin-top:0;padding-top:14px;font-size:12px;color:#dcdcdc}
+footer .fb a{display:inline-flex;align-items:center;gap:10px;background:#ffe500;color:#052962;border-radius:999px;padding:6px 8px 6px 18px;font:700 15px system-ui,sans-serif}
+footer .fb a:hover{background:#fff;color:#052962}
+footer .fb a::after{content:"";width:30px;height:30px;border-radius:50%;background:#052962 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffe500' stroke-width='3'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E") center/16px no-repeat}
+@media(max-width:560px){.fsg>div{padding:12px 8px 14px}.fsg>div:first-child{padding-left:0}footer .fpl{font-size:16px}footer .fsg a.fy{font-size:13px;letter-spacing:0;padding:4px 0}}
+/* ---------- front page grid, varied cards, article extras, shrinking header ---------- */
+.gtop{display:grid;gap:0;margin-top:20px;border-bottom:1px solid var(--ln);padding-bottom:20px}
+.gtop.c1{grid-template-columns:1fr}.gtop.c2{grid-template-columns:1.7fr 1fr}.gtop.c3{grid-template-columns:1.8fr 1fr 1fr}
+.gtop>div{min-width:0;padding:0 16px}.gtop>div:first-child{padding-left:0}.gtop>div:last-child{padding-right:0}.gtop>div+div{border-left:1px solid var(--ln)}
+.gl .ph{aspect-ratio:3/2}
+.gl .cat{margin-top:10px}.gl h1{font-size:clamp(28px,3.6vw,42px);line-height:1.08;margin:4px 0 8px}.gl p{font-size:18px;line-height:1.35;margin:0 0 8px}
+.gs .card{padding:12px 0 14px}.gs .card:first-child{border-top:0;padding-top:0}.gs .card h3{font-size:19px}.gs .card.ct h3{font-size:18px}
+.gm .mvw{margin:0}
+.mvw h2{font:700 22px/1.2 Georgia,'Times New Roman',serif;color:var(--nv);margin:0 0 6px}
+:root[data-theme=dark] .mvw h2{color:#fff}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .mvw h2{color:#fff}}
+.mvw ol{list-style:none;margin:0;padding:0}.mvw li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--ln)}.mvw li:first-child{border-top:0}
+.mvw li b{flex:none;min-width:34px;font:700 40px/.9 Georgia,'Times New Roman',serif;color:var(--ac)}
+.mvw li a{font:700 16px/1.3 Georgia,'Times New Roman',serif}
+.mvw li a:hover{text-decoration:underline}
+/* rows of cards split by vertical lines, one large, one with picture, others text only */
+main .sec>.g{overflow:hidden;gap:0 0;margin-left:-15px;width:calc(100% + 15px)}
+main .sec>.g>.card{margin-left:-1px;border-left:1px solid var(--ln);padding:12px 14px 16px 15px}
+main .sec>.g>.card.cb{grid-column:span 2}
+.card.cb h3{font-size:clamp(24px,2.6vw,30px);line-height:1.12}.card.cb p{font-size:17px}
+.card.ct{padding-top:12px}.card.ct h3{font-size:19px}
+.g .card .sm{display:none}
+main .sec[class*=" s-"]{background:var(--sb,transparent);box-shadow:0 0 0 100vmax var(--sb,transparent);clip-path:inset(0 -100vmax);padding-bottom:18px;margin-top:30px}
+.s-world{--sb:#f1f4f9;--sc:#c70000}.s-opinion{--sb:#fef4ea;--sc:#e05e00}.s-history{--sb:#f7f1e8;--sc:#a1845c}.s-culture{--sb:#fdf0f6;--sc:#bb3b80}
+:root[data-theme=dark] main .sec[class*=" s-"]{--sb:rgba(255,255,255,.05)}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) main .sec[class*=" s-"]{--sb:rgba(255,255,255,.05)}}
+.rel .sec{margin-top:34px}
+@media(max-width:1000px){.gtop.c3{grid-template-columns:1.5fr 1fr}.gtop.c3 .gm{grid-column:1/-1;border-left:0;padding:16px 0 0;border-top:1px solid var(--ln);margin-top:16px}}
+@media(max-width:760px){.gtop,.gtop.c2,.gtop.c3{grid-template-columns:1fr}.gtop>div,.gtop>div:last-child{padding:0}.gtop>div+div{border-left:0;border-top:1px solid var(--ln);margin-top:16px;padding-top:12px}
+ main .sec>.g{margin-left:0;width:auto;overflow:visible}main .sec>.g>.card,main .sec>.g>.card.cb{margin-left:0;grid-column:auto;border-left:0;padding:12px 0}}
+/* article: smaller headline, drop cap, share icons */
+article h1{font-size:clamp(27px,3.4vw,36px);line-height:1.12}
+article{position:relative}
+.dc::first-letter{float:left;font:700 4.3em/.8 Georgia,'Times New Roman',serif;color:var(--ks,var(--ac));padding:.06em .1em 0 0}
+.shi{margin:12px 0 16px}.shi>div{display:flex;gap:8px}
+.shi a,.shi button{width:38px;height:38px;border-radius:50%;border:1px solid var(--ln);background:none;color:var(--tx);display:grid;place-items:center;cursor:pointer;padding:0}
+.shi a:hover,.shi button:hover{background:var(--nv);border-color:var(--nv);color:#fff}
+@media(min-width:1400px){.arw .shi{position:absolute;left:-58px;top:0;bottom:0;width:38px;margin:0}.arw .shi>div{position:sticky;top:90px;flex-direction:column}}
+/* shrinking header: brand name appears in the slim bar */
+.nbl{display:none;color:#fff;font:700 20px/1 Georgia,'Times New Roman',serif;white-space:nowrap;padding-right:16px;margin-right:2px;border-right:1px solid #3a5f96}
+.nb.sc .nbl{display:block}.nb.sc .nbl:hover{color:#ffe500}
+@media(max-width:900px){.nb.sc .nbl{display:none}}
+.arw .ars .sec>.g{margin-left:0;width:auto;overflow:visible}.arw .ars .sec>.g>.card,.arw .ars .sec>.g>.card.cb{margin-left:0;border-left:0;padding:12px 0;grid-column:auto}
+/* ---------- yellow round buttons, Guardian "veggie burger" proportions: 44px yellow circle, three 2px navy bars 20px wide, bars 6px apart, cross when open ---------- */
+#mb{width:44px;height:44px;gap:4px;margin:10px 0;box-shadow:none;transition:background-color .15s,width .35s,height .35s,margin .35s}
+#mb i{width:20px;height:2px;border-radius:0;background:#052962;transition:transform .25s,opacity .15s}
+#mb:hover,#btt:hover,.pc button:not(:disabled):hover{background:#ffd900}
+#mb[aria-expanded=true] i:nth-child(1){transform:translateY(6px) rotate(45deg)}#mb[aria-expanded=true] i:nth-child(2){opacity:0}#mb[aria-expanded=true] i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.nb.sc #mb{width:38px;height:38px;margin:6px 0}
+#mb:focus-visible,#btt:focus-visible{outline:3px solid #fff;outline-offset:2px;box-shadow:0 0 0 6px #052962}
+#btt{width:44px;height:44px;box-shadow:none;border:0}
+/* ---------- open menu panel in the newspaper style: navy, serif section titles, plain links, thin lines, no blue pills ---------- */
+#mp{background:#052962;color:#fff;border:0;border-top:1px solid #506991;min-width:min(320px,calc(100vw - 32px));padding:6px 20px 14px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+#mp h4{display:none}
+#mp .mpg{display:block;padding:0;border-top:1px solid #506991}#mp .mpg:first-of-type{border-top:0}
+#mp a.mpp,#mp .mpg b{display:block;width:auto;background:none;border-radius:0;padding:14px 0 6px;margin:0;font:700 22px/1.2 Georgia,'Times New Roman',serif;color:#fff}
+#mp a.mpp{padding:14px 0;border-top:0}
+#mp .mpg a{display:block;padding:5px 0;font:400 16px/1.3 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#fff}
+#mp .mpg>a:last-child{padding-bottom:12px}
+#mp a:hover,#mp a.mpp:hover{color:#ffe500;text-decoration:underline}
+#mp a.fy{display:inline-block;margin-right:14px;padding:12px 0 0;font:400 14px/1.3 system-ui,sans-serif;text-transform:none;letter-spacing:0;color:#ffe500}
+#mp .mpg+a.fy{border-top:1px solid #506991;margin-top:0;display:block}
 .lsrc{line-height:1.8}.lsrc a{color:var(--ac)}
 @media(max-width:560px){.lfacts{grid-template-columns:1fr}.lfacts dt{border-top:1px solid var(--ln)}.lfacts dd{border-top:0}.lh2{font-size:21px}}
 </style>
@@ -830,19 +970,21 @@ function art(a,sty){
  for(let i=0;i<34;i++)d+=`<circle cx="${f(r()*600)}" cy="${f(r()*400)}" r="${f(.6+r()*1.5)}" fill="#fff" opacity="${f(.15+r()*.4)}"/>`;
  return `<svg class="ph art" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"${sty?` style="${sty}"`:''}>${d}<rect width="600" height="400" fill="url(#${id}v)"/></svg>`}
 
-function card(a){const im=safeImg(a.thumb||a.image);return `<div class="card">${im?`<a href="${url(a)}"><img class="ph" loading="lazy" src="${im}" alt="${esc(a.imageCaption||a.title)}"></a>`:`<a href="${url(a)}" tabindex="-1" aria-hidden="true">${art(a)}</a>`}<div class="cat k-${SL[a.category]||''}">${esc(a.subcategory||a.category)}</div><h3><a href="${url(a)}">${esc(a.title)}</a></h3>${a.subtitle?`<p>${esc(a.subtitle)}</p>`:''}<div class="meta">${esc(a.author)} · ${fd(a.date)}</div><a class="sm" href="${url(a)}">Read more <span class="ar">→</span></a></div>`}
-function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2><div class="empty">No stories published yet.</div></div>`;const n=limit[key+t]||4;
- return `<div class="sec s-${key}"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map(card).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
+function mostV(L,n=5){const V=D.views||{},m=L.map(a=>[a,+V[a.id]||0]).filter(x=>x[1]>0).sort((p,q)=>q[1]-p[1]).slice(0,n).map(x=>x[0]);if(!m.length)return '';return `<div class="mvw"><h2>Most viewed</h2><ol>${m.map((a,i)=>`<li><b>${i+1}</b><a href="${url(a)}">${esc(a.title)}</a></li>`).join('')}</ol></div>`}
+const cvar=i=>i===0?'b':i===1?'':i===2?'t':(i%2?'t':'');
+function card(a,v){const im=safeImg(a.thumb||a.image);return `<div class="card${v==='b'?' cb':v==='t'?' ct':''}">${v==='t'?'':im?`<a href="${url(a)}"><img class="ph" loading="lazy" src="${im}" alt="${esc(a.imageCaption||a.title)}"></a>`:`<a href="${url(a)}" tabindex="-1" aria-hidden="true">${art(a)}</a>`}<div class="cat k-${SL[a.category]||''}">${esc(a.subcategory||a.category)}</div><h3><a href="${url(a)}">${esc(a.title)}</a></h3>${a.subtitle&&v!=='x'?`<p>${esc(a.subtitle)}</p>`:''}<div class="meta">${esc(a.author)} · ${fd(a.date)}</div><a class="sm" href="${url(a)}">Read more <span class="ar">→</span></a></div>`}
+function block(t,list,key){if(!list.length)return `<div class="sec"><h2>${t}</h2><div class="empty">No stories published yet.</div></div>`;const n=limit[key+t]||3;
+ return `<div class="sec s-${key}"><h2><a href="/${key}">${t}</a></h2><div class="g">${list.slice(0,n).map((a,i)=>card(a,cvar(i))).join('')}</div>${list.length>n?`<button class="more" onclick="limit['${key+t}']=${n}+4;go()">See more</button>`:''}</div>`}
 function shell(inner,cur){
  const MENU=[['Home','/'],['World',[['History','/history'],['Opinion','/opinion'],['Culture','/culture'],['Lifestyle','/lifestyle'],['Audio','/audio'],['Video','/videos']]],['Explore',[['Weather','/weather'],['Horoscope','/horoscope'],['Games','/games.html']]],['Tools',[['Resume Builder','/resume'],['Calculator','/calculators'],['Trekking','/trek-planner'],['Today\'s Rates','/rates']]]];
  const navHtml=MENU.map(([t,x])=>typeof x==='string'?`<a href="${x}" class="${cur===x?'on':''}">${t}</a>`:`<div class="dd"><button type="button" class="ddb ${x.some(([,h])=>h===cur)?'on':''}" aria-expanded="false" aria-haspopup="true" onclick="ddT(this)">${t}<i aria-hidden="true">▾</i></button><div class="ddm">${x.map(([n,h])=>`<a href="${h}" class="${cur===h?'on':''}">${n}</a>`).join('')}</div></div>`).join('');
  const panelHtml='<h4>Sections</h4>'+MENU.map(([t,x],i)=>typeof x==='string'?`<a class="mpg mpp" href="${x}">${t}</a>`:`<div class="mpg"><b>${t}</b>${x.map(([n,h])=>`<a href="${h}">${n}</a>`).join('')}</div>`).join('');
  return `<div class="util" id="top"><div class="w"><span>${new Date().toLocaleString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}<button class="wxb" id="wx" onclick="wxExact()" title="Tap to use your exact location">${wxHtml()}</button></span><span><a href="/p/support">Support</a><button class="thb" id="thm" aria-label="Toggle dark mode" onclick="toggleTheme()"></button></span></div></div>
  <a class="hd" href="/" aria-label="The Sujan Khadka — home"><img src="/header.webp" width="1600" height="262" fetchpriority="high" alt="The Sujan Khadka"></a>
- <div class="nb"><div class="w"><nav aria-label="Sections">${navHtml}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
+ <div class="nb"><div class="w"><a class="nbl" href="/">The Sujan Khadka</a><nav aria-label="Sections">${navHtml}</nav><button id="mb" aria-label="Menu" aria-expanded="false" aria-controls="mp" onclick="const m=$('#mp');m.classList.toggle('open');this.setAttribute('aria-expanded',m.classList.contains('open'))"><i></i><i></i><i></i></button>
  <div id="mp">${panelHtml}<a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a><a class="fy" href="#" onclick="cnsOpen();return false">Privacy settings</a></div></div></div>
  <div class="w"><main id="main">${inner}</main></div>
- <footer><div class="w"><div class="fsg">${MENU.filter(m=>typeof m[1]!=='string').map(([t,x])=>`<div><b class="fpl">${t}</b>${x.map(([n,h])=>`<a class="fy" href="${h}">${n}</a>`).join('')}</div>`).join('')}</div><div class="ffy"><a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a><a class="fy" href="#" onclick="cnsOpen();return false">Privacy settings</a></div><div class="ins" id="ins"><div><h4>Install as an app</h4><span>Add the site to your home screen. Recent stories open even with weak internet.</span><span id="inh" style="display:none"></span></div><button class="bt" id="inb" onclick="installApp()">Install</button></div><div class="meta fb"><span>© ${new Date().getFullYear()} The Sujan Khadka. All rights reserved.</span><a href="#top" onclick="event.preventDefault();document.getElementById('top').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})">Back to top ↑</a></div></div></footer>`}
+ <footer><div class="w"><div class="fsg">${MENU.filter(m=>typeof m[1]!=='string').map(([t,x])=>`<div><b class="fpl">${t}</b>${x.map(([n,h])=>`<a class="fy" href="${h}">${n}</a>`).join('')}</div>`).join('')}</div><div class="ffy"><a class="fy" href="/p/about">About</a><a class="fy" href="/p/contact">Contact</a><a class="fy" href="/p/support">Support us</a><a class="fy" href="#" onclick="cnsOpen();return false">Privacy settings</a></div><div class="ins" id="ins"><div><h4>Install as an app</h4><span>Add the site to your home screen. Recent stories open even with weak internet.</span><span id="inh" style="display:none"></span></div><button class="bt" id="inb" onclick="installApp()">Install</button></div><div class="meta fb"><span>© ${new Date().getFullYear()} The Sujan Khadka. All rights reserved.</span><a href="#top" onclick="event.preventDefault();document.getElementById('top').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'start'})">Back to top</a></div></div></footer>`}
 /* ---- page banners: themed, animated SVG headers in the site's navy, yellow and crimson ---- */
 const GBK={
 world:`<svg viewBox="0 0 1000 150" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gw" x1="0" x2="1"><stop offset="0" stop-color="#021634"/><stop offset="1" stop-color="#0d4aa8"/></linearGradient><clipPath id="gwc"><circle cx="820" cy="75" r="58"/></clipPath></defs><rect width="1000" height="150" fill="url(#gw)"/><g stroke="rgba(255,255,255,.08)" fill="none"><path d="M0 110C200 60 330 140 520 90S760 40 1000 80"/><path d="M0 132C220 92 360 150 560 112S800 72 1000 102"/></g><circle cx="820" cy="75" r="58" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/><g clip-path="url(#gwc)" fill="none" stroke="rgba(255,255,255,.38)"><path d="M762 50H878M762 75H878M762 100H878"/><ellipse class="gb-m" style="--d:0s" cx="820" cy="75" rx="58" ry="58"/><ellipse class="gb-m" style="--d:-2s" cx="820" cy="75" rx="58" ry="58"/><ellipse class="gb-m" style="--d:-4s" cx="820" cy="75" rx="58" ry="58"/></g><circle cx="820" cy="75" r="72" fill="none" stroke="rgba(255,229,0,.28)" stroke-dasharray="3 7"/><g class="gb-sp" style="transform-origin:820px 75px;--t:9s"><circle cx="820" cy="3" r="5" fill="#ffe500"/></g></svg>`,
@@ -857,10 +999,9 @@ horoscope:`<svg viewBox="0 0 1000 150" preserveAspectRatio="xMidYMid slice"><def
 function gbanner(k,t,g){return GBK[k]?`<div class="gb"><div class="gbs" aria-hidden="true">${GBK[k]}</div>${t?`<${g||'h1'} class="gbt">${t}</${g||'h1'}>`:''}</div>`:''}
 function home(){const L=live();if(!L.length)return `<div class="empty" style="padding:60px 0;text-align:center">No stories have been published yet.</div>`;
  let f=D.home.map(id=>L.find(a=>a.id===id)).filter(Boolean);if(!f.length)f=L.slice(0,5);
- const [lead,...rest]=f,sec=rest.slice(0,4),im=safeImg(lead.image);
- let h=`<section class="lead"><div><div class="cat k-${SL[lead.category]||''}">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div><a class="sm" href="${url(lead)}">Read more <span class="ar">→</span></a></div>${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:`<a href="${url(lead)}" tabindex="-1" aria-hidden="true">${art(lead)}</a>`}</section>`;
- h+='<div class="wfp wfhome" id="wfp" style="min-height:92px"></div>';h+=ratesHtml();h+=cpSlot(cpCtx());h+=bnHtml();
- if(sec.length)h+=`<div class="sec"><div class="g">${sec.map(card).join('')}</div></div>`;
+ const [lead,...rest]=f,side=rest.slice(0,4),im=safeImg(lead.image),mvh=mostV(L,5),nc=1+(side.length?1:0)+(mvh?1:0);
+ let h=`<section class="gtop c${nc}"><div class="gl">${im?`<a href="${url(lead)}"><img class="ph" fetchpriority="high" decoding="async" src="${im}" alt="${esc(lead.imageCaption||lead.title)}"></a>`:`<a href="${url(lead)}" tabindex="-1" aria-hidden="true">${art(lead)}</a>`}<div class="cat k-${SL[lead.category]||''}">${esc(lead.category)}</div><h1><a href="${url(lead)}">${esc(lead.title)}</a></h1><p>${esc(lead.subtitle)}</p><div class="meta">${esc(lead.author)} · ${fd(lead.date)}</div></div>${side.length?`<div class="gs">${side.map((a,i)=>card(a,i===0?'':'t')).join('')}</div>`:''}${mvh?`<div class="gm">${mvh}</div>`:''}</section>`;
+ h+=ratesHtml();h+=cpSlot(cpCtx());h+=bnHtml();
  CATS.forEach(c=>h+=block(c,L.filter(a=>a.category===c),SL[c]));h+=`<nav class="hqs" aria-label="More from World"><b>More from World</b>${[['History','/history'],['Opinion','/opinion'],['Culture','/culture'],['Lifestyle','/lifestyle'],['Audio','/audio'],['Video','/videos']].map(x=>`<a href="${x[1]}">${x[0]}</a>`).join('')}</nav>`;return h}
 function stats(L){let v=0;for(const k in (D.views||{}))if(k.slice(0,3)!=='ad:')v+=+D.views[k]||0;let g=0;try{g=+localStorage.getItem('sk_games_played')||0}catch(e){}
  const c=(n,l)=>`<div class="st"><b data-n="${n}">${n.toLocaleString()}</b><span>${l}</span></div>`;
@@ -886,15 +1027,18 @@ function articlePg(slug){const L=live(),a=L.find(x=>x.slug===slug);if(!a)return 
  if(!window._v||window._v!==a.id){window._v=a.id;api('/api/view',{method:'POST',body:JSON.stringify({id:a.id})}).catch(()=>{})}
  tts.text=plain(a);tts.path=location.pathname;
  const tags=a.tags||[],more=L.filter(x=>x.id!==a.id&&x.category===a.category).slice(0,3),
- like=L.filter(x=>x.id!==a.id&&!more.includes(x)).map(x=>({x,s:(x.tags||[]).filter(t=>tags.includes(t)).length})).sort((p,q)=>q.s-p.s).slice(0,3).map(o=>o.x),im=safeImg(a.image);
+ rel=[...more,...L.filter(x=>x.id!==a.id&&!more.includes(x))].slice(0,3),like=L.filter(x=>x.id!==a.id&&!more.includes(x)).map(x=>({x,s:(x.tags||[]).filter(t=>tags.includes(t)).length})).sort((p,q)=>q.s-p.s).slice(0,3).map(o=>o.x),im=safeImg(a.image);
  return `<div class="arw"><article${seoNe(a.title+' '+a.body)?' lang="ne"':''} class="a-${SL[a.category]||''}"><div class="cat k-${SL[a.category]||''}"><a href="/${SL[a.category]}">${esc(a.category)}</a>${a.subcategory?' · '+esc(a.subcategory):''}</div><h1>${esc(a.title)}</h1>${a.subtitle?`<p class="sub">${esc(a.subtitle)}</p>`:''}
  <div class="by meta">By <strong>${esc(a.author)}</strong> · ${fd(a.date)}${a.updated?` · Updated ${fd(a.updated)}`:''} · ${rt(a.body)} min read</div>
- <button class="shr" onclick="share()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.6" fill="currentColor"/><circle cx="19" cy="5" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M7 11 17 6M7 13l10 5"/></svg>Share</button>
+ ${shareBar()}
  <div class="pl" id="pl" role="group" aria-label="Listen to this story"><span id="pst">Listen to this story</span><span class="pc"><button id="bp" onclick="listen('play')" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><button id="bz" onclick="listen('pause')" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button><button id="bs" onclick="listen('stop')" aria-label="Stop"><svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg></button></span></div>
  ${im?`<figure class="hero" style="margin:0"><img style="display:block" src="${im}" alt="${esc(a.imageCaption||a.title)}"><figcaption>${esc(a.imageCaption)}</figcaption></figure>`:`<div style="margin:0 0 22px">${art(a,'aspect-ratio:16/7;border-radius:10px')}</div>`}
- ${body(a.body,(a.images||[]).slice(1))}${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}
+ ${dcap(body(a.body,(a.images||[]).slice(1)),a)}${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}
 </article>
- <aside class="ars">${cpSlot(cpCtx())}${bnHtml()}${more.length?`<div class="sec"><h2>More on this story</h2><div class="g">${more.map(card).join('')}</div></div>`:''}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}</aside></div>`}
+ <aside class="ars">${cpSlot(cpCtx())}${bnHtml()}${mostV(L,5)}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}</aside></div>${rel.length?`<section class="rel"><div class="sec s-${SL[a.category]||'world'}"><h2>More from ${esc(a.category)}</h2><div class="g">${rel.map((x,i)=>card(x,cvar(i))).join('')}</div></div></section>`:''}`}
+function dcap(t,a){return !seoNe(a.title+' '+a.body)&&rt(a.body)>=2&&t.startsWith('<p>')?t.replace('<p>','<p class="dc">'):t}
+function shareBar(){const u=encodeURIComponent(location.origin+location.pathname),t=encodeURIComponent(document.title),f=p=>`<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">${p}</svg>`,l=(h,n,s)=>`<a href="${h}" target="_blank" rel="noopener" aria-label="${n}" title="${n}">${s}</a>`;
+ return `<div class="shi" role="group" aria-label="Share this story"><div>${l('https://www.facebook.com/sharer/sharer.php?u='+u,'Share on Facebook',f('<path d="M13.5 22v-8h2.7l.5-3.3h-3.2V8.6c0-.9.3-1.6 1.7-1.6h1.6V4.1C16.4 4 15.5 4 14.4 4 12 4 10.3 5.5 10.3 8.2v2.5H7.5V14h2.8v8z"/>'))}${l('https://twitter.com/intent/tweet?url='+u+'&text='+t,'Share on X',f('<path d="M18.2 3h3.1l-6.8 7.8L22.5 21h-6.3l-4.9-6.4L5.6 21H2.5l7.3-8.3L2 3h6.4l4.4 5.9zm-1.1 16.2h1.7L7.3 4.7H5.5z"/>'))}${l('https://wa.me/?text='+t+'%20'+u,'Share on WhatsApp',f('<path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.1.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.5.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.2.1.8-.1 1.5z"/>'))}${l('mailto:?subject='+t+'&body='+u,'Share by email','<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg>')}<button type="button" onclick="share()" aria-label="Copy link or share" title="Copy link or share"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.4" fill="currentColor"/><circle cx="19" cy="5" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M7 11 17 6M7 13l10 5"/></svg></button></div></div>`}
 const DEF={about:'Hello, I\'m Sujan Kumar Khadka.\n\nI\'m a student and lifelong learner committed to personal growth, continuous learning, and professional development. I enjoy exploring new ideas, developing my skills, and discovering opportunities to grow both personally and professionally.\n\nThis website is my personal space on the internet, where I share news, opinion, and culture and lifestyle.\n\nI believe that consistency, curiosity, and a willingness to learn are essential for long-term success.\n\nMy goal is simple: to keep learning, keep improving, and create something meaningful along the way.\n\nThank you for visiting my website.\n\nLearning today. Building for tomorrow.',contact:'We would be glad to hear from you. Whether you have a question, a news tip, feedback or a correction, please write to us by email.\n\nEmail: sujankumarkhadka56@gmail.com\n\nWHAT YOU CAN WRITE TO US ABOUT\nNews tips and story ideas\nCorrections and feedback on our stories\nQuestions about the website\nPrivacy enquiries\n\nWHEN YOU WRITE\nPlease include a clear subject line and, if you are writing about a story, the link or headline. We read every message and reply as soon as we can.\n\nWe use your email address and message only to reply to you.',support:'The Sujan Khadka is independent, free to read and free of advertising. Your support helps us keep it that way. There are simple ways to help, and every one of them matters.\n\nREAD AND SHARE\nShare stories you value with friends, family and on social media. Word of mouth is the strongest support an independent site can have.\n\nTELL US WHAT YOU THINK\nHonest feedback makes our stories better. Tell us what you liked, what we missed and what you would like to read next.\n\nSEND A TIP OR A CORRECTION\nIf you know about a story we should cover, or you spot a mistake, please write to us. Our Contact page has the details.\n\nINSTALL THE APP\nAdd the site to your home screen from the footer of any page. Recent stories open even with a weak internet connection.\n\nThank you for reading and for being part of The Sujan Khadka.',privacy:"The Sujan Khadka respects your privacy. This page explains what information is handled when you use this website.\n\nWHAT WE COLLECT\nReaders do not need an account, and the site does not ask for your name, email or other personal details. If you email us, we use your email address and message only to reply.\n\nTECHNICAL DATA\nOur hosting provider, Cloudflare, processes technical data such as IP address and browser type to deliver the site and keep it secure. We do not use this data to identify individual readers.\n\nADVERTISING AND TRACKING\nThis site does not run advertising or third-party tracking scripts.\n\nEXTERNAL LINKS\nStories may link to other websites. We are not responsible for their privacy practices.\n\nQUESTIONS\nFor privacy questions, contact: sujankumarkhadka56@gmail.com\n\nWe may update this page from time to time. The latest version is always published here.",cookies:"This website does not use cookies to track readers.\n\nLOCAL STORAGE\nTo load faster, your browser may keep a copy of recently published stories on your device. This contains only public stories and no personal information. You can clear it at any time in your browser settings.\n\nSIGN-IN COOKIE\nA secure sign-in cookie is used only by the site developer to manage content. Readers never receive it.\n\nOTHER WEBSITES\nSites we link to may use their own cookies, which we do not control.\n\nQUESTIONS\nContact: sujankumarkhadka56@gmail.com",terms:"By using The Sujan Khadka you agree to these terms.\n\nCONTENT\nStories, text and images published here belong to The Sujan Khadka unless stated otherwise. You may share links and quote short extracts with credit and a link back. Please do not republish full stories or images without written permission.\n\nOPINION AND ACCURACY\nWe aim to be accurate and fair. Opinion pieces reflect the views of their authors. Content is for general information and is not professional advice. If you find an error, please email us.\n\nUSE OF THE SITE\nPlease do not misuse the site, try to disrupt it, or try to reach areas that are not public.\n\nLINKS\nWe may link to other websites and are not responsible for their content.\n\nCHANGES\nWe may update these terms or the site at any time.\n\nCONTACT\nsujankumarkhadka56@gmail.com"};
 const link=t=>esc(t).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g,m=>`<a href="mailto:${m}">${m}</a>`);
 const FX={
@@ -1049,7 +1193,7 @@ function go(){const p=location.pathname.split('/').filter(Boolean);if(tts.path&&
  if(p[0]!=='audio')auStop();
  if(!p.length)out=home();else if(p[0]==='p')out=pagePg(p[1]);else if(p[0]==='audio')out=audioPg();else if(p[0]==='listen')out=voicePg(p[1]);else if(p[0]==='videos')out=videoPg();else if(p[0]==='horoscope')out=rfPg();else if(p[0]==='weather')out=wfPg();else if(p[0]==='tools')out=p[1]==='money'?toolsPg():toolsHub();else if(p[0]==='explore')out=exploreHub();else if(p[0]==='learn')out=lrnPg(p[1]);else if(p[0]==='calculators')out=calcPg(p[1]);else if(p[0]==='rates')out=ratesPg();else if(p[0]==='lifestyle'&&!p[1])out=section('Culture & Lifestyle','Lifestyle');else if(p[0]==='culture'&&!p[1])out=section('Culture & Lifestyle','Culture');else if(p[0]==='resume')out='<section class="sec"><h2>Resume Builder</h2><iframe id="resumeFrame" title="Resume builder" style="display:block;width:100%;min-height:600px;height:calc(100vh - 150px);border:0;border-radius:12px;background:var(--bg);color-scheme:normal"></iframe></section>';else if(p[0]==='trek-planner')out='<section class="sec"><h2>Trek Planner</h2><iframe id="trekPlannerFrame" title="Nepal Trek Planner" style="display:block;width:100%;min-height:700px;height:calc(100vh - 180px);border:0;border-radius:12px;background:var(--bg)"></iframe></section>';
  else{const c=CATS.find(c=>SL[c]===p[0]);if(!c)out=home();else if(p[1])out=articlePg(p[1]);else out=section(c)}
- $('#app').innerHTML=shell(out,cur);if(p[0]==='trek-planner'){const tf=document.getElementById('trekPlannerFrame');if(tf)tf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(TREK_PLANNER_B64),c=>c.charCodeAt(0)));}if(p[0]==='resume'){const rf=document.getElementById('resumeFrame');if(rf)rf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(RESUME_B64),c=>c.charCodeAt(0)))}ttsUi();voxUi();insUi();thUi();bnStart();cpTick();if(MODL.learn)lrnInit();if(MODL.calculators)calcInit();motion();bodyStat(true);imgFx();if(MODL.explore){hzInit();RF.init()}ratesInit();if(MODL.explore&&p[0]==='weather')wfInit();if(MODL.tools)toolsInit();if(!p.length)homeWx();seoApply(p,out);if(p.length<2)scrollTo(0,0)}
+ $('#app').innerHTML=shell(out,cur);if(p[0]==='trek-planner'){const tf=document.getElementById('trekPlannerFrame');if(tf)tf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(TREK_PLANNER_B64),c=>c.charCodeAt(0)));}if(p[0]==='resume'){const rf=document.getElementById('resumeFrame');if(rf)rf.srcdoc=new TextDecoder().decode(Uint8Array.from(atob(RESUME_B64),c=>c.charCodeAt(0)))}ttsUi();voxUi();insUi();thUi();bnStart();cpTick();if(MODL.learn)lrnInit();if(MODL.calculators)calcInit();motion();bodyStat(true);imgFx();if(MODL.explore){hzInit();RF.init()}ratesInit();if(MODL.explore&&p[0]==='weather')wfInit();if(MODL.tools)toolsInit();seoApply(p,out);if(p.length<2)scrollTo(0,0)}
 document.addEventListener('click',e=>{const a=e.target.closest('a[href^="/"]');if(!a||a.target||e.metaKey||e.ctrlKey||/^\/(img|api|header)/.test(a.getAttribute('href'))||/\.html(\?|#|$)/.test(a.getAttribute('href')))return;e.preventDefault();const hr=a.getAttribute('href');if(hr===location.pathname+location.search){scrollTo(0,0);const mp=$('#mp');if(mp)mp.classList.remove('open');return}document.querySelectorAll('.nb nav a.on').forEach(x=>x.classList.remove('on'));if(a.closest('nav'))a.classList.add('on');history.pushState(null,'',hr);go();scrollTo(0,0)});
 const tts={text:'',q:[],i:0,on:false,id:0,path:''};
 const plain=a=>[a.title,a.subtitle,a.body].filter(Boolean).join('\n').replace(/^## /gm,'').replace(/^> /gm,'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
