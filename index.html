@@ -843,6 +843,35 @@ article{position:relative}
 #mp a:hover,#mp a.mpp:hover{color:#ffe500;text-decoration:underline}
 #mp a.fy{display:inline-block;margin-right:14px;padding:12px 0 0;font:400 14px/1.3 system-ui,sans-serif;text-transform:none;letter-spacing:0;color:#ffe500}
 #mp .mpg+a.fy{border-top:1px solid #506991;margin-top:0;display:block}
+/* ---------- developer section in the same newspaper style: navy tab bar with yellow underline, serif headings, pill buttons, square fields ---------- */
+#upb{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9500;background:#052962;color:#fff;border:2px solid #ffe500;border-radius:999px;padding:10px 20px;font:700 15px system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:calc(100vw - 32px);text-align:center}
+.ad h1{font:700 clamp(28px,5vw,36px)/1.1 Georgia,'Times New Roman',serif;color:var(--nv);margin:10px 0 8px}
+:root[data-theme=dark] .ad h1{color:#fff}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ad h1{color:#fff}}
+.ad h2,.ad h3{font-family:Georgia,'Times New Roman',serif;color:var(--nv)}
+:root[data-theme=dark] .ad h2,:root[data-theme=dark] .ad h3{color:#fff}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ad h2,:root:not([data-theme=light]) .ad h3{color:#fff}}
+.ad .tabs{background:var(--nv);padding:0 10px;gap:0;margin:12px -16px 14px;border-bottom:4px solid #ffe500;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}.ad .tabs::-webkit-scrollbar{display:none}
+.ad .tabs .bt,.ad .tabs .bt.o{background:none;border:0;border-bottom:4px solid transparent;border-radius:0;color:#fff;font:700 17px/1 Georgia,'Times New Roman',serif;padding:16px 14px 12px;margin:0 0 -4px;white-space:nowrap}
+.ad .tabs .bt:not(.o){border-bottom-color:#ffe500;background:rgba(255,255,255,.08)}
+.ad .tabs .bt:hover{color:#ffe500}
+.ad .tabs .so,.ad .tabs .bt.so{margin-left:auto;background:#ffe500;color:#052962;border-radius:999px;font:700 14px system-ui,sans-serif;padding:8px 16px;margin-bottom:6px;margin-top:6px;border:0}
+.ad .tabs .so:hover{background:#ffd900;color:#052962}
+.ad .bt{border-radius:999px;font:700 14px system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:9px 18px;background:var(--nv);border:1px solid var(--nv);color:#fff}
+.ad .bt:hover{background:#0b3c8c;border-color:#0b3c8c}
+.ad .bt.o{background:none;color:var(--nv);border:1px solid var(--nv)}.ad .bt.o:hover{background:var(--nv);color:#fff}
+.ad .bt.d{background:#c70000;border-color:#c70000;color:#fff}.ad .bt.d:hover{background:#a30000;border-color:#a30000}
+:root[data-theme=dark] .ad .bt.o{color:#fff;border-color:#8fa9d4}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ad .bt.o{color:#fff;border-color:#8fa9d4}}
+.ad input,.ad select,.ad textarea{border:1px solid #bdbdbd;border-radius:0;background:var(--bg);color:var(--tx)}
+.ad input:focus,.ad select:focus,.ad textarea:focus{outline:0;border-color:var(--nv);box-shadow:0 0 0 2px #ffe500}
+.ad label{font:700 13px system-ui,sans-serif;color:var(--tx)}
+.ad input[type=file]{border:1px dashed #bdbdbd;padding:12px;background:none}
+.ad input[type=file]::file-selector-button{background:#ffe500;color:#052962;border:0;border-radius:999px;padding:9px 18px;margin-right:12px;font:700 14px system-ui,sans-serif;cursor:pointer}
+.ad input[type=file]::file-selector-button:hover{background:#ffd900}
+.ad .stats{border-top:1px solid var(--nv)}.ad .st b{color:var(--nv)}
+:root[data-theme=dark] .ad .st b{color:#ffe500}@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ad .st b{color:#ffe500}}
+.ad .row{border-bottom:1px solid var(--ln)}
+.ad .row b,.ad .row>div>b{font:700 18px/1.25 Georgia,'Times New Roman',serif}
+.ad progress{accent-color:var(--nv)}
+@media(max-width:760px){.ad .tabs{flex-wrap:wrap;overflow:visible;padding:0 8px}.ad .tabs .bt,.ad .tabs .bt.o{font-size:16px;padding:12px 10px 10px}}
 .lsrc{line-height:1.8}.lsrc a{color:var(--ac)}
 @media(max-width:560px){.lfacts{grid-template-columns:1fr}.lfacts dt{border-top:1px solid var(--ln)}.lfacts dd{border-top:0}.lh2{font-size:21px}}
 </style>
@@ -1077,7 +1106,7 @@ function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=m
  <label>Author</label><input id="e_a" value="${esc(a.author)}"><label>Tags (comma separated)</label><input id="e_g" value="${esc((a.tags||[]).join(', '))}">
  <label>Images ${imgs.length}/${max}${multi?' — first is the main image':''}</label>
  ${imgs.map((m,i)=>`<div class="row"><img src="${safeImg(m.thumb||m.url)}" style="width:90px;height:60px;object-fit:cover" alt=""><input class="ic" data-i="${i}" style="flex:1;margin:0" placeholder="Caption (optional)" value="${esc(m.caption)}"><button class="bt d" onclick="rmImg(${i})">Remove</button></div>`).join('')}
- ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs(this.files)">`:'<p class="meta">Maximum reached.</p>'}
+ ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs([...this.files]);this.value=''">`:'<p class="meta">Maximum reached.</p>'}
  <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link); a YouTube, Vimeo or .mp4 link alone on its own line becomes a video</label>
  <div class="pdfbar"><label class="bt o" style="cursor:pointer">Import from PDF<input type="file" accept="application/pdf,.pdf" hidden onchange="pdfImport(this.files[0]);this.value=''"></label><button type="button" class="bt o" onclick="copyBody()">Copy all text</button><span id="pdfst" class="meta"></span></div>
  <textarea id="e_b" oninput="bodyStat()">${esc(a.body)}</textarea>
@@ -1092,7 +1121,20 @@ async function sv(st){sync();const a=ed,prev=a.status;if(!a.title||!a.body)retur
  if(!a.id){a.id='a'+Date.now();const b=slugify(a.title);let s=b,i=2;while(A.articles.some(x=>x.slug===s))s=b+'-'+i++;a.slug=s;A.articles.push(a)}else a.updated=new Date().toISOString();
  const i=A.home.indexOf(a.id);if(a.featured&&i<0)A.home.unshift(a.id);if(!a.featured&&i>=0)A.home.splice(i,1);
  if(await persist()){ed=null;go()}}
-const jpg=(i,w,q)=>new Promise(ok=>{const s=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',q)});
+const jpg=(i,w,q)=>new Promise(ok=>{const s=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingQuality='high';x.drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',q)});
+/* ---------- phone photos: open big camera pictures safely, shrink them first, say clearly what went wrong ---------- */
+async function loadPic(f,max){max=max||2800;let b=null;
+ if(window.createImageBitmap){try{b=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){try{b=await createImageBitmap(f)}catch(e2){}}}
+ if(!b){const u=URL.createObjectURL(f);try{b=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=()=>no(new Error('format'));m.src=u})}finally{setTimeout(()=>URL.revokeObjectURL(u),6e4)}}
+ const W=b.width||b.naturalWidth,H=b.height||b.naturalHeight;if(!W||!H)throw new Error('format');
+ const s=Math.min(1,max/Math.max(W,H));if(s===1)return{src:b,s:1};
+ const tw=Math.max(1,Math.round(W*s)),th=Math.max(1,Math.round(H*s));let src=b,cw=W,ch=H;
+ while(cw/2>tw){const t=document.createElement('canvas');t.width=Math.round(cw/2);t.height=Math.round(ch/2);const u=t.getContext('2d');u.imageSmoothingQuality='high';u.drawImage(src,0,0,t.width,t.height);src=t;cw=t.width;ch=t.height}
+ const c=document.createElement('canvas');c.width=tw;c.height=th;const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,0,0,tw,th);
+ if(b.close)try{b.close()}catch(e){}
+ return{src:c,s:tw/W}}
+const upMsg=e=>{const m=e&&e.message||'';return m==='format'?'This photo could not be opened. Photos saved as HEIC or AVIF sometimes fail. Choose a JPEG or PNG, or retake the photo with the camera set to the most compatible format.':m==='login'?'Your developer session has ended. Sign in again, then upload the photo.':m==='big'?'The photo is too large for the server. Choose a smaller one.':(typeof navigator!=='undefined'&&navigator.onLine===false)?'There is no internet connection. Check it and try again.':'The photo could not be uploaded ('+(m||'unknown error')+'). Try again or choose another photo.'};
+function upBusy(t){let e=document.getElementById('upb');if(!t){if(e)e.remove();return}if(!e){e=document.createElement('div');e.id='upb';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=t}
 const norm=(i,w,h,q,crop,plain)=>new Promise(ok=>{const r=Math.max(w/i.width,h/i.height),sw=Math.min(i.width,w/r),sh=Math.min(i.height,h/r);let src=i,cx=(i.width-sw)/2,cy=(i.height-sh)*.35,cw=sw,ch=sh;if(crop){cx=crop.x;cy=crop.y;cw=crop.w;ch=crop.h}
  while(cw/2>w){const t=document.createElement('canvas');t.width=Math.round(cw/2);t.height=Math.round(ch/2);const u=t.getContext('2d');u.imageSmoothingQuality='high';u.drawImage(src,cx,cy,cw,ch,0,0,t.width,t.height);src=t;cx=0;cy=0;cw=t.width;ch=t.height}
  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,cx,cy,cw,ch,0,0,w,h);
@@ -1104,14 +1146,14 @@ const norm=(i,w,h,q,crop,plain)=>new Promise(ok=>{const r=Math.max(w/i.width,h/i
  /* light unsharp mask so every photo has the same crispness */
  const A=.45;for(let yy=1;yy<h-1;yy++)for(let xx=1;xx<w-1;xx++){const k=(yy*w+xx)*4;for(let ch2=0;ch2<3;ch2++){const j=k+ch2,bl=(o[j-4]+o[j+4]+o[j-w*4]+o[j+w*4])*.125+o[j]*.5;p[j]=o[j]+(o[j]-bl)*A}p[k+3]=255}x.putImageData(d,0,0)}catch(e){}
  c.toBlob(ok,'image/jpeg',q)});
-const put=async b=>{const x=await api('/api/admin/upload',{method:'POST',headers:{'content-type':'image/jpeg'},body:b});if(!x.ok)throw 0;return (await x.json()).url};
-const up=(f,crop)=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=async()=>{try{const a=await norm(i,1600,900,.86,crop),b=await norm(i,800,450,.84,crop),url=await put(a);ok({url,thumb:await put(b)})}catch(e){no(e)}};i.onerror=no;i.src=r.result};r.readAsDataURL(f)});
+const put=async b=>{let e;if(!b)throw new Error('format');for(let k=0;k<2;k++){try{const x=await api('/api/admin/upload',{method:'POST',headers:{'content-type':'image/jpeg'},body:b});if(x.status===401||x.status===403)throw new Error('login');if(x.status===413)throw new Error('big');if(!x.ok)throw new Error('server '+x.status);const j=await x.json();if(!j||!j.url)throw new Error('no address returned');return j.url}catch(er){e=er;if(er.message==='login'||er.message==='big')break;await new Promise(r=>setTimeout(r,900))}}throw e};
+const up=async(f,crop)=>{const p=await loadPic(f),c=crop?{x:crop.x*p.s,y:crop.y*p.s,w:crop.w*p.s,h:crop.h*p.s}:undefined,a=await norm(p.src,1600,900,.86,c),b=await norm(p.src,800,450,.84,c),url=await put(a);return{url,thumb:await put(b)}};
 async function addImgs(files){sync();const max=MULTI.includes(ed.category||'World')?5:1;ed.images=ed.images||[];const left=max-ed.images.length;if(left<1)return;
  if(files.length>left)alert('Only '+left+' more allowed.');
- for(const f of [...files].slice(0,left)){const crop=await cropPick(f);if(crop===false)continue;try{ed.images.push({...await up(f,crop||undefined),caption:''})}catch(e){alert('Upload failed')}}go()}
+ const list=[...files].slice(0,left);let n=0;for(const f of list){const crop=await cropPick(f);if(crop===false)continue;n++;upBusy('Uploading photo '+n+' of '+list.length+'… please wait');try{ed.images.push({...await up(f,crop||undefined),caption:''})}catch(e){upBusy();alert(upMsg(e))}}upBusy();go()}
 /* 16:9 crop tool: choose what shows in the wide frame and preview the finished Guardian-style result before uploading */
-function cropPick(f,ar,plain){ar=ar||16/9;return new Promise(res=>{
- const url=URL.createObjectURL(f),im=new Image();
+function cropPick(f,ar,plain){ar=ar||16/9;return new Promise(async res=>{
+ let url,pS=1;const im=new Image();try{const P=await loadPic(f,1600);pS=P.s;url=P.s===1?URL.createObjectURL(f):await new Promise((ok,no)=>P.src.toBlob(b=>b?ok(URL.createObjectURL(b)):no(new Error('format')),'image/jpeg',.9))}catch(e){url=URL.createObjectURL(f);pS=1}
  im.onerror=()=>{URL.revokeObjectURL(url);res(null)};
  im.onload=()=>{
   const iw=im.naturalWidth,ih=im.naturalHeight,o=document.createElement('div');o.id='crp';
@@ -1133,7 +1175,7 @@ function cropPick(f,ar,plain){ar=ar||16/9;return new Promise(res=>{
   const end=()=>{if(d){d=null;fr.style.cursor='';prev()}};fr.addEventListener('pointerup',end);fr.addEventListener('pointercancel',end);
   fr.addEventListener('wheel',e=>{e.preventDefault();setZ(z*(e.deltaY<0?1.08:.93))},{passive:false});
   zr.addEventListener('input',()=>setZ(+zr.value));
-  o.querySelector('#cr_ok').onclick=()=>close(rect());o.querySelector('#cr_auto').onclick=()=>close(null);o.querySelector('#cr_x').onclick=()=>close(false);
+  o.querySelector('#cr_ok').onclick=()=>close((r=>({x:r.x/pS,y:r.y/pS,w:r.w/pS,h:r.h/pS}))(rect()));o.querySelector('#cr_auto').onclick=()=>close(null);o.querySelector('#cr_x').onclick=()=>close(false);
   paint();prev();o.querySelector('#cr_ok').focus({preventScroll:true})};
  im.src=url})}
 function rmImg(i){sync();ed.images.splice(i,1);go()}
@@ -1320,14 +1362,13 @@ function adTab(){return cpTab()+(cpEd?'':'<details class="cpold"><summary><stron
 function adPopupTab(){const o=adDraft||(A.pages||{}).__ad||{};if(!adDraft)adDraft={img:o.img||''};
  return `<div class="aup"><strong>Popup advertisement</strong><p class="meta">The popup appears when someone opens the website. For the first 5 seconds a countdown shows. After that, visitors can close it only with the ✕ button or the Esc key, then see the site as usual.</p>
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ad_on" ${o.on?'checked':''} style="width:auto"> Show the popup to visitors</label>
- <label>Image (optional)</label>${adDraft.img?`<img src="${esc(adDraft.img)}" alt="" style="max-width:260px;display:block;margin:6px 0">`:''}<input type="file" accept="image/*" onchange="adUp(this.files[0])">${adDraft.img?'<button class="bt o" onclick="adNoImg()">Remove image</button>':''}
+ <label>Image (optional)</label>${adDraft.img?`<img src="${esc(adDraft.img)}" alt="" style="max-width:260px;display:block;margin:6px 0">`:''}<input type="file" accept="image/*" onchange="adUp(this.files[0]);this.value=''">${adDraft.img?'<button class="bt o" onclick="adNoImg()">Remove image</button>':''}
  <label>Title</label><input id="ad_t" value="${esc(o.title||'')}"><label>Text</label><textarea id="ad_x" style="min-height:90px">${esc(o.text||'')}</textarea>
  <label>Button text</label><input id="ad_b" value="${esc(o.btn==null?'Learn more':o.btn)}"><label>Button link (https://…)</label><input id="ad_l" type="url" inputmode="url" value="${esc(o.link||'')}" placeholder="https://…">
  <label>How often to show it</label><select id="ad_f"><option value="visit" ${(o.freq||'visit')==='visit'?'selected':''}>Once per visit</option><option value="day" ${o.freq==='day'?'selected':''}>Once per day</option><option value="always" ${o.freq==='always'?'selected':''}>Every time a page is opened</option></select>
  <div style="margin-top:12px"><button class="bt" onclick="adSave()">Save ad</button><button class="bt o" onclick="adPreview()">Preview</button></div></div>`}
 function adKeep(){const v=adVals();adDraft={...v}}
-async function adUp(f){if(!f)return;adKeepAll();try{const r=new FileReader(),src=await new Promise((ok,no)=>{r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});
- adDraft.img=await put(await jpg(i,1000,.82))}catch(e){alert('Image upload failed')}go()}
+async function adUp(f){if(!f)return;adKeepAll();upBusy('Uploading photo… please wait');try{const p=await loadPic(f,2000);adDraft.img=await put(await jpg(p.src,1000,.82))}catch(e){upBusy();alert(upMsg(e))}upBusy();go()}
 function adNoImg(){adKeepAll();adDraft.img='';go()}
 function adPreview(){adShow(adVals(),true)}
 async function adSave(){const v=adVals();if(v.link&&!/^https?:\/\//i.test(v.link))return alert('The link must start with https://');
@@ -1445,7 +1486,7 @@ function cpForm(){const c=cpEd,o=(arr,v)=>arr.map(([k,t])=>`<option value="${k}"
  <div style="margin-top:12px"><button class="bt" onclick="cpSave()">Save campaign</button><button class="bt o" onclick="cpPrev()">Preview</button>${c._ex?'<button class="bt o" onclick="cpKeep();cpPhone(cpEd.id)">Preview on phone</button>':''}<button class="bt o" onclick="cpEd=null;go()">Cancel</button></div></div>`}
 function cpPrev(){cpKeep();const c=cpEd;if(c.kind==='popup')cpShow(c,true);else{const d=document.createElement('div');d.id='adm';d.className='full cpbp';d.innerHTML=`<div class="cpbw">${cpBanner(c)}<button class="bt" onclick="document.getElementById('adm').remove();document.body.style.overflow=''">Close preview</button></div>`;document.body.appendChild(d);document.body.style.overflow='hidden'}}
 async function cpUp(k,f){if(!f)return;cpKeep();const ar=k==='imgD'?16/9:(cpEd.kind==='popup'?4/5:1),W=ar>1?1280:ar<1?960:1000,H=Math.round(W/ar),crop=await cropPick(f,ar,true);if(crop===false){go();return}
- try{const src=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});cpEd[k]=await put(await norm(i,W,H,.86,crop||undefined,true))}catch(e){alert('Image upload failed')}go()}
+ upBusy('Uploading photo… please wait');try{const p=await loadPic(f),c=crop?{x:crop.x*p.s,y:crop.y*p.s,w:crop.w*p.s,h:crop.h*p.s}:undefined;cpEd[k]=await put(await norm(p.src,W,H,.86,c,true))}catch(e){upBusy();alert(upMsg(e))}upBusy();go()}
 async function cpSave(){cpKeep();const c=cpEd;if(c.link&&!cpHttp(c.link))return alert('The link must start with https://');if(!c.imgD&&!c.imgM&&!c.title&&!c.text)return alert('Add an image, a title or some text first.');
  if(c.start&&c.end&&c.end<c.start)return alert('The end date is before the start date.');if(c.where==='sections'&&!c.secs.length)return alert('Choose at least one section, or pick another place.');
  const x={...c};delete x._ex;x.name=x.name||'Untitled campaign';const L=A.pages.__camps.items,i=L.findIndex(y=>y.id===x.id);if(i<0)L.push(x);else L[i]=x;
@@ -1490,12 +1531,11 @@ function bnTab(){const o=bnDraft||(A.pages||{}).__ads||{on:false,items:[]};if(!b
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bn_pop" ${bnDraft.pop?'checked':''} style="width:auto"> Also open these photos as a popup when the website opens (5-second countdown)</label>
  <label>How often to show the popup</label><select id="bn_f"><option value="visit" ${(bnDraft.freq||'visit')==='visit'?'selected':''}>Once per visit</option><option value="day" ${bnDraft.freq==='day'?'selected':''}>Once per day</option><option value="always" ${bnDraft.freq==='always'?'selected':''}>Every time a page is opened</option></select>
  ${it.map((x,i)=>`<div class="bni" data-img="${esc(x.img)}"><img src="${esc(x.img)}" alt=""><input placeholder="Link when tapped (optional, https://…)" value="${esc(x.link||'')}"><button class="bt d" onclick="bnRm(${i})">Remove</button></div>`).join('')}
- ${it.length<5?`<label>Add photos</label><input type="file" accept="image/*" multiple onchange="bnUp(this.files)">`:'<p class="meta">Maximum of 5 photos reached.</p>'}
+ ${it.length<5?`<label>Add photos</label><input type="file" accept="image/*" multiple onchange="bnUp([...this.files]);this.value=''">`:'<p class="meta">Maximum of 5 photos reached.</p>'}
  <div style="margin-top:12px"><button class="bt" onclick="bnSave()">Save photo ads</button><button class="bt o" onclick="bnPreview()">Preview popup</button></div></div>`}
 function bnPreview(){const v=bnVals();if(!v.items.length)return alert('Add at least one photo first.');adShow({items:v.items},true)}
 async function bnUp(files){adKeepAll();const room=5-bnDraft.items.length;if(files.length>room)alert('Only '+room+' more photo'+(room===1?'':'s')+' allowed.');
- for(const f of [...files].slice(0,room)){try{const src=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f)}),i=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=no;m.src=src});
-  bnDraft.items.push({img:await put(await jpg(i,1200,.8)),link:''})}catch(e){alert('Photo upload failed')}}go()}
+ const list=[...files].slice(0,room);let n=0;for(const f of list){n++;upBusy('Uploading photo '+n+' of '+list.length+'… please wait');try{const p=await loadPic(f,2400);bnDraft.items.push({img:await put(await jpg(p.src,1200,.8)),link:''})}catch(e){upBusy();alert(upMsg(e))}}upBusy();go()}
 function bnRm(i){adKeepAll();bnDraft.items.splice(i,1);go()}
 async function bnSave(){const v=bnVals();if(v.items.some(x=>x.link&&!/^https?:\/\//i.test(x.link)))return alert('Links must start with https://');
  if(v.on&&!v.items.length)return alert('Add at least one photo first.');
