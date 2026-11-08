@@ -1118,7 +1118,7 @@ function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=m
  <label>Author</label><input id="e_a" value="${esc(a.author)}"><label>Tags (comma separated)</label><input id="e_g" value="${esc((a.tags||[]).join(', '))}">
  <label>Images ${imgs.length}/${max}${multi?' — first is the main image':''}</label>
  ${imgs.map((m,i)=>`<div class="row"><img src="${safeImg(m.thumb||m.url)}" style="width:90px;height:60px;object-fit:cover" alt=""><input class="ic" data-i="${i}" style="flex:1;margin:0" placeholder="Caption (optional)" value="${esc(m.caption)}"><button class="bt d" onclick="rmImg(${i})">Remove</button></div>`).join('')}
- ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs([...this.files]);this.value=''">`:'<p class="meta">Maximum reached.</p>'}
+ ${imgs.length<max?`<input type="file" accept="image/*,.heic,.heif,.avif" ${multi?'multiple':''} onchange="addImgs([...this.files]);this.value=''">`:'<p class="meta">Maximum reached.</p>'}
  <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link); a YouTube, Vimeo or .mp4 link alone on its own line becomes a video</label>
  <div class="pdfbar"><label class="bt o" style="cursor:pointer">Import from PDF<input type="file" accept="application/pdf,.pdf" hidden onchange="pdfImport(this.files[0]);this.value=''"></label><button type="button" class="bt o" onclick="copyBody()">Copy all text</button><span id="pdfst" class="meta"></span></div>
  <textarea id="e_b" oninput="bodyStat()">${esc(a.body)}</textarea>
@@ -1135,17 +1135,30 @@ async function sv(st){sync();const a=ed,prev=a.status;if(!a.title||!a.body)retur
  if(await persist()){ed=null;go()}}
 const jpg=(i,w,q)=>new Promise(ok=>{const s=Math.min(1,w/i.width),c=document.createElement('canvas');c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingQuality='high';x.drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',q)});
 /* ---------- phone photos: open big camera pictures safely, shrink them first, say clearly what went wrong ---------- */
-async function loadPic(f,max){max=max||2800;let b=null;
+/* HEIC / HEIF photos (most new phones) are not opened by Chrome itself: a small converter is fetched only when one is picked */
+const HCACHE=new WeakMap();let _h2a=null;
+function heicLib(){if(window.heic2any)return Promise.resolve(window.heic2any);if(_h2a)return _h2a;
+ const urls=['https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js','https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js','https://unpkg.com/heic2any@0.0.4/dist/heic2any.min.js'];
+ return _h2a=(async()=>{for(const u of urls){try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>{s.remove();no(0)};document.head.appendChild(s)});if(window.heic2any)return window.heic2any}catch(e){}}throw new Error('heiclib')})().catch(e=>{_h2a=null;throw e})}
+async function picKind(f){const n=(f.name||'').toLowerCase(),t=(f.type||'').toLowerCase();if(/hei[cf]/.test(t)||/\.(heic|heif|hif)$/.test(n))return'heic';if(/avif/.test(t)||/\.avif$/.test(n))return'avif';
+ try{const b=new Uint8Array(await f.slice(0,32).arrayBuffer());let s='';for(let i=4;i<Math.min(32,b.length);i++)s+=String.fromCharCode(b[i]);if(/ftyp(heic|heix|hevc|hevx|heim|heis|mif1|msf1)/.test(s))return'heic';if(/ftyp(avif|avis)/.test(s))return'avif'}catch(e){}return''}
+async function decodePic(f){let b=null;
  if(window.createImageBitmap){try{b=await createImageBitmap(f,{imageOrientation:'from-image'})}catch(e){try{b=await createImageBitmap(f)}catch(e2){}}}
  if(!b){const u=URL.createObjectURL(f);try{b=await new Promise((ok,no)=>{const m=new Image();m.onload=()=>ok(m);m.onerror=()=>no(new Error('format'));m.src=u})}finally{setTimeout(()=>URL.revokeObjectURL(u),6e4)}}
- const W=b.width||b.naturalWidth,H=b.height||b.naturalHeight;if(!W||!H)throw new Error('format');
- const s=Math.min(1,max/Math.max(W,H));if(s===1)return{src:b,s:1};
+ const W=b.width||b.naturalWidth,H=b.height||b.naturalHeight;if(!W||!H)throw new Error('format');return{b,W,H}}
+async function loadPic(f,max){max=max||2800;let blob=HCACHE.get(f)||f,d;
+ try{d=await decodePic(blob)}catch(e){
+  const k=await picKind(f);if(k!=='heic'&&k!=='avif')throw e;
+  upBusy('Converting the '+(k==='heic'?'HEIC':'AVIF')+' photo… this can take a few seconds');
+  try{const lib=await heicLib().catch(()=>{throw new Error('heiclib')});let o;try{o=await lib({blob:f,toType:'image/jpeg',quality:.92})}catch(e3){throw new Error('format')}
+   blob=Array.isArray(o)?o[0]:o;HCACHE.set(f,blob);d=await decodePic(blob)}finally{upBusy()}}
+ const{b,W,H}=d,s=Math.min(1,max/Math.max(W,H));if(s===1)return{src:b,s:1,blob};
  const tw=Math.max(1,Math.round(W*s)),th=Math.max(1,Math.round(H*s));let src=b,cw=W,ch=H;
  while(cw/2>tw){const t=document.createElement('canvas');t.width=Math.round(cw/2);t.height=Math.round(ch/2);const u=t.getContext('2d');u.imageSmoothingQuality='high';u.drawImage(src,0,0,t.width,t.height);src=t;cw=t.width;ch=t.height}
  const c=document.createElement('canvas');c.width=tw;c.height=th;const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(src,0,0,tw,th);
  if(b.close)try{b.close()}catch(e){}
- return{src:c,s:tw/W}}
-const upMsg=e=>{const m=e&&e.message||'';return m==='format'?'This photo could not be opened. Photos saved as HEIC or AVIF sometimes fail. Choose a JPEG or PNG, or retake the photo with the camera set to the most compatible format.':m==='login'?'Your developer session has ended. Sign in again, then upload the photo.':m==='big'?'The photo is too large for the server. Choose a smaller one.':(typeof navigator!=='undefined'&&navigator.onLine===false)?'There is no internet connection. Check it and try again.':'The photo could not be uploaded ('+(m||'unknown error')+'). Try again or choose another photo.'};
+ return{src:c,s:tw/W,blob}}
+const upMsg=e=>{const m=e&&e.message||'';return m==='heiclib'?'This photo is in HEIC format and needs a small converter that could not be loaded. Check your internet connection and try again.':m==='format'?'This file could not be opened as a photo. It may be damaged or not a picture. Try another photo.':m==='login'?'Your developer session has ended. Sign in again, then upload the photo.':m==='big'?'The photo is too large for the server. Choose a smaller one.':(typeof navigator!=='undefined'&&navigator.onLine===false)?'There is no internet connection. Check it and try again.':'The photo could not be uploaded ('+(m||'unknown error')+'). Try again or choose another photo.'};
 function upBusy(t){let e=document.getElementById('upb');if(!t){if(e)e.remove();return}if(!e){e=document.createElement('div');e.id='upb';e.setAttribute('role','status');document.body.appendChild(e)}e.textContent=t}
 const norm=(i,w,h,q,crop,plain)=>new Promise(ok=>{const r=Math.max(w/i.width,h/i.height),sw=Math.min(i.width,w/r),sh=Math.min(i.height,h/r);let src=i,cx=(i.width-sw)/2,cy=(i.height-sh)*.35,cw=sw,ch=sh;if(crop){cx=crop.x;cy=crop.y;cw=crop.w;ch=crop.h}
  while(cw/2>w){const t=document.createElement('canvas');t.width=Math.round(cw/2);t.height=Math.round(ch/2);const u=t.getContext('2d');u.imageSmoothingQuality='high';u.drawImage(src,cx,cy,cw,ch,0,0,t.width,t.height);src=t;cx=0;cy=0;cw=t.width;ch=t.height}
@@ -1165,7 +1178,7 @@ async function addImgs(files){sync();const max=MULTI.includes(ed.category||'Worl
  const list=[...files].slice(0,left);let n=0;for(const f of list){const crop=await cropPick(f);if(crop===false)continue;n++;upBusy('Uploading photo '+n+' of '+list.length+'… please wait');try{ed.images.push({...await up(f,crop||undefined),caption:''})}catch(e){upBusy();alert(upMsg(e))}}upBusy();go()}
 /* 16:9 crop tool: choose what shows in the wide frame and preview the finished Guardian-style result before uploading */
 function cropPick(f,ar,plain){ar=ar||16/9;return new Promise(async res=>{
- let url,pS=1;const im=new Image();try{const P=await loadPic(f,1600);pS=P.s;url=P.s===1?URL.createObjectURL(f):await new Promise((ok,no)=>P.src.toBlob(b=>b?ok(URL.createObjectURL(b)):no(new Error('format')),'image/jpeg',.9))}catch(e){url=URL.createObjectURL(f);pS=1}
+ let url,pS=1;const im=new Image();try{const P=await loadPic(f,1600);pS=P.s;url=P.s===1?URL.createObjectURL(P.blob||f):await new Promise((ok,no)=>P.src.toBlob(b=>b?ok(URL.createObjectURL(b)):no(new Error('format')),'image/jpeg',.9))}catch(e){url=URL.createObjectURL(f);pS=1}
  im.onerror=()=>{URL.revokeObjectURL(url);res(null)};
  im.onload=()=>{
   const iw=im.naturalWidth,ih=im.naturalHeight,o=document.createElement('div');o.id='crp';
@@ -1374,7 +1387,7 @@ function adTab(){return cpTab()+(cpEd?'':'<details class="cpold"><summary><stron
 function adPopupTab(){const o=adDraft||(A.pages||{}).__ad||{};if(!adDraft)adDraft={img:o.img||''};
  return `<div class="aup"><strong>Popup advertisement</strong><p class="meta">The popup appears when someone opens the website. For the first 5 seconds a countdown shows. After that, visitors can close it only with the ✕ button or the Esc key, then see the site as usual.</p>
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="ad_on" ${o.on?'checked':''} style="width:auto"> Show the popup to visitors</label>
- <label>Image (optional)</label>${adDraft.img?`<img src="${esc(adDraft.img)}" alt="" style="max-width:260px;display:block;margin:6px 0">`:''}<input type="file" accept="image/*" onchange="adUp(this.files[0]);this.value=''">${adDraft.img?'<button class="bt o" onclick="adNoImg()">Remove image</button>':''}
+ <label>Image (optional)</label>${adDraft.img?`<img src="${esc(adDraft.img)}" alt="" style="max-width:260px;display:block;margin:6px 0">`:''}<input type="file" accept="image/*,.heic,.heif,.avif" onchange="adUp(this.files[0]);this.value=''">${adDraft.img?'<button class="bt o" onclick="adNoImg()">Remove image</button>':''}
  <label>Title</label><input id="ad_t" value="${esc(o.title||'')}"><label>Text</label><textarea id="ad_x" style="min-height:90px">${esc(o.text||'')}</textarea>
  <label>Button text</label><input id="ad_b" value="${esc(o.btn==null?'Learn more':o.btn)}"><label>Button link (https://…)</label><input id="ad_l" type="url" inputmode="url" value="${esc(o.link||'')}" placeholder="https://…">
  <label>How often to show it</label><select id="ad_f"><option value="visit" ${(o.freq||'visit')==='visit'?'selected':''}>Once per visit</option><option value="day" ${o.freq==='day'?'selected':''}>Once per day</option><option value="always" ${o.freq==='always'?'selected':''}>Every time a page is opened</option></select>
@@ -1479,7 +1492,7 @@ function cpTab(){A.pages=A.pages||{};const S=A.pages.__camps=A.pages.__camps||{i
 function cpNew(){return{id:cpId(),name:'',kind:'banner',on:true,start:cpToday(),end:'',where:'all',secs:[],label:'Advertisement',imgD:'',imgM:'',title:'',text:'',btn:'Learn more',link:'',freq:'visit',adv:{name:'',contact:'',price:'',paid:false}}}
 function cpEdit(id){const c=A.pages.__camps.items.find(x=>x.id===id);if(c){cpEd=JSON.parse(JSON.stringify(c));cpEd.adv=cpEd.adv||{};cpEd.secs=cpEd.secs||[];cpEd._ex=1;go()}}
 function cpKeep(){if(!$('#cp_n')||!cpEd)return;Object.assign(cpEd,{name:$('#cp_n').value.trim(),on:$('#cp_on').checked,start:$('#cp_s').value,end:$('#cp_e').value,where:$('#cp_w').value,secs:CATS.filter((c,i)=>$('#cp_sec'+i)&&$('#cp_sec'+i).checked),label:$('#cp_lb').value,title:$('#cp_t').value.trim(),text:$('#cp_x').value.trim(),btn:$('#cp_b').value.trim(),link:$('#cp_l').value.trim(),adv:{name:$('#cp_an').value.trim(),contact:$('#cp_ac').value.trim(),price:$('#cp_ap').value.trim(),paid:$('#cp_apd').checked}});if($('#cp_f'))cpEd.freq=$('#cp_f').value}
-function cpForm(){const c=cpEd,o=(arr,v)=>arr.map(([k,t])=>`<option value="${k}" ${k===v?'selected':''}>${t}</option>`).join(''),im=(k,t,hint)=>`<label>${t} <span class="meta">${hint}</span></label>${c[k]?`<img src="${esc(c[k])}" alt="" style="max-width:${k==='imgD'?'260px':'130px'};display:block;margin:6px 0;border:1px solid var(--ln)">`:''}<input type="file" accept="image/*" onchange="cpUp('${k}',this.files[0]);this.value=''">${c[k]?`<button class="bt o" onclick="cpKeep();cpEd.${k}='';go()">Remove</button>`:''}`;
+function cpForm(){const c=cpEd,o=(arr,v)=>arr.map(([k,t])=>`<option value="${k}" ${k===v?'selected':''}>${t}</option>`).join(''),im=(k,t,hint)=>`<label>${t} <span class="meta">${hint}</span></label>${c[k]?`<img src="${esc(c[k])}" alt="" style="max-width:${k==='imgD'?'260px':'130px'};display:block;margin:6px 0;border:1px solid var(--ln)">`:''}<input type="file" accept="image/*,.heic,.heif,.avif" onchange="cpUp('${k}',this.files[0]);this.value=''">${c[k]?`<button class="bt o" onclick="cpKeep();cpEd.${k}='';go()">Remove</button>`:''}`;
  return `<div class="aup"><strong>${c._ex?'Edit campaign':'New campaign'}</strong>
  <label>Campaign name (only you see this)</label><input id="cp_n" value="${esc(c.name)}" placeholder="e.g. Himalayan Bank – November">
  <label>Type</label><select id="cp_k" onchange="cpKeep();cpEd.kind=this.value;go()">${o([['banner','Banner (shown inside pages)'],['popup','Popup (opens over the page)']],c.kind)}</select>
@@ -1543,7 +1556,7 @@ function bnTab(){const o=bnDraft||(A.pages||{}).__ads||{on:false,items:[]};if(!b
  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bn_pop" ${bnDraft.pop?'checked':''} style="width:auto"> Also open these photos as a popup when the website opens (5-second countdown)</label>
  <label>How often to show the popup</label><select id="bn_f"><option value="visit" ${(bnDraft.freq||'visit')==='visit'?'selected':''}>Once per visit</option><option value="day" ${bnDraft.freq==='day'?'selected':''}>Once per day</option><option value="always" ${bnDraft.freq==='always'?'selected':''}>Every time a page is opened</option></select>
  ${it.map((x,i)=>`<div class="bni" data-img="${esc(x.img)}"><img src="${esc(x.img)}" alt=""><input placeholder="Link when tapped (optional, https://…)" value="${esc(x.link||'')}"><button class="bt d" onclick="bnRm(${i})">Remove</button></div>`).join('')}
- ${it.length<5?`<label>Add photos</label><input type="file" accept="image/*" multiple onchange="bnUp([...this.files]);this.value=''">`:'<p class="meta">Maximum of 5 photos reached.</p>'}
+ ${it.length<5?`<label>Add photos</label><input type="file" accept="image/*,.heic,.heif,.avif" multiple onchange="bnUp([...this.files]);this.value=''">`:'<p class="meta">Maximum of 5 photos reached.</p>'}
  <div style="margin-top:12px"><button class="bt" onclick="bnSave()">Save photo ads</button><button class="bt o" onclick="bnPreview()">Preview popup</button></div></div>`}
 function bnPreview(){const v=bnVals();if(!v.items.length)return alert('Add at least one photo first.');adShow({items:v.items},true)}
 async function bnUp(files){adKeepAll();const room=5-bnDraft.items.length;if(files.length>room)alert('Only '+room+' more photo'+(room===1?'':'s')+' allowed.');
