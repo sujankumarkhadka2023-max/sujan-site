@@ -882,6 +882,47 @@ article .bya{font:700 18px/1.25 Georgia,'Times New Roman',serif;color:var(--ks)}
 article .bya strong{font-weight:700;color:var(--ks)}
 article .bym{font:12.5px/1.4 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--mu);margin-top:3px}
 .meta{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+/* Money tools and Today's rates: Guardian look, readable in light and dark */
+:root:not(.zz) .tlh{background:#052962}
+:root:not(.zz) .tlh h1{font-family:Georgia,'Times New Roman','Noto Serif Devanagari',serif;font-weight:700;color:#ffe500}
+:root:not(.zz) .tlt{gap:8px;padding-bottom:6px}
+:root:not(.zz) .tlt button,:root:not(.zz) .tlm button,:root:not(.zz) .tlc2{background:transparent;color:var(--tx);border:1px solid var(--tx);border-radius:22px;font-family:'Guardian Text Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-weight:700;min-height:44px}
+:root:not(.zz) .tlt button{flex:none;min-width:0;padding:0 20px}
+:root:not(.zz) .tlm button{padding:0 12px}
+:root:not(.zz) .tlc2{min-height:38px;padding:0 16px;font-size:15px}
+:root:not(.zz) .tlt button:hover,:root:not(.zz) .tlm button:hover,:root:not(.zz) .tlc2:hover{background:rgba(127,127,127,.14)}
+:root:not(.zz) .tlt button.on,:root:not(.zz) .tlm button.on{background:#052962;color:#fff;border-color:#052962}
+:root:not(.zz) .tlcd{border:0;border-top:1px solid var(--tx);border-radius:0;padding:14px 0 18px;background:none;box-shadow:none}
+:root:not(.zz) .tlcd h2{font-family:Georgia,'Times New Roman','Noto Serif Devanagari',serif;font-weight:700;color:var(--tx)}
+:root:not(.zz) .tlcd h2 small{color:var(--mu)}
+:root:not(.zz) .tlcd h3{font-family:Georgia,'Times New Roman','Noto Serif Devanagari',serif;color:var(--tx)}
+:root:not(.zz) .tlo h3{color:#ffe500}
+:root:not(.zz) .tlsb,:root:not(.zz) .tln{color:var(--mu)}
+:root:not(.zz) .tlf>span{font-family:'Guardian Text Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--tx)}
+:root:not(.zz) .tlf input,:root:not(.zz) .tlf select{border:1px solid #8a8a8a;border-radius:2px;min-height:46px;background:var(--bg);color:var(--tx)}
+:root:not(.zz) .tlf input:focus,:root:not(.zz) .tlf select:focus{outline:3px solid #ffe500;border-color:var(--tx)}
+:root:not(.zz) .tlo{background:#052962;color:#fff;border-radius:0;box-shadow:none}
+:root:not(.zz) .tlgo{border-radius:22px;background:#ffe500;color:#052962;font-weight:700}
+:root:not(.zz) .tlsp.tlcd{border:0;padding:0}
+:root:not(.zz) .tlcd:not(.tlsp) .tlrw,:root:not(.zz) .tlcd:not(.tlsp) .tlrw span,:root:not(.zz) .tlcd:not(.tlsp) .tlrw b{color:var(--tx)}
+:root:not(.zz) .tlcd:not(.tlsp) .tlgd{color:#0a7d3a}
+:root:not(.zz) .tlo .tlrw,:root:not(.zz) .tlo .tlrw b,:root:not(.zz) .tlo .tlrw span{color:#fff}
+:root:not(.zz) .tlo .tlgd{color:#7ff0a8}
+:root:not(.zz) .tlcd:not(.tlsp) .tlw th{color:var(--tx)}
+:root:not(.zz) .tlcd:not(.tlsp) .tlw th,:root:not(.zz) .tlcd:not(.tlsp) .tlw td{border-bottom:1px solid var(--ln)}
+:root:not(.zz) .tlcd:not(.tlsp) .tlsplit{border-color:var(--ln)}
+:root:not(.zz) .tlcd:not(.tlsp) .tlleg{color:var(--tx)}
+:root:not(.zz) .tlcd:not(.tlsp) .tlslab{background:#052962}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]):not(.zz) .tlt button.on,:root:not([data-theme=light]):not(.zz) .tlm button.on{background:#ffe500;color:#052962;border-color:#ffe500}}
+:root[data-theme=dark]:not(.zz) .tlt button.on,:root[data-theme=dark]:not(.zz) .tlm button.on{background:#ffe500;color:#052962;border-color:#ffe500}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]):not(.zz) .tlcd:not(.tlsp) .tlgd{color:#5fd88f}}
+:root[data-theme=dark]:not(.zz) .tlcd:not(.tlsp) .tlgd{color:#5fd88f}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]):not(.zz) .tlcd:not(.tlsp) .tlb i{background:#ffe500}}
+:root[data-theme=dark]:not(.zz) .tlcd:not(.tlsp) .tlb i{background:#ffe500}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]):not(.zz) .tlcd:not(.tlsp) .tlslab{background:#ffe500}}
+:root[data-theme=dark]:not(.zz) .tlcd:not(.tlsp) .tlslab{background:#ffe500}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]):not(.zz) .tlo{background:#052962;border:1px solid rgba(255,255,255,.25)}}
+:root[data-theme=dark]:not(.zz) .tlo{background:#052962;border:1px solid rgba(255,255,255,.25)}
 .lsrc{line-height:1.8}.lsrc a{color:var(--ac)}
 @media(max-width:560px){.lfacts{grid-template-columns:1fr}.lfacts dt{border-top:1px solid var(--ln)}.lfacts dd{border-top:0}.lh2{font-size:21px}}
 </style>
