@@ -127,7 +127,7 @@ function makeAvatar(){
 function init3D(){
  const canvas=$('mg-canvas'),stage=$('mg-stage');
  scene=new THREE.Scene();scene.background=new THREE.Color(0x4b4a54);
- camera=new THREE.PerspectiveCamera(34,1,.1,100);camera.position.set(3.5,2.45,5.8);
+ camera=new THREE.PerspectiveCamera(34,1,.1,100);camera.position.set(2.7,1.75,4.5);
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;exImport('environments/RoomEnvironment.js').then(m=>{const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new m.RoomEnvironment(),.04).texture}).catch(()=>{});
  scene.add(new THREE.HemisphereLight(0xffffff,0x555560,.5));
  const key=new THREE.DirectionalLight(0xfff2e6,2.6);key.position.set(3,6,5);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
@@ -231,7 +231,7 @@ function poseFor(name,p){
 // ---- Real rigged human model (GLB with a standard Mixamo / Ready Player Me skeleton) ----
 // The hidden procedural skeleton still solves every exercise; its joint rotations are copied onto the real model's bones.
 let rigList=null,rigRoot=null,rigHips=null;
-const MODEL_URLS=['https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/models/gltf/Soldier.glb'];   // male model
+const MODEL_URLS=['/person.glb'];   // real human model: upload person.glb next to index.html (any Mixamo-rigged GLB works)
 let rigOn=false;
 const _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_dn=new THREE.Vector3(0,-1,0);
 function setupModel(gltf){
@@ -273,8 +273,8 @@ function loadModel(url){
  const cib=window.createImageBitmap;window.createImageBitmap=undefined;
  return new Promise((res,rej)=>new GLTFLoader().load(url,res,undefined,rej)).then(setupModel).finally(()=>{window.createImageBitmap=cib});
 }
-async function tryModels(){for(const u of MODEL_URLS){try{await loadModel(u);return}catch(e){console.warn('Model not used:',u,e)}}}
-function modelBtn(){const b=$('mg-load');if(b)b.textContent=rigRoot?(rigOn?'Real model':'Athlete model'):'Real model'}
+async function tryModels(){for(const u of MODEL_URLS){try{await loadModel(u);return}catch(e){console.warn('Model not used:',u,e)}}const b=$('mg-load');if(b)b.textContent='person.glb missing'}
+function modelBtn(){const b=$('mg-load');if(b)b.textContent=rigRoot?(rigOn?'Basic model':'Real person'):'Real person'}
 function toggleModel(){
  if(!rigRoot){const b=$('mg-load');b.textContent='Loading…';tryModels().then(modelBtn);return}
  rigOn=!rigOn;rigRoot.visible=rigOn;avatar.traverse(o=>{if(o.isMesh)o.visible=!rigOn});modelBtn();
@@ -331,7 +331,7 @@ $('mg-exercise').addEventListener('change',e=>choose(e.target.value));
 root.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{choose(b.dataset.pick);$('mg-stage').scrollIntoView({behavior:'smooth',block:'center'})}));
 root.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{
  const view=b.dataset.view;root.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
- const positions={front:[0,2.4,6],side:[6,2.3,0],back:[0,2.4,-6]};const pos=positions[view];camera.position.set(...pos);controls.target.set(0,1.05,0);controls.update();
+ const positions={front:[0,1.7,4.8],side:[4.8,1.6,0],back:[0,1.7,-4.8]};const pos=positions[view];camera.position.set(...pos);controls.target.set(0,1.05,0);controls.update();
 }));
 try{init3D();choose('squat');tryModels().then(modelBtn);$('mg-load').onclick=toggleModel}catch(err){console.error(err);$('mg-state').textContent='3D UNAVAILABLE';$('mg-cue-title').textContent='3D viewer could not start';$('mg-cue').textContent='Check that your site allows JavaScript modules and can load the Three.js CDN. The workout controls require WebGL support.'}
 
