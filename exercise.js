@@ -231,7 +231,7 @@ function poseFor(name,p){
 // ---- Real rigged human model (GLB with a standard Mixamo / Ready Player Me skeleton) ----
 // The hidden procedural skeleton still solves every exercise; its joint rotations are copied onto the real model's bones.
 let rigList=null,rigRoot=null,rigHips=null;
-const MODEL_URLS=['/person.glb'];   // real human model: upload person.glb next to index.html (any Mixamo-rigged GLB works)
+const MODEL_URLS=['/man.glb'];   // real human model: upload man.glb next to index.html (any Mixamo-rigged GLB works)
 let rigOn=false;
 const _q1=new THREE.Quaternion(),_q2=new THREE.Quaternion(),_dn=new THREE.Vector3(0,-1,0);
 function setupModel(gltf){
@@ -273,7 +273,7 @@ function loadModel(url){
  const cib=window.createImageBitmap;window.createImageBitmap=undefined;
  return new Promise((res,rej)=>new GLTFLoader().load(url,res,undefined,rej)).then(setupModel).finally(()=>{window.createImageBitmap=cib});
 }
-async function tryModels(){for(const u of MODEL_URLS){try{await loadModel(u);return}catch(e){console.warn('Model not used:',u,e)}}const b=$('mg-load');if(b)b.textContent='person.glb missing'}
+async function tryModels(){for(const u of MODEL_URLS){try{await loadModel(u);return}catch(e){console.warn('Model not used:',u,e)}}const b=$('mg-load');if(b)b.textContent='man.glb missing'}
 function modelBtn(){const b=$('mg-load');if(b)b.textContent=rigRoot?(rigOn?'Basic model':'Real person'):'Real person'}
 function toggleModel(){
  if(!rigRoot){const b=$('mg-load');b.textContent='Loading…';tryModels().then(modelBtn);return}
