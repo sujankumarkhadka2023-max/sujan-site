@@ -302,6 +302,83 @@ async function ogRewrite(req, env, res) {
   return new Response(html, { status: res.status, headers: h });
 }
 
+// ---- /sitemap.xml: built on request from the fixed pages + every published article, so new articles appear by themselves ----
+const SM_SITE = 'https://sujankumarkhadka.com.np';
+const SM_PAGES = [
+  '/',
+  '/world',
+  '/history',
+  '/opinion',
+  '/culture',
+  '/lifestyle',
+  '/audio',
+  '/videos',
+  '/horoscope',
+  '/weather',
+  '/explore',
+  '/tools',
+  '/rates',
+  '/calculators',
+  '/learn',
+  '/resume',
+  '/trek-planner',
+  '/p/about',
+  '/p/contact',
+  '/p/support',
+  '/p/privacy',
+  '/p/cookies',
+  '/p/terms',
+  '/calculators/basic',
+  '/calculators/percentage',
+  '/calculators/discount',
+  '/calculators/vat',
+  '/calculators/income-tax',
+  '/calculators/loan-emi',
+  '/calculators/interest',
+  '/calculators/age',
+  '/calculators/date-difference',
+  '/calculators/gpa-cgpa',
+  '/calculators/bmi',
+  '/calculators/unit-converter',
+  '/calculators/ad-to-bs',
+  '/learn/english',
+  '/learn/ielts',
+  '/learn/pte',
+  '/learn/maths',
+  '/learn/fitness',
+  '/learn/interview',
+  '/learn/gurkha-uk',
+  '/learn/gurkha-sg',
+  '/learn/nepal-army',
+  '/learn/legion',
+  '/exercise',
+  '/games.html',
+  '/2048.html',
+  '/memory.html',
+  '/slide.html',
+  '/sudoku.html',
+  '/word.html'
+];
+const smEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+const smDay = d => { const t = new Date(d); return isNaN(t) ? '' : t.toISOString().slice(0, 10); };
+async function sitemapResponse(req, env) {
+  const rows = SM_PAGES.map(p => [SM_SITE + p, '']);
+  try {
+    const d = await ogData(env, new URL(req.url).origin), seen = new Set();
+    for (const a of d.articles || []) {
+      const sec = OG_SECT[a.category];
+      if (!sec || !a.slug) continue;
+      const loc = SM_SITE + '/' + sec + '/' + encodeURIComponent(a.slug);
+      if (seen.has(loc)) continue;
+      seen.add(loc);
+      rows.push([loc, smDay(a.updated || a.date)]);
+    }
+  } catch (e) { /* if the article list cannot be read, still serve the fixed pages */ }
+  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    rows.map(([u, m]) => '  <url><loc>' + smEsc(u) + '</loc>' + (m ? '<lastmod>' + m + '</lastmod>' : '') + '</url>').join('\n') + '\n</urlset>\n';
+  return new Response(req.method === 'HEAD' ? null : xml, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+}
+
 async function handle({ request: req, env, next }) {
   const p = new URL(req.url).pathname, r = req.method;
   // Visitor's approximate place from Cloudflare (free, no permission prompt) — used for the weather
@@ -309,6 +386,7 @@ async function handle({ request: req, env, next }) {
     const c = req.cf || {};
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
+  if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) {

@@ -12,6 +12,7 @@
       "/audio/*",
       "/video/*",
       "/",
+      "/sitemap.xml",
       "/world",
       "/opinion",
       "/history",
