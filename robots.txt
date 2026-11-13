@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /developer
+Disallow: /api/admin/
+Disallow: /man.glb
+
+Sitemap: https://sujankumarkhadka.com.np/sitemap.xml
