@@ -387,6 +387,7 @@ async function handle({ request: req, env, next }) {
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
   if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
+  if (p.startsWith('/api/chat/')) return chatRoute(req, env);
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) {
@@ -515,3 +516,94 @@ async function handle({ request: req, env, next }) {
 }
 
 export default { fetch: (request, env) => handle({ request, env, next: () => env.ASSETS.fetch(request) }) };
+
+// ---- CHAT START: private two-person chat. One Durable Object per room. It only relays encrypted text and forgets each message once it has been seen. ----
+const CH_TTL = 6048e5, CH_MAX = 6000, CH_QUEUE = 40;
+const chSend = (ws, o) => { try { ws.send(JSON.stringify(o)); } catch (e) {} };
+function chatRoute(req, env) {
+  const u = new URL(req.url), m = u.pathname.match(/^\/api\/chat\/([A-Za-z0-9_-]{16,64})$/);
+  if (!m) return J({ error: 'Not found' }, 404);
+  if (!env.CHAT) return J({ error: 'Chat is not set up yet.' }, 503);
+  if ((req.headers.get('upgrade') || '').toLowerCase() !== 'websocket') return J({ error: 'Expected a WebSocket connection.' }, 426);
+  const o = req.headers.get('origin');
+  if (o && o !== u.origin) return J({ error: 'Forbidden' }, 403);
+  return env.CHAT.get(env.CHAT.idFromName(m[1])).fetch(req);
+}
+export class ChatRoom {
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  async fetch(req) {
+    if (this.ctx.getWebSockets().length >= 6) return new Response('Room is busy', { status: 429 });
+    const pair = new WebSocketPair(), [client, server] = Object.values(pair);
+    this.ctx.acceptWebSocket(server);
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  peers(slot) { return this.ctx.getWebSockets().filter(s => (s.deserializeAttachment() || {}).slot === slot); }
+  async wipe(why) {
+    for (const s of this.ctx.getWebSockets()) { chSend(s, { t: 'ended', why }); try { s.close(1000, 'ended'); } catch (e) {} }
+    await this.ctx.storage.deleteAlarm();
+    await this.ctx.storage.deleteAll();
+    await this.ctx.storage.put('dead', Date.now()); // the link stays dead, it cannot be reused
+  }
+  async alarm() { await this.wipe('expired'); }
+  async webSocketMessage(ws, data) {
+    if (typeof data !== 'string' || data.length > CH_MAX) { try { ws.close(1009, 'Too large'); } catch (e) {} return; }
+    let m; try { m = JSON.parse(data); } catch (e) { return; }
+    if (!m || typeof m.t !== 'string') return;
+    const st = this.ctx.storage, now = Date.now(), at = ws.deserializeAttachment() || {};
+    // at most 30 messages in 10 seconds per connection
+    let w = at.w || now, n = at.n || 0;
+    if (now - w > 1e4) { w = now; n = 0; }
+    if (++n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
+    at.w = w; at.n = n; ws.serializeAttachment(at);
+    if (m.t === 'hello') {
+      const cid = String(m.cid || '');
+      if (!/^[A-Za-z0-9_-]{16,40}$/.test(cid)) return;
+      if (await st.get('dead')) { chSend(ws, { t: 'ended', why: 'expired' }); try { ws.close(1000, 'ended'); } catch (e) {} return; }
+      const room = (await st.get('room')) || { a: null, b: null, c: now };
+      if (now > room.c + CH_TTL) { await this.wipe('expired'); return; }
+      let slot = room.a === cid ? 'a' : room.b === cid ? 'b' : !room.a ? 'a' : !room.b ? 'b' : null;
+      if (!slot) { chSend(ws, { t: 'full' }); try { ws.close(1000, 'full'); } catch (e) {} return; }
+      room[slot] = cid; await st.put('room', room);
+      for (const s of this.ctx.getWebSockets()) {
+        if (s !== ws && (s.deserializeAttachment() || {}).cid === cid) { chSend(s, { t: 'replaced' }); try { s.close(1000, 'replaced'); } catch (e) {} }
+      }
+      at.cid = cid; at.slot = slot; ws.serializeAttachment(at);
+      const other = slot === 'a' ? 'b' : 'a';
+      chSend(ws, { t: 'joined', you: slot, peer: this.peers(other).length > 0, locked: !!(room.a && room.b), exp: room.c + CH_TTL });
+      for (const s of this.peers(other)) chSend(s, { t: 'peer', on: true, locked: !!(room.a && room.b) });
+      const q = await st.list({ prefix: 'q:' + slot + ':' });
+      for (const [, v] of q) chSend(ws, { t: 'msg', id: v.id, iv: v.iv, ct: v.ct, ts: v.ts });
+      await st.setAlarm(room.c + CH_TTL);
+      return;
+    }
+    if (!at.slot) return;
+    const other = at.slot === 'a' ? 'b' : 'a';
+    if (m.t === 'msg') {
+      const id = String(m.id || ''), iv = String(m.iv || ''), ct = String(m.ct || '');
+      if (!/^[A-Za-z0-9_-]{6,24}$/.test(id) || !iv || iv.length > 40 || !ct || ct.length > 5000) return;
+      const q = await st.list({ prefix: 'q:' + other + ':' });
+      if (q.size >= CH_QUEUE) { chSend(ws, { t: 'err', e: 'queue', id }); return; }
+      const rec = { id, iv, ct, ts: now };
+      await st.put('q:' + other + ':' + id, rec);
+      chSend(ws, { t: 'sent', id });
+      for (const s of this.peers(other)) chSend(s, { t: 'msg', ...rec });
+    } else if (m.t === 'seen') {
+      const id = String(m.id || '');
+      if (!/^[A-Za-z0-9_-]{6,24}$/.test(id)) return;
+      await st.delete('q:' + at.slot + ':' + id);
+      for (const s of this.peers(other)) chSend(s, { t: 'seen', id });
+    } else if (m.t === 'typing') {
+      for (const s of this.peers(other)) chSend(s, { t: 'typing' });
+    } else if (m.t === 'end') {
+      await this.wipe('ended');
+    }
+  }
+  async webSocketClose(ws) {
+    const at = ws.deserializeAttachment() || {};
+    if (!at.slot) return;
+    const other = at.slot === 'a' ? 'b' : 'a';
+    if (this.peers(at.slot).filter(s => s !== ws).length === 0) for (const s of this.peers(other)) chSend(s, { t: 'peer', on: false });
+  }
+  async webSocketError(ws) { await this.webSocketClose(ws); }
+}
+// ---- CHAT END ----
