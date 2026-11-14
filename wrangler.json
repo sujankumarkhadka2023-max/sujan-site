@@ -34,6 +34,14 @@
       {
         "name": "CHAT",
         "class_name": "ChatRoom"
+      },
+      {
+        "name": "GROUP",
+        "class_name": "GroupRoom"
+      },
+      {
+        "name": "USER",
+        "class_name": "ChatUser"
       }
     ]
   },
@@ -43,6 +51,21 @@
       "new_sqlite_classes": [
         "ChatRoom"
       ]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": [
+        "GroupRoom"
+      ]
+    },
+    {
+      "tag": "v3",
+      "new_sqlite_classes": [
+        "ChatUser"
+      ]
     }
-  ]
+  ],
+  "vars": {
+    "GOOGLE_CLIENT_ID": ""
+  }
 }

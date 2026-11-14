@@ -387,7 +387,8 @@ async function handle({ request: req, env, next }) {
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
   if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
-  if (p.startsWith('/api/chat/')) return chatRoute(req, env);
+  if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
+  if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) {
@@ -520,14 +521,47 @@ export default { fetch: (request, env) => handle({ request, env, next: () => env
 // ---- CHAT START: private two-person chat. One Durable Object per room. It only relays encrypted text and forgets each message once it has been seen. ----
 const CH_TTL = 6048e5, CH_MAX = 6000, CH_QUEUE = 40;
 const chSend = (ws, o) => { try { ws.send(JSON.stringify(o)); } catch (e) {} };
+// Sign in with Google (optional: only active when GOOGLE_CLIENT_ID is set). Google proves who the person is, we keep only a hashed id.
+const chKey = env => env.CHAT_SECRET || env.ADMIN_PASSWORD; // CHAT_SECRET is optional; it keeps chat sign-ins fully separate from the developer login
+const chHex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+async function chToken(env, uid) { const exp = Date.now() + 30 * 864e5; return uid + '.' + exp + '.' + await hmac(chKey(env), 'chat' + uid + '.' + exp); }
+async function chVerify(env, tok) {
+  const m = String(tok || '').match(/^(u[0-9a-f]{24})\.(\d{10,15})\.([0-9a-f]{64})$/);
+  if (!m || +m[2] < Date.now() || !chKey(env)) return null;
+  return eq(m[3], await hmac(chKey(env), 'chat' + m[1] + '.' + m[2])) ? m[1] : null;
+}
+async function chatAuthRoute(req, env) {
+  const u = new URL(req.url);
+  if (u.pathname === '/api/chat-config') return J({ gid: env.GOOGLE_CLIENT_ID && chKey(env) ? env.GOOGLE_CLIENT_ID : '' }, 200, { 'cache-control': 'no-store' });
+  if (req.method !== 'POST') return J({ error: 'POST only' }, 405);
+  const o = req.headers.get('origin');
+  if (o && o !== u.origin) return J({ error: 'Forbidden' }, 403);
+  if (!env.GOOGLE_CLIENT_ID || !chKey(env)) return J({ error: 'Sign-in is not set up.' }, 503);
+  let b; try { b = await req.json(); } catch (e) { return J({ error: 'Bad request' }, 400); }
+  const cred = String((b && b.credential) || '');
+  if (cred.length < 100 || cred.length > 4000) return J({ error: 'Bad sign-in' }, 400);
+  let g; try { const r = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(cred)); if (!r.ok) throw 0; g = await r.json(); } catch (e) { return J({ error: 'Google sign-in could not be checked.' }, 401); }
+  const okIss = g.iss === 'accounts.google.com' || g.iss === 'https://accounts.google.com';
+  if (g.aud !== env.GOOGLE_CLIENT_ID || !okIss || !g.sub || +g.exp * 1000 < Date.now() || String(g.email_verified) !== 'true') return J({ error: 'Google sign-in was not accepted.' }, 401);
+  const uid = 'u' + chHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('chat:' + g.sub))).slice(0, 24);
+  const token = await chToken(env, uid);
+  return J({ token, uid, name: String(g.given_name || g.name || '').slice(0, 30), exp: +token.split('.')[1] }, 200, { 'cache-control': 'no-store' });
+}
+async function chWho(env, ws, m, at) { // returns the person's id, or null after telling the browser to sign in
+  if (!env.GOOGLE_CLIENT_ID) return String(m.cid || '');
+  const uid = await chVerify(env, m.tok);
+  if (!uid) { chSend(ws, { t: 'auth' }); try { ws.close(1000, 'auth'); } catch (e) {} return null; }
+  return uid;
+}
 function chatRoute(req, env) {
-  const u = new URL(req.url), m = u.pathname.match(/^\/api\/chat\/([A-Za-z0-9_-]{16,64})$/);
+  const u = new URL(req.url), m = u.pathname.match(/^\/api\/(chat|group)\/([A-Za-z0-9_-]{16,64})$/);
   if (!m) return J({ error: 'Not found' }, 404);
-  if (!env.CHAT) return J({ error: 'Chat is not set up yet.' }, 503);
+  const ns = m[1] === 'group' ? env.GROUP : env.CHAT;
+  if (!ns) return J({ error: 'Chat is not set up yet.' }, 503);
   if ((req.headers.get('upgrade') || '').toLowerCase() !== 'websocket') return J({ error: 'Expected a WebSocket connection.' }, 426);
   const o = req.headers.get('origin');
   if (o && o !== u.origin) return J({ error: 'Forbidden' }, 403);
-  return env.CHAT.get(env.CHAT.idFromName(m[1])).fetch(req);
+  return ns.get(ns.idFromName(m[2])).fetch(req);
 }
 export class ChatRoom {
   constructor(ctx, env) { this.ctx = ctx; this.env = env; }
@@ -556,7 +590,7 @@ export class ChatRoom {
     if (++n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
     at.w = w; at.n = n; ws.serializeAttachment(at);
     if (m.t === 'hello') {
-      const cid = String(m.cid || '');
+      const cid = await chWho(this.env, ws, m, at); if (cid === null) return;
       if (!/^[A-Za-z0-9_-]{16,40}$/.test(cid)) return;
       if (await st.get('dead')) { chSend(ws, { t: 'ended', why: 'expired' }); try { ws.close(1000, 'ended'); } catch (e) {} return; }
       const room = (await st.get('room')) || { a: null, b: null, c: now };
@@ -607,3 +641,129 @@ export class ChatRoom {
   async webSocketError(ws) { await this.webSocketClose(ws); }
 }
 // ---- CHAT END ----
+
+// ---- GROUP START: group chat, up to 20 people. Messages are encrypted in the browser and kept for one hour, then deleted. ----
+const GR_MAX = 20, GR_KEEP = 36e5, GR_STORE = 200;
+export class GroupRoom {
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  async fetch(req) {
+    if (this.ctx.getWebSockets().length >= 60) return new Response('Room is busy', { status: 429 });
+    const rid = new URL(req.url).pathname.split('/').pop();
+    if ((await this.ctx.storage.get('rid')) !== rid) await this.ctx.storage.put('rid', rid);
+    const pair = new WebSocketPair(), [client, server] = Object.values(pair);
+    this.ctx.acceptWebSocket(server);
+    return new Response(null, { status: 101, webSocket: client });
+  }
+  online() { return this.ctx.getWebSockets().filter(s => (s.deserializeAttachment() || {}).cid); }
+  async reg(uid, op, exp) { // the person's own list of groups, kept by a small per-person object: at most 5 groups
+    if (!this.env.GOOGLE_CLIENT_ID || !this.env.USER || !/^u[0-9a-f]{24}$/.test(uid)) return true;
+    try { const rid = await this.ctx.storage.get('rid'); if (!rid) return true;
+      const r = await this.env.USER.get(this.env.USER.idFromName(uid)).fetch('https://u.local/' + op + '?r=' + encodeURIComponent(rid) + '&x=' + (exp || 0));
+      return !!(await r.json()).ok; } catch (e) { return true; }
+  }
+  async count(ws) {
+    const room = (await this.ctx.storage.get('room')) || { m: [] };
+    const n = new Set(this.online().filter(s => s !== ws).map(s => s.deserializeAttachment().cid)).size;
+    return { t: 'n', on: n, members: room.m.length };
+  }
+  async wipe(why) {
+    for (const s of this.ctx.getWebSockets()) { chSend(s, { t: 'ended', why }); try { s.close(1000, 'ended'); } catch (e) {} }
+    const room = await this.ctx.storage.get('room');
+    if (room) for (const uid of room.m) await this.reg(uid, 'leave', 0);
+    const rid = await this.ctx.storage.get('rid');
+    await this.ctx.storage.deleteAlarm();
+    await this.ctx.storage.deleteAll();
+    await this.ctx.storage.put('dead', Date.now());
+    if (rid) await this.ctx.storage.put('rid', rid);
+  }
+  async plan() {
+    const st = this.ctx.storage, room = await st.get('room'); if (!room) return;
+    const end = room.c + CH_TTL, old = await st.list({ prefix: 'g:', limit: 1 });
+    let next = end;
+    for (const [, v] of old) next = Math.min(end, v.ts + GR_KEEP + 1000);
+    await st.setAlarm(next);
+  }
+  async alarm() {
+    const st = this.ctx.storage, now = Date.now(), room = await st.get('room');
+    if (!room || now >= room.c + CH_TTL) { await this.wipe('expired'); return; }
+    for (const [k, v] of await st.list({ prefix: 'g:' })) if (now - v.ts >= GR_KEEP) await st.delete(k);
+    await this.plan();
+  }
+  async webSocketMessage(ws, data) {
+    if (typeof data !== 'string' || data.length > CH_MAX) { try { ws.close(1009, 'Too large'); } catch (e) {} return; }
+    let m; try { m = JSON.parse(data); } catch (e) { return; }
+    if (!m || typeof m.t !== 'string') return;
+    const st = this.ctx.storage, now = Date.now(), at = ws.deserializeAttachment() || {};
+    let w = at.w || now, n = at.n || 0;
+    if (now - w > 1e4) { w = now; n = 0; }
+    if (++n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
+    at.w = w; at.n = n; ws.serializeAttachment(at);
+    if (m.t === 'hello') {
+      const cid = await chWho(this.env, ws, m, at); if (cid === null) return;
+      if (!/^[A-Za-z0-9_-]{16,40}$/.test(cid)) return;
+      if (await st.get('dead')) { chSend(ws, { t: 'ended', why: 'expired' }); try { ws.close(1000, 'ended'); } catch (e) {} return; }
+      const room = (await st.get('room')) || { m: [], c: now, o: cid };
+      if (now > room.c + CH_TTL) { await this.wipe('expired'); return; }
+      if (!room.m.includes(cid)) {
+        if (room.m.length >= GR_MAX) { chSend(ws, { t: 'full' }); try { ws.close(1000, 'full'); } catch (e) {} return; }
+        if (!(await this.reg(cid, 'join', room.c + CH_TTL))) { chSend(ws, { t: 'limit' }); try { ws.close(1000, 'limit'); } catch (e) {} return; }
+        room.m.push(cid);
+      }
+      await st.put('room', room);
+      for (const s of this.ctx.getWebSockets()) {
+        if (s !== ws && (s.deserializeAttachment() || {}).cid === cid) { chSend(s, { t: 'replaced' }); try { s.close(1000, 'replaced'); } catch (e) {} }
+      }
+      at.cid = cid; ws.serializeAttachment(at);
+      chSend(ws, { t: 'joined', owner: room.o === cid, exp: room.c + CH_TTL, max: GR_MAX });
+      for (const [, v] of await st.list({ prefix: 'g:' })) if (now - v.ts < GR_KEEP) chSend(ws, { t: 'msg', id: v.id, iv: v.iv, ct: v.ct, ts: v.ts });
+      const c = await this.count();
+      for (const s of this.online()) chSend(s, c);
+      await this.plan();
+      return;
+    }
+    if (!at.cid) return;
+    if (m.t === 'msg') {
+      const id = String(m.id || ''), iv = String(m.iv || ''), ct = String(m.ct || '');
+      if (!/^[A-Za-z0-9_-]{6,24}$/.test(id) || !iv || iv.length > 40 || !ct || ct.length > 5000) return;
+      const all = await st.list({ prefix: 'g:' });
+      if (all.size >= GR_STORE) { const first = [...all.keys()][0]; await st.delete(first); }
+      const rec = { id, iv, ct, ts: now };
+      await st.put('g:' + String(now).padStart(14, '0') + ':' + id, rec);
+      await this.plan();
+      chSend(ws, { t: 'sent', id, ts: now });
+      for (const s of this.online()) if (s !== ws) chSend(s, { t: 'msg', ...rec });
+    } else if (m.t === 'typing') {
+      for (const s of this.online()) if (s !== ws) chSend(s, { t: 'typing' });
+    } else if (m.t === 'leave') {
+      const room = await st.get('room');
+      if (room) { room.m = room.m.filter(x => x !== at.cid); await st.put('room', room); await this.reg(at.cid, 'leave', 0); }
+      at.cid = null; ws.serializeAttachment(at); try { ws.close(1000, 'left'); } catch (e) {}
+      const c = await this.count();
+      for (const s of this.online()) chSend(s, c);
+    } else if (m.t === 'end') {
+      const room = await st.get('room');
+      if (room && room.o === at.cid) await this.wipe('ended');
+    }
+  }
+  async webSocketClose(ws) {
+    const at = ws.deserializeAttachment() || {};
+    if (!at.cid) return;
+    const c = await this.count(ws);
+    for (const s of this.online()) if (s !== ws) chSend(s, c);
+  }
+  async webSocketError(ws) { await this.webSocketClose(ws); }
+}
+export class ChatUser {
+  constructor(ctx) { this.ctx = ctx; }
+  async fetch(req) {
+    const u = new URL(req.url), r = (u.searchParams.get('r') || '').slice(0, 64), x = +u.searchParams.get('x') || 0, st = this.ctx.storage, now = Date.now();
+    const g = (await st.get('g')) || {};
+    for (const k in g) if (g[k] <= now) delete g[k];
+    let ok = true;
+    if (u.pathname === '/join') { if (!g[r]) { if (Object.keys(g).length >= 5) ok = false; else g[r] = x || now + 7 * 864e5; } }
+    else if (u.pathname === '/leave') delete g[r];
+    await st.put('g', g);
+    return new Response(JSON.stringify({ ok, n: Object.keys(g).length }));
+  }
+}
+// ---- GROUP END ----
