@@ -293,9 +293,10 @@ async function ogRewrite(req, env, res) {
   if (!o) return res;
   let html = await res.text();
   const full = o.title === OG_NAME ? OG_NAME : o.title + ' — ' + OG_NAME;
-  html = html.replace(/<title>[\s\S]*?<\/title>/i, '<title>' + ogEsc(full) + '</title>')
-    .replace(/<meta name="description" content="[^"]*">/i, '<meta name="description" content="' + ogEsc(o.desc) + '">')
-    .replace(/<\/head>/i, ogMeta(o) + '</head>');
+  const t1 = '<title>' + ogEsc(full) + '</title>', t2 = '<meta name="description" content="' + ogEsc(o.desc) + '">', t3 = ogMeta(o) + '</head>';
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, () => t1) // function replacers: a "$&" in a story title must not be treated as a pattern
+    .replace(/<meta name="description" content="[^"]*">/i, () => t2)
+    .replace(/<\/head>/i, () => t3);
   const h = new Headers(res.headers);
   ['content-length', 'content-encoding', 'etag'].forEach(k => h.delete(k));
   h.set('cache-control', 'public, max-age=0, must-revalidate');
@@ -516,10 +517,45 @@ async function handle({ request: req, env, next }) {
   }
 }
 
-export default { fetch: (request, env) => handle({ request, env, next: () => env.ASSETS.fetch(request) }) };
+export default {
+  async fetch(request, env) {
+    const res = await handle({ request, env, next: () => env.ASSETS.fetch(request) });
+    if (res.status === 101 || res.webSocket) return res;
+    const h = new Headers(res.headers); // basic browser safety headers on every response
+    if (!h.has('x-content-type-options')) h.set('x-content-type-options', 'nosniff');
+    if (!h.has('referrer-policy')) h.set('referrer-policy', 'strict-origin-when-cross-origin');
+    if (!h.has('x-frame-options')) h.set('x-frame-options', 'SAMEORIGIN');
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
+  }
+};
 
 // ---- CHAT START: private two-person chat. One Durable Object per room. It only relays encrypted text and forgets each message once it has been seen. ----
 const CH_TTL = 6048e5, CH_MAX = 6000, CH_QUEUE = 40;
+// Files and voice messages: the browser cuts an encrypted file into pieces, the server only stores the scrambled pieces for one hour.
+const CH_BLOB = 3e5, CH_FCH = 44, CH_QUOTA = 40e6, CH_HOUR = 36e5, CH_FID = /^[A-Za-z0-9_-]{6,24}$/;
+const chBK = (fid, i) => 'b:' + fid + ':' + String(i).padStart(2, '0');
+async function blobPut(st, m, now) {
+  const fid = String(m.fid || ''), i = m.i, iv = String(m.iv || ''), ct = String(m.ct || '');
+  if (!CH_FID.test(fid) || !Number.isInteger(i) || i < 0 || i >= CH_FCH || !iv || iv.length > 40 || !ct || ct.length > 280000) return 'blobbad';
+  const old = await st.get(chBK(fid, i)), bq = (await st.get('bq')) || 0, add = ct.length - (old ? old.ct.length : 0);
+  if (bq + add > CH_QUOTA) return 'blobfull';
+  await st.put(chBK(fid, i), { iv, ct });
+  const bm = (await st.get('bm:' + fid)) || { s: 0 }; bm.s += add; await st.put('bm:' + fid, bm);
+  await st.put('bq', bq + add);
+  if (!(await st.get('bx:' + fid))) await st.put('bx:' + fid, now + CH_HOUR);
+  return '';
+}
+async function blobKeep(st, fid, until) { if (CH_FID.test(fid) && (await st.get('bx:' + fid))) await st.put('bx:' + fid, until); }
+async function blobSweep(st, now) {
+  for (const [k, until] of await st.list({ prefix: 'bx:' })) {
+    if (until > now) continue;
+    const fid = k.slice(3), bm = await st.get('bm:' + fid);
+    for (const [bk] of await st.list({ prefix: 'b:' + fid + ':' })) await st.delete(bk);
+    if (bm) await st.put('bq', Math.max(0, ((await st.get('bq')) || 0) - bm.s));
+    await st.delete('bm:' + fid); await st.delete(k);
+  }
+}
+async function blobNext(st) { let n = 0; for (const [, v] of await st.list({ prefix: 'bx:' })) if (!n || v < n) n = v; return n; }
 const chSend = (ws, o) => { try { ws.send(JSON.stringify(o)); } catch (e) {} };
 // Sign in with Google (optional: only active when GOOGLE_CLIENT_ID is set). Google proves who the person is, we keep only a hashed id.
 const chKey = env => env.CHAT_SECRET || env.ADMIN_PASSWORD; // CHAT_SECRET is optional; it keeps chat sign-ins fully separate from the developer login
@@ -534,6 +570,7 @@ async function chatAuthRoute(req, env) {
   const u = new URL(req.url);
   if (u.pathname === '/api/chat-config') return J({ gid: env.GOOGLE_CLIENT_ID && chKey(env) ? env.GOOGLE_CLIENT_ID : '' }, 200, { 'cache-control': 'no-store' });
   if (req.method !== 'POST') return J({ error: 'POST only' }, 405);
+  if (await chHit(req, 'login', 20)) return J({ error: 'Too many sign-in attempts. Wait a minute.' }, 429);
   const o = req.headers.get('origin');
   if (o && o !== u.origin) return J({ error: 'Forbidden' }, 403);
   if (!env.GOOGLE_CLIENT_ID || !chKey(env)) return J({ error: 'Sign-in is not set up.' }, 503);
@@ -553,7 +590,19 @@ async function chWho(env, ws, m, at) { // returns the person's id, or null after
   if (!uid) { chSend(ws, { t: 'auth' }); try { ws.close(1000, 'auth'); } catch (e) {} return null; }
   return uid;
 }
-function chatRoute(req, env) {
+// simple per-visitor speed limit (spam guard): at most `max` calls per minute from one address
+async function chHit(req, kind, max) {
+  try {
+    if (typeof caches === 'undefined') return false;
+    const ip = req.headers.get('cf-connecting-ip') || 'x', k = new Request('https://rl.local/' + kind + '/' + encodeURIComponent(ip)), c = await caches.default.match(k);
+    const n = c ? +(await c.text()) || 0 : 0;
+    if (n >= max) return true;
+    await caches.default.put(k, new Response(String(n + 1), { headers: { 'cache-control': 'max-age=60' } }));
+  } catch (e) {}
+  return false;
+}
+async function chatRoute(req, env) {
+  if (await chHit(req, 'ws', 60)) return J({ error: 'Too many requests. Wait a minute.' }, 429);
   const u = new URL(req.url), m = u.pathname.match(/^\/api\/(chat|group)\/([A-Za-z0-9_-]{16,64})$/);
   if (!m) return J({ error: 'Not found' }, 404);
   const ns = m[1] === 'group' ? env.GROUP : env.CHAT;
@@ -578,16 +627,26 @@ export class ChatRoom {
     await this.ctx.storage.deleteAll();
     await this.ctx.storage.put('dead', Date.now()); // the link stays dead, it cannot be reused
   }
-  async alarm() { await this.wipe('expired'); }
+  async plan() {
+    const st = this.ctx.storage, room = await st.get('room'); if (!room) return;
+    let next = room.c + CH_TTL; const bx = await blobNext(st); if (bx) next = Math.min(next, bx + 500);
+    await st.setAlarm(next);
+  }
+  async alarm() {
+    const st = this.ctx.storage, now = Date.now(), room = await st.get('room');
+    if (!room || now >= room.c + CH_TTL) { await this.wipe('expired'); return; }
+    await blobSweep(st, now); await this.plan();
+  }
   async webSocketMessage(ws, data) {
-    if (typeof data !== 'string' || data.length > CH_MAX) { try { ws.close(1009, 'Too large'); } catch (e) {} return; }
+    if (typeof data !== 'string' || data.length > CH_BLOB || (data.length > CH_MAX && !data.startsWith('{"t":"blob"'))) { try { ws.close(1009, 'Too large'); } catch (e) {} return; }
     let m; try { m = JSON.parse(data); } catch (e) { return; }
     if (!m || typeof m.t !== 'string') return;
     const st = this.ctx.storage, now = Date.now(), at = ws.deserializeAttachment() || {};
     // at most 30 messages in 10 seconds per connection
     let w = at.w || now, n = at.n || 0;
     if (now - w > 1e4) { w = now; n = 0; }
-    if (++n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
+    n += (m.t === 'blob' || m.t === 'get') ? 0.25 : 1;
+    if (n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
     at.w = w; at.n = n; ws.serializeAttachment(at);
     if (m.t === 'hello') {
       const cid = await chWho(this.env, ws, m, at); if (cid === null) return;
@@ -606,8 +665,8 @@ export class ChatRoom {
       chSend(ws, { t: 'joined', you: slot, peer: this.peers(other).length > 0, locked: !!(room.a && room.b), exp: room.c + CH_TTL });
       for (const s of this.peers(other)) chSend(s, { t: 'peer', on: true, locked: !!(room.a && room.b) });
       const q = await st.list({ prefix: 'q:' + slot + ':' });
-      for (const [, v] of q) chSend(ws, { t: 'msg', id: v.id, iv: v.iv, ct: v.ct, ts: v.ts });
-      await st.setAlarm(room.c + CH_TTL);
+      for (const [, v] of q) chSend(ws, { t: 'msg', id: v.id, iv: v.iv, ct: v.ct, ts: v.ts, fid: v.fid });
+      await this.plan();
       return;
     }
     if (!at.slot) return;
@@ -618,14 +677,24 @@ export class ChatRoom {
       const q = await st.list({ prefix: 'q:' + other + ':' });
       if (q.size >= CH_QUEUE) { chSend(ws, { t: 'err', e: 'queue', id }); return; }
       const rec = { id, iv, ct, ts: now };
+      const fid = m.fid ? String(m.fid) : '';
+      if (fid) { if (!CH_FID.test(fid)) return; rec.fid = fid; const rm = await st.get('room'); await blobKeep(st, fid, rm.c + CH_TTL); }
       await st.put('q:' + other + ':' + id, rec);
       chSend(ws, { t: 'sent', id });
       for (const s of this.peers(other)) chSend(s, { t: 'msg', ...rec });
     } else if (m.t === 'seen') {
       const id = String(m.id || '');
       if (!/^[A-Za-z0-9_-]{6,24}$/.test(id)) return;
+      const seenRec = await st.get('q:' + at.slot + ':' + id);
       await st.delete('q:' + at.slot + ':' + id);
+      if (seenRec && seenRec.fid) { await blobKeep(st, seenRec.fid, now + CH_HOUR); await this.plan(); }
       for (const s of this.peers(other)) chSend(s, { t: 'seen', id });
+    } else if (m.t === 'blob') {
+      const e = await blobPut(st, m, now);
+      if (e) chSend(ws, { t: 'err', e, fid: m.fid }); else { chSend(ws, { t: 'bok', fid: m.fid, i: m.i }); await this.plan(); }
+    } else if (m.t === 'get') {
+      const row = CH_FID.test(String(m.fid || '')) && Number.isInteger(m.i) ? await st.get(chBK(m.fid, m.i)) : null;
+      chSend(ws, row ? { t: 'blob', fid: m.fid, i: m.i, iv: row.iv, ct: row.ct } : { t: 'nob', fid: m.fid });
     } else if (m.t === 'typing') {
       for (const s of this.peers(other)) chSend(s, { t: 'typing' });
     } else if (m.t === 'end') {
@@ -681,22 +750,25 @@ export class GroupRoom {
     const end = room.c + CH_TTL, old = await st.list({ prefix: 'g:', limit: 1 });
     let next = end;
     for (const [, v] of old) next = Math.min(end, v.ts + GR_KEEP + 1000);
+    const bx = await blobNext(st); if (bx) next = Math.min(next, bx + 500);
     await st.setAlarm(next);
   }
   async alarm() {
     const st = this.ctx.storage, now = Date.now(), room = await st.get('room');
     if (!room || now >= room.c + CH_TTL) { await this.wipe('expired'); return; }
     for (const [k, v] of await st.list({ prefix: 'g:' })) if (now - v.ts >= GR_KEEP) await st.delete(k);
+    await blobSweep(st, now);
     await this.plan();
   }
   async webSocketMessage(ws, data) {
-    if (typeof data !== 'string' || data.length > CH_MAX) { try { ws.close(1009, 'Too large'); } catch (e) {} return; }
+    if (typeof data !== 'string' || data.length > CH_BLOB || (data.length > CH_MAX && !data.startsWith('{"t":"blob"'))) { try { ws.close(1009, 'Too large'); } catch (e) {} return; }
     let m; try { m = JSON.parse(data); } catch (e) { return; }
     if (!m || typeof m.t !== 'string') return;
     const st = this.ctx.storage, now = Date.now(), at = ws.deserializeAttachment() || {};
     let w = at.w || now, n = at.n || 0;
     if (now - w > 1e4) { w = now; n = 0; }
-    if (++n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
+    n += (m.t === 'blob' || m.t === 'get') ? 0.25 : 1;
+    if (n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
     at.w = w; at.n = n; ws.serializeAttachment(at);
     if (m.t === 'hello') {
       const cid = await chWho(this.env, ws, m, at); if (cid === null) return;
@@ -715,7 +787,7 @@ export class GroupRoom {
       }
       at.cid = cid; ws.serializeAttachment(at);
       chSend(ws, { t: 'joined', owner: room.o === cid, exp: room.c + CH_TTL, max: GR_MAX });
-      for (const [, v] of await st.list({ prefix: 'g:' })) if (now - v.ts < GR_KEEP) chSend(ws, { t: 'msg', id: v.id, iv: v.iv, ct: v.ct, ts: v.ts });
+      for (const [, v] of await st.list({ prefix: 'g:' })) if (now - v.ts < GR_KEEP) chSend(ws, { t: 'msg', id: v.id, iv: v.iv, ct: v.ct, ts: v.ts, fid: v.fid });
       const c = await this.count();
       for (const s of this.online()) chSend(s, c);
       await this.plan();
@@ -728,10 +800,18 @@ export class GroupRoom {
       const all = await st.list({ prefix: 'g:' });
       if (all.size >= GR_STORE) { const first = [...all.keys()][0]; await st.delete(first); }
       const rec = { id, iv, ct, ts: now };
+      const fid = m.fid ? String(m.fid) : '';
+      if (fid) { if (!CH_FID.test(fid)) return; rec.fid = fid; await blobKeep(st, fid, now + GR_KEEP); }
       await st.put('g:' + String(now).padStart(14, '0') + ':' + id, rec);
       await this.plan();
       chSend(ws, { t: 'sent', id, ts: now });
       for (const s of this.online()) if (s !== ws) chSend(s, { t: 'msg', ...rec });
+    } else if (m.t === 'blob') {
+      const e = await blobPut(st, m, now);
+      if (e) chSend(ws, { t: 'err', e, fid: m.fid }); else { chSend(ws, { t: 'bok', fid: m.fid, i: m.i }); await this.plan(); }
+    } else if (m.t === 'get') {
+      const row = CH_FID.test(String(m.fid || '')) && Number.isInteger(m.i) ? await st.get(chBK(m.fid, m.i)) : null;
+      chSend(ws, row ? { t: 'blob', fid: m.fid, i: m.i, iv: row.iv, ct: row.ct } : { t: 'nob', fid: m.fid });
     } else if (m.t === 'typing') {
       for (const s of this.online()) if (s !== ws) chSend(s, { t: 'typing' });
     } else if (m.t === 'leave') {

@@ -51,6 +51,16 @@ const CSS=`
 .chs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .chwho{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--ln);padding:8px 0;margin-bottom:6px;font-size:14px;color:var(--mu)}.chwho b{color:var(--tx)}.chwho code{font:600 13px ui-monospace,monospace;background:color-mix(in srgb,var(--tx) 7%,var(--bg));padding:2px 6px;border-radius:3px}
 .chgate{max-width:460px;border-top:4px solid #ffd900;padding-top:14px}#ch-g{min-height:48px;margin:16px 0}
+.ch [hidden]{display:none!important}
+.chi{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--ln);background:var(--bg);color:var(--tx);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.chi:hover{background:#ffd900;border-color:#ffd900;color:#052962}.chi svg{width:20px;height:20px}
+.chrec{display:flex;align-items:center;gap:10px;margin-top:10px;padding:8px 12px;border:1px solid var(--ac);border-radius:999px;color:var(--ac);font:700 14px system-ui,sans-serif}
+.chrec i{width:10px;height:10px;border-radius:50%;background:var(--ac);animation:chp 1s infinite}@keyframes chp{50%{opacity:.25}}
+.chrec .tm{flex:1}.chrec button{border-radius:999px;padding:7px 14px;font:700 13px system-ui,sans-serif;cursor:pointer;border:1px solid var(--ac);background:transparent;color:var(--ac)}.chrec button.go{background:var(--ac);color:#fff}
+.chf{display:flex;flex-direction:column;gap:6px;min-width:190px}
+.chf .fn{font-weight:700;overflow-wrap:anywhere}.chf .fs{font:12px system-ui,sans-serif;opacity:.8}
+.chf button{align-self:flex-start;border-radius:999px;padding:7px 14px;font:700 13px system-ui,sans-serif;cursor:pointer;border:1px solid currentColor;background:transparent;color:inherit}
+.chf audio{width:100%;max-width:260px;height:36px}.chf img{max-width:100%;max-height:260px;border-radius:6px;display:block}
 .chnick{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:14px;color:var(--mu)}.chnick input{flex:1;padding:7px 10px;border:1px solid var(--ln);border-radius:4px;background:var(--bg);color:var(--tx)}
 `;
 const SH={fb:'<path d="M13.5 22v-8h2.7l.5-3.3h-3.2V8.6c0-.9.3-1.6 1.7-1.6h1.6V4.1C16.4 4 15.5 4 14.4 4 12 4 10.3 5.5 10.3 8.2v2.5H7.5V14h2.8v8z"/>',x:'<path d="M18.2 3h3.1l-6.8 7.8L22.5 21h-6.3l-4.9-6.4L5.6 21H2.5l7.3-8.3L2 3h6.4l4.4 5.9zm-1.1 16.2h1.7L7.3 4.7H5.5z"/>',wa:'<path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.1.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.5.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.2.1.8-.1 1.5z"/>'};
@@ -70,7 +80,7 @@ function chats(){const now=Date.now();const a=ls.get('sk_chats',[]).filter(e=>e&
 function saveChat(e){const a=chats().filter(x=>x.r!==e.r);a.unshift(e);ls.set('sk_chats',a)}
 function dropChat(r){ls.set('sk_chats',chats().filter(x=>x.r!==r));ls.del('skm_'+r)}
 let S=null,tick=0;
-function dispose(){if(S){S.stop=true;try{S.ws&&S.ws.close()}catch(e){}}S=null;if(tick){clearInterval(tick);tick=0}}
+function dispose(){if(S){if(S.rec){try{S.rec.rc.stop();S.rec.st.getTracks().forEach(t=>t.stop())}catch(e){}clearInterval(S.rec.tm)}for(const m of S.msgs.values())if(m.url)URL.revokeObjectURL(m.url);S.stop=true;try{S.ws&&S.ws.close()}catch(e){}}S=null;if(tick){clearInterval(tick);tick=0}}
 function left(ms){const s=Math.max(0,Math.ceil(ms/1000));if(s>=3600)return Math.ceil(s/3600)+' h';if(s>=60)return Math.ceil(s/60)+' min';return s+' s'}
 function days(ms){const d=Math.max(0,Math.ceil(ms/864e5));return d+(d===1?' day':' days')}
 
@@ -150,7 +160,7 @@ async function room(root,h){
   ent={k:h.k,r:h.room,key:h.key,n:isG?h.name:'Private chat',c:Date.now(),x:Date.now()+7*864e5};saveChat(ent)}
  let key;try{key=await crypto.subtle.importKey('raw',UB64(h.key),'AES-GCM',false,['encrypt','decrypt'])}catch(e){root.innerHTML='<div class="chnote">This link is not valid.</div><button class="chb" onclick="location.hash=\'\'">All chats</button>';return}
  let cid=ls.get('skc_'+h.room,null);if(!cid){cid=rid(18);ls.set('skc_'+h.room,cid)}
- S={k:h.k,room:h.room,key,cid,msgs:new Map(),ws:null,tries:0,stop:false,peer:false,locked:false,hadPeer:false,ent,link:location.href,owner:false,on:0,members:0,nick:ls.get('sk_nick','')};
+ S={k:h.k,room:h.room,key,cid,msgs:new Map(),w:new Map(),nodes:new Map(),ws:null,tries:0,stop:false,peer:false,locked:false,hadPeer:false,ent,link:location.href,owner:false,on:0,members:0,nick:ls.get('sk_nick','')};
  const title=esc(isG?ent.n:'Private chat');
  root.innerHTML=`<div class="chbar"><button class="chb g" id="ch-back" type="button">← All chats</button><span class="chbadge">${isG?'Group · up to '+GMAX:'Two people'}</span></div>
  <div class="chk">${isG?'Group chat':'Private chat'}</div><h1 style="font-size:32px">${title}</h1>${who()}
@@ -158,8 +168,9 @@ async function room(root,h){
  <div class="chbox" id="ch-share"${isG?'':' hidden'}><b>${isG?'Invite people to this group':'Send this link to one person only'}</b><p class="chn" style="margin:4px 0 8px">${isG?'Anyone with this link can join and read the group, up to '+GMAX+' people. ':'It locks when your friend opens it. Anyone who has this link can read the chat. '}<b id="ch-exp"></b></p><input id="ch-link" readonly aria-label="Chat link"><div class="chs"><button class="chb" id="ch-copy" type="button">Copy link</button><button class="chb g" id="ch-share-b" type="button">Share…</button></div><div class="shi" role="group" aria-label="Share this chat link"><div id="ch-icons"></div></div></div>
  ${isG?'<label class="chnick">Your name in this group <input id="ch-nick" maxlength="20" placeholder="For example Sujan"></label>':''}
  <div class="chlog" id="ch-log" aria-live="polite"></div><div class="chn" id="ch-ty" style="min-height:18px"></div>
- <div class="chc"><textarea id="ch-in" rows="1" maxlength="1000" placeholder="Write a message" aria-label="Message"></textarea><button class="chb" id="ch-send" type="button">Send</button></div>
- <div class="chbar" style="margin-top:8px"><span class="chn" style="margin:0">Messages disappear one hour after they are ${isG?'sent':'seen'}.</span><button class="chb r" id="ch-end" type="button">${isG?(ent.owner?'End group':'Leave group'):'End chat'}</button></div>
+ <div class="chrec" id="ch-rec" hidden><i></i><span class="tm" id="ch-rtm">Recording 0:00</span><button id="ch-rcx" type="button">Cancel</button><button class="go" id="ch-rsd" type="button">Send</button></div>
+ <div class="chc" id="ch-comp"><button class="chi" id="ch-att" type="button" aria-label="Send a file" title="Send a file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></svg></button><button class="chi" id="ch-mic" type="button" aria-label="Record a voice message" title="Record a voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><textarea id="ch-in" rows="1" maxlength="1000" placeholder="Write a message" aria-label="Message"></textarea><button class="chb" id="ch-send" type="button">Send</button></div><input type="file" id="ch-file" hidden>
+ <div class="chbar" style="margin-top:8px"><span class="chn" style="margin:0">Messages, voice notes and files (up to 8 MB) disappear one hour after they are ${isG?'sent':'seen'}.</span><button class="chb r" id="ch-end" type="button">${isG?(ent.owner?'End group':'Leave group'):'End chat'}</button></div>
  <p class="chn">Screenshots cannot be blocked. Chat only with people you trust. To report abuse, leave the chat and write to us on the Contact page.</p>`;
  $('ch-back').onclick=()=>{location.hash=''};{const o=$('ch-out');if(o)o.onclick=()=>{ls.del('sk_cu');route()}}
  const link=location.href;$('ch-link').value=link;
@@ -170,6 +181,8 @@ async function room(root,h){
   $('ch-icons').innerHTML=l('https://www.facebook.com/sharer/sharer.php?u='+u,'Share on Facebook',f(SH.fb))+l('https://twitter.com/intent/tweet?url='+u+'&text='+t,'Share on X',f(SH.x))+l('https://wa.me/?text='+t+'%20'+u,'Share on WhatsApp',f(SH.wa))+l('mailto:?subject='+encodeURIComponent(isG?ent.n:'Private chat')+'&body='+t+'%20'+u,'Share by email','<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg>')}
  if(isG){const ni=$('ch-nick');ni.value=S.nick;ni.onchange=()=>{S.nick=ni.value.trim().slice(0,20);ls.set('sk_nick',S.nick)}}
  $('ch-send').onclick=send;
+ $('ch-att').onclick=()=>$('ch-file').click();$('ch-file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)sendFile(f,{})};
+ $('ch-mic').onclick=recStart;$('ch-rcx').onclick=()=>recStop(false);$('ch-rsd').onclick=()=>recStop(true);
  $('ch-in').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!/Android|iPhone|iPad/i.test(navigator.userAgent)){e.preventDefault();send()}};
  let lt=0;$('ch-in').oninput=()=>{const n=Date.now();if(S.ws&&S.ws.readyState===1&&n-lt>2500){lt=n;S.ws.send(JSON.stringify({t:'typing'}))}};
  $('ch-end').onclick=()=>{
@@ -178,32 +191,108 @@ async function room(root,h){
   else{if(!confirm('End this chat for both of you and delete everything?'))return;if(S.ws&&S.ws.readyState===1)S.ws.send(JSON.stringify({t:'end'}));else finish('Chat ended.')}};
  document.onvisibilitychange=ackPending;window.onfocus=ackPending;
  await load();draw();
- tick=setInterval(()=>{if(!S||!$('ch-log')){dispose();return}const now=Date.now();let ch=false;for(const [id,m] of [...S.msgs]){if(m.until&&m.until<=now){S.msgs.delete(id);ch=true}}if(ch)persist();draw()},1000);
+ tick=setInterval(()=>{if(!S||!$('ch-log')){dispose();return}const now=Date.now();let ch=false;for(const [id,m] of [...S.msgs]){if(m.until&&m.until<=now){if(m.url)URL.revokeObjectURL(m.url);S.msgs.delete(id);ch=true}}if(ch)persist();draw()},1000);
  connect();
 }
 /* encrypted copy of this chat's messages on this device, so a refresh keeps them for their hour */
-async function persist(){if(!S)return;const now=Date.now();const a=[...S.msgs.values()].filter(m=>m.state!=='sending'&&(!m.until||m.until>now)).map(m=>({id:m.id,mine:m.mine,text:m.text,n:m.n,ts:m.ts,until:m.until,state:m.state,acked:m.acked}));
+async function persist(){if(!S)return;const now=Date.now();const a=[...S.msgs.values()].filter(m=>m.state!=='sending'&&m.busy!=='up'&&(!m.until||m.until>now)).map(m=>({id:m.id,mine:m.mine,text:m.text,n:m.n,ts:m.ts,until:m.until,state:m.state,acked:m.acked,f:m.f,fid:m.fid}));
  try{const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},S.key,new TextEncoder().encode(JSON.stringify(a)));ls.set('skm_'+S.room,{iv:B64(iv),ct:B64(ct)})}catch(e){}}
 async function load(){const v=ls.get('skm_'+S.room,null);if(!v)return;try{const p=await crypto.subtle.decrypt({name:'AES-GCM',iv:UB64(v.iv)},S.key,UB64(v.ct));const now=Date.now();for(const m of JSON.parse(new TextDecoder().decode(p)))if(!m.until||m.until>now)S.msgs.set(m.id,m)}catch(e){}}
+const FCH=192*1024,MAXF=8*1024*1024,MAXV=120;
+const BAD=/\.(exe|apk|bat|cmd|com|msi|scr|js|vbs|jar|ps1|sh|html?|dll|lnk|app|dmg|iso)$/i;
+const IMG=/^image\/(jpeg|png|webp|gif)$/;
+const fsz=n=>n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+const mmss=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
+const safeName=n=>String(n||'file').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').slice(0,100)||'file';
+function actRender(m,nd){
+ const sig=[m.url?1:0,m.busy||'',m.err||'',m.fs||''].join('|');if(nd.sig===sig)return;nd.sig=sig;const f=m.f,a=nd.act;a.textContent='';
+ const btn=(t,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=fn;a.appendChild(b)};
+ if(m.err||m.fs){const x=document.createElement('div');x.className='fs';x.textContent=m.err||m.fs;a.appendChild(x)}
+ if(m.url){
+  if(f.k==='v'){const au=document.createElement('audio');au.controls=true;au.src=m.url;a.appendChild(au);if(m.play){m.play=0;au.play().catch(()=>{})}}
+  else if(f.k==='i'){const im=document.createElement('img');im.src=m.url;im.alt=f.name;a.appendChild(im);btn('Download',()=>saveBlob(m))}
+  else btn('Download',()=>saveBlob(m));
+ }else if(!m.busy&&!(m.mine&&m.state==='sending')){
+  btn(f.k==='v'?'Play voice message':f.k==='i'?'View photo':'Download',async()=>{await getBlob(m);if(m.url&&f.k==='v')m.play=1;if(m.url&&f.k==='f')saveBlob(m);nd.sig=''})
+ }
+}
+function mkNode(m){
+ const d=document.createElement('div');d.className='chm '+(m.mine?'me':'th');
+ if(S.k==='g'&&!m.mine&&m.n){const w=document.createElement('span');w.className='w';w.textContent=m.n;d.appendChild(w)}
+ if(m.f){const b=document.createElement('div');b.className='chf';const n=document.createElement('div');n.className='fn';n.textContent=(m.f.k==='v'?'Voice message · '+mmss(m.f.d||0):m.f.name)+'';b.appendChild(n);
+  if(m.f.k!=='v'){const z=document.createElement('div');z.className='fs';z.textContent=fsz(m.f.size||0);b.appendChild(z)}
+  const a=document.createElement('div');b.appendChild(a);d.appendChild(b);d.act=a}
+ else{const t=document.createElement('div');t.textContent=m.text;d.appendChild(t)}
+ const s=document.createElement('small');d.appendChild(s);d.sm=s;return d}
 function draw(){
  const log=$('ch-log');if(!log||!S)return;const now=Date.now();
  const keep=[...S.msgs.values()].sort((a,b)=>(a.ts||0)-(b.ts||0));
- if(!keep.length){log.innerHTML='<div class="e">Messages will appear here. They disappear one hour after they are seen.</div>';return}
- const stick=log.scrollTop+log.clientHeight>=log.scrollHeight-40;log.textContent='';
- for(const m of keep){
-  const d=document.createElement('div');d.className='chm '+(m.mine?'me':'th');
-  if(S.k==='g'&&!m.mine&&m.n){const w=document.createElement('span');w.className='w';w.textContent=m.n;d.appendChild(w)}
-  const t=document.createElement('div');t.textContent=m.text;d.appendChild(t);
-  const s=document.createElement('small');
-  if(m.until)s.textContent=(S.k==='g'?'':'Seen · ')+'disappears in '+left(m.until-now);
-  else s.textContent=m.mine?(m.state==='sent'?'Sent · not seen yet':'Sending…'):'Reading…';
-  d.appendChild(s);log.appendChild(d)}
+ if(!S.nodes)S.nodes=new Map();
+ const stick=log.scrollTop+log.clientHeight>=log.scrollHeight-40;
+ for(const [id,nd] of [...S.nodes])if(!S.msgs.has(id)){nd.remove();S.nodes.delete(id)}
+ let em=log.querySelector('.e');
+ if(!keep.length){if(!em){log.textContent='';em=document.createElement('div');em.className='e';log.appendChild(em)}em.textContent='Messages will appear here. They disappear one hour after they are seen.';return}
+ if(em)em.remove();
+ keep.forEach((m,i)=>{
+  let nd=S.nodes.get(m.id);if(!nd){nd=mkNode(m);S.nodes.set(m.id,nd)}
+  if(nd.act)actRender(m,nd);
+  nd.sm.textContent=m.until?(S.k==='g'?'':'Seen · ')+'disappears in '+left(m.until-now):m.mine?(m.state==='sent'?'Sent · not seen yet':'Sending…'):'Reading…';
+  if(log.children[i]!==nd)log.insertBefore(nd,log.children[i]||null)});
  if(stick)log.scrollTop=log.scrollHeight}
+function saveBlob(m){const a=document.createElement('a');a.href=m.url;a.download=safeName(m.f.name);document.body.appendChild(a);a.click();a.remove()}
+/* pieces: ask the server for each encrypted piece, decrypt it here, join them */
+function wait(key,ms){return new Promise((res,rej)=>{const t=setTimeout(()=>{S.w.delete(key);rej(new Error('timeout'))},ms||25000);S.w.set(key,{res:v=>{clearTimeout(t);S.w.delete(key);res(v)},rej:e=>{clearTimeout(t);S.w.delete(key);rej(e)}})})}
+async function getBlob(m){
+ if(m.url||m.busy||!m.fid)return;m.busy='get';m.err='';const f=m.f,parts=[];draw();
+ try{for(let i=0;i<f.n;i++){m.fs='Downloading '+(i+1)+' of '+f.n+'…';draw();const p=wait('g:'+m.fid+':'+i);S.ws.send(JSON.stringify({t:'get',fid:m.fid,i}));const r=await p;
+   const buf=await crypto.subtle.decrypt({name:'AES-GCM',iv:UB64(r.iv)},S.key,UB64(r.ct));parts.push(buf)}
+  const type=f.k==='v'&&/^audio\//.test(f.type)?f.type:f.k==='i'&&IMG.test(f.type)?f.type:'application/octet-stream';
+  m.url=URL.createObjectURL(new Blob(parts,{type}));m.fs=''}
+ catch(e){m.err=e&&e.message==='gone'?'This file is no longer available.':'Could not download. Try again.'}
+ m.busy='';draw()}
+/* sending a file or a voice message */
+async function sendFile(file,over){
+ if(!S||!S.ws||S.ws.readyState!==1){note('Not connected yet. Try again in a moment.');return}
+ const name=safeName(file.name||'file');
+ if(!over.k&&BAD.test(name)){note('This file type is not allowed, for safety.');return}
+ if(file.size>MAXF){note('Files can be up to 8 MB. This one is '+fsz(file.size)+'.');return}
+ if(!file.size){note('This file is empty.');return}
+ const type=String(file.type||'').slice(0,60),k=over.k||(IMG.test(type)?'i':'f'),n=Math.ceil(file.size/FCH);
+ const fid=rid(9),id=rid(9),f={k,name:over.name||name,type,size:file.size,n,d:over.d||0};
+ const m={id,mine:true,text:'',f,fid,state:'sending',ts:Date.now(),n:S.nick,url:URL.createObjectURL(file),busy:'up'};S.msgs.set(id,m);draw();
+ try{const buf=await file.arrayBuffer();
+  for(let i=0;i<n;i++){m.fs='Uploading '+Math.round(i/n*100)+'%';draw();
+   const iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},S.key,buf.slice(i*FCH,(i+1)*FCH));
+   const p=wait('u:'+fid+':'+i);S.ws.send(JSON.stringify({t:'blob',fid,i,iv:B64(iv),ct:B64(ct)}));await p}
+  const e=await encObj({m:'',n:S.k==='g'?S.nick||'Guest':undefined,f});
+  m.fs='';m.busy='';S.ws.send(JSON.stringify({t:'msg',id,iv:e.iv,ct:e.ct,fid}));draw()}
+ catch(e){m.busy='';m.fs='';m.err=e&&e.message==='blobfull'?'This chat has no space left for files.':'Upload failed.';draw();setTimeout(()=>{S&&S.msgs.delete(id);draw()},4000)}
+}
+function note(t){const e=$('ch-ty');if(e)e.textContent=t}
+/* voice recorder */
+async function recStart(){
+ if(!S||!S.ws||S.ws.readyState!==1){note('Not connected yet. Try again in a moment.');return}
+ if(!navigator.mediaDevices||!window.MediaRecorder){note('Voice messages are not supported in this browser.');return}
+ let st;try{st=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){note('Allow the microphone to record a voice message.');return}
+ const mt=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));
+ const rc=new MediaRecorder(st,mt?{mimeType:mt,audioBitsPerSecond:32000}:{audioBitsPerSecond:32000}),ch=[];
+ rc.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
+ S.rec={rc,st,ch,t0:Date.now(),mt:rc.mimeType||mt||'audio/webm'};rc.start(500);
+ $('ch-comp').hidden=true;$('ch-rec').hidden=false;
+ S.rec.tm=setInterval(()=>{const s=(Date.now()-S.rec.t0)/1000;const e=$('ch-rtm');if(e)e.textContent='Recording '+mmss(s);if(s>=MAXV)recStop(true)},250)}
+function recStop(send){
+ const r=S&&S.rec;if(!r)return;S.rec=null;clearInterval(r.tm);
+ const dur=Math.round((Date.now()-r.t0)/1000);
+ r.rc.onstop=()=>{r.st.getTracks().forEach(t=>t.stop());
+  if(send&&dur>=1&&r.ch.length){const type=String(r.mt).split(';')[0];const ext=/mp4/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm';sendFile(new File(r.ch,'voice.'+ext,{type}),{k:'v',name:'Voice message',d:dur})}};
+ try{r.rc.stop()}catch(e){r.st.getTracks().forEach(t=>t.stop())}
+ const c=$('ch-comp'),rr=$('ch-rec');if(c)c.hidden=false;if(rr)rr.hidden=true}
 function startSeen(m,from){if(m.until)return;m.until=(from||Date.now())+HOUR;persist();draw()}
 function ackPending(){
  if(!S||S.k!=='p'||!S.ws||S.ws.readyState!==1||document.visibilityState!=='visible')return;
  for(const m of S.msgs.values())if(!m.mine&&!m.acked){m.acked=1;S.ws.send(JSON.stringify({t:'seen',id:m.id}));startSeen(m)}}
-async function enc(text){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},S.key,new TextEncoder().encode(JSON.stringify({m:text,n:S.k==='g'?S.nick||'Guest':undefined})));return{iv:B64(iv),ct:B64(ct)}}
+async function encObj(o){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},S.key,new TextEncoder().encode(JSON.stringify(o)));return{iv:B64(iv),ct:B64(ct)}}
+const enc=text=>encObj({m:text,n:S.k==='g'?S.nick||'Guest':undefined});
 async function dec(iv,ct){try{const p=await crypto.subtle.decrypt({name:'AES-GCM',iv:UB64(iv)},S.key,UB64(ct));return JSON.parse(new TextDecoder().decode(p))}catch(e){return null}}
 function setSt(txt,cls){const e=$('ch-st');if(!e)return;e.className='chst '+(cls||'');e.lastChild.textContent=txt}
 function finish(txt){if(!S)return;S.stop=true;const r=S.room;S.msgs.clear();dropChat(r);const sh=$('ch-share');if(sh)sh.hidden=true;setSt(txt);const i=$('ch-in'),b=$('ch-send');if(i)i.disabled=true;if(b)b.disabled=true;try{S.ws&&S.ws.close()}catch(e){}
@@ -232,9 +321,14 @@ async function onMsg(m){
  if(m.t==='sent'){const x=S.msgs.get(m.id);if(x){x.state='sent';if(S.k==='g'){x.ts=m.ts;x.until=m.ts+HOUR}persist();draw()}return}
  if(m.t==='seen'){const x=S.msgs.get(m.id);if(x)startSeen(x);return}
  if(m.t==='typing'){const t=$('ch-ty');if(t){t.textContent=S.k==='g'?'Someone is typing…':'Your friend is typing…';clearTimeout(S.tt);S.tt=setTimeout(()=>{const y=$('ch-ty');if(y)y.textContent=''},2500)}return}
+ if(m.t==='bok'){const w=S.w.get('u:'+m.fid+':'+m.i);if(w)w.res();return}
+ if(m.t==='blob'){const w=S.w.get('g:'+m.fid+':'+m.i);if(w)w.res(m);return}
+ if(m.t==='nob'){for(const [k,w] of [...S.w])if(k.startsWith('g:'+m.fid+':'))w.rej(new Error('gone'));return}
+ if(m.t==='err'&&m.fid){for(const [k,w] of [...S.w])if(k.startsWith('u:'+m.fid+':'))w.rej(new Error(m.e));return}
  if(m.t==='err'){const t=$('ch-ty');if(t)t.textContent=m.e==='slow'?'You are sending too fast. Wait a moment.':'Your friend has too many unread messages.';return}
  if(m.t==='msg'){if(S.msgs.has(m.id))return;const p=await dec(m.iv,m.ct);S.hadPeer=true;
   const x={id:m.id,mine:false,text:p?p.m:'This message could not be opened. The link may be incomplete.',n:p&&p.n,ts:m.ts||Date.now()};
+  const pf=p&&p.f;if(pf&&m.fid&&/^[A-Za-z0-9_-]{6,24}$/.test(m.fid)&&['f','v','i'].includes(pf.k)&&Number.isInteger(pf.n)&&pf.n>=1&&pf.n<=44){x.fid=m.fid;x.f={k:pf.k,name:safeName(pf.name),type:String(pf.type||'').slice(0,60),size:Math.max(0,+pf.size||0),n:pf.n,d:Math.max(0,Math.min(600,+pf.d||0))}}
   if(S.k==='g'){x.until=x.ts+HOUR;if(x.until<=Date.now())return}
   S.msgs.set(m.id,x);persist();draw();ackPending()}
 }
