@@ -225,7 +225,203 @@ async function ratesResponse(req) {
 }
 
 // ---- share previews: put each story's own title, summary and picture into the page for WhatsApp, Facebook, Messenger, X, Google ----
-const OG_SECT = { World: 'world', Opinion: 'opinion', History: 'history', 'Culture & Lifestyle': 'culture' };
+// which section a story belongs to (older stories say "Culture & Lifestyle"; the site shows them under /culture or /lifestyle)
+const ogSec = a => ({ World: 'world', Opinion: 'opinion', History: 'history', Culture: 'culture', Lifestyle: 'lifestyle' })[a.category] || (a.category === 'Culture & Lifestyle' ? (a.subcategory === 'Lifestyle' ? 'lifestyle' : 'culture') : '');
+// the title and description of every page, written into the page itself so Google sees different text on each address (made from what the site shows)
+const PAGE_HEADS = {
+ "/": [
+  "The Sujan Khadka — News, Weather, Rates and Tools",
+  "World news, history, opinion, culture and lifestyle, plus weather, horoscope, games, today's rates and free tools for Nepal."
+ ],
+ "/world": [
+  "World — The Sujan Khadka",
+  "Latest world news, analysis and explainers from The Sujan Khadka."
+ ],
+ "/opinion": [
+  "Opinion — The Sujan Khadka",
+  "Opinion and commentary from The Sujan Khadka."
+ ],
+ "/history": [
+  "History — The Sujan Khadka",
+  "History stories and explainers from The Sujan Khadka."
+ ],
+ "/culture": [
+  "Culture — The Sujan Khadka",
+  "Culture stories from The Sujan Khadka."
+ ],
+ "/lifestyle": [
+  "Lifestyle — The Sujan Khadka",
+  "Lifestyle stories from The Sujan Khadka."
+ ],
+ "/audio": [
+  "Audio — The Sujan Khadka",
+  "Listen to audio stories and talks from The Sujan Khadka."
+ ],
+ "/videos": [
+  "Videos — The Sujan Khadka",
+  "Watch videos from The Sujan Khadka."
+ ],
+ "/horoscope": [
+  "Daily Rashifal — The Sujan Khadka",
+  "Read your daily horoscope (rashifal) for all twelve zodiac signs in English and Nepali. Love, career, money and health, updated every day."
+ ],
+ "/weather": [
+  "Weather — The Sujan Khadka",
+  "Live weather forecast for Kathmandu, Pokhara and cities around the world: temperature, rain chance, wind, hourly and 7-day views."
+ ],
+ "/explore": [
+  "Explore — The Sujan Khadka",
+  "Explore weather forecasts for Nepal and the world, your daily horoscope (rashifal) and free browser games, all in one place."
+ ],
+ "/tools": [
+  "Tools — The Sujan Khadka",
+  "Free online tools: resume builder, 13 calculators, trek planner for Nepal, and today's gold, silver and currency rates."
+ ],
+ "/tools/money": [
+  "Money tools — The Sujan Khadka",
+  "Remittance, loan EMI, income tax and savings calculators."
+ ],
+ "/rates": [
+  "Today's rates — The Sujan Khadka",
+  "Today's gold, silver and foreign currency rates in Nepal, plus remittance, loan EMI, income tax and savings calculators."
+ ],
+ "/calculators": [
+  "Calculators — The Sujan Khadka",
+  "Thirteen free online calculators: basic, percentage, discount, VAT, income tax, loan EMI, interest, age, date difference, GPA, BMI, unit converter and AD to…"
+ ],
+ "/learn": [
+  "Learn — The Sujan Khadka",
+  "Free short courses, English and test practice, full mock exams with score history, and step-by-step preparation guides."
+ ],
+ "/exercise": [
+  "Exercises, stretches and yoga with a 3D body guide — The Sujan Khadka",
+  "Learn exercises with an animated body guide, follow ready-made home workouts with a timer and voice, and track your progress."
+ ],
+ "/resume": [
+  "Free Resume Builder — The Sujan Khadka",
+  "Free online resume builder that fits your CV on one A4 page. Fill in your details, preview instantly and download as PDF."
+ ],
+ "/trek-planner": [
+  "Trek Planner for Nepal — The Sujan Khadka",
+  "Plan a trek in Nepal day by day: choose a route, see stages, altitude and rest days, and get a simple itinerary you can save."
+ ],
+ "/p/about": [
+  "About Me — The Sujan Khadka",
+  "Hello, I'm Sujan Kumar Khadka."
+ ],
+ "/p/contact": [
+  "Contact — The Sujan Khadka",
+  "We would be glad to hear from you. Whether you have a question, a news tip, feedback or a correction, please write to us by email."
+ ],
+ "/p/support": [
+  "Support us — The Sujan Khadka",
+  "The Sujan Khadka is independent, free to read and free of advertising. Your support helps us keep it that way. There are simple ways to help, and every one…"
+ ],
+ "/p/privacy": [
+  "Privacy — The Sujan Khadka",
+  "The Sujan Khadka respects your privacy. This page explains what information is handled when you use this website."
+ ],
+ "/p/cookies": [
+  "Cookies — The Sujan Khadka",
+  "This website does not use cookies to track readers."
+ ],
+ "/p/terms": [
+  "Terms — The Sujan Khadka",
+  "By using The Sujan Khadka you agree to these terms."
+ ],
+ "/calculators/basic": [
+  "Basic Calculator — Calculators — The Sujan Khadka",
+  "Add, subtract, multiply, divide and work out percentages. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent…"
+ ],
+ "/calculators/percentage": [
+  "Percentage Calculator — Calculators — The Sujan Khadka",
+  "Find a percentage, a share or a percentage change. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent anywhere."
+ ],
+ "/calculators/discount": [
+  "Discount Calculator — Calculators — The Sujan Khadka",
+  "Work out the sale price, the saving and any tax on top. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent…"
+ ],
+ "/calculators/vat": [
+  "VAT Calculator — Calculators — The Sujan Khadka",
+  "Add VAT to a price or take it out. Nepal VAT is 13%. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent…"
+ ],
+ "/calculators/income-tax": [
+  "Nepal Income Tax Calculator 2083/84 | The Sujan Khadka",
+  "Estimate your Nepal income tax for 2083/84 (from Shrawan 2083) with the new slabs from 1% to 29%, deductions, and take-home pay each month. Free online…"
+ ],
+ "/calculators/loan-emi": [
+  "Loan EMI Calculator — Monthly Instalment | The Sujan Khadka",
+  "Work out your monthly loan instalment (EMI), total interest and total payment, with a year-by-year schedule. Free EMI calculator for home, vehicle and…"
+ ],
+ "/calculators/interest": [
+  "Interest Calculator — Calculators — The Sujan Khadka",
+  "Simple and compound interest side by side. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent anywhere."
+ ],
+ "/calculators/age": [
+  "Age Calculator — Calculators — The Sujan Khadka",
+  "Your exact age in years, months and days. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent anywhere."
+ ],
+ "/calculators/date-difference": [
+  "Date Difference Calculator — Calculators — The Sujan Khadka",
+  "The time between two dates in years, months, weeks and days. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is…"
+ ],
+ "/calculators/gpa-cgpa": [
+  "GPA / CGPA Calculator — Calculators — The Sujan Khadka",
+  "Grade point average for a term, or cumulative average over many terms. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you…"
+ ],
+ "/calculators/bmi": [
+  "BMI Calculator — Calculators — The Sujan Khadka",
+  "Body mass index from your height and weight. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you type is sent anywhere."
+ ],
+ "/calculators/unit-converter": [
+  "Unit Converter — Calculators — The Sujan Khadka",
+  "Convert length, weight, area, volume, speed, time, data and temperature. Free online calculator on The Sujan Khadka. It runs in your browser and nothing you…"
+ ],
+ "/calculators/ad-to-bs": [
+  "AD to BS Date Converter — Nepali Date | The Sujan Khadka",
+  "Convert any date between AD (English) and BS (Bikram Sambat, Nepali) with the Nepali month name, weekday and days in the month. Covers BS 2000 to 2083. Free…"
+ ],
+ "/learn/english": [
+  "English Practice — Learn — The Sujan Khadka",
+  "Grammar, vocabulary, reading, writing and speaking. Built for tests, interviews and work abroad."
+ ],
+ "/learn/ielts": [
+  "IELTS — Learn — The Sujan Khadka",
+  "Format, scoring and strategies for all four parts. Includes a study plan."
+ ],
+ "/learn/pte": [
+  "PTE Academic — Learn — The Sujan Khadka",
+  "Task types, timing and templates for PTE Academic, with practice routines."
+ ],
+ "/learn/maths": [
+  "Maths for tests — Learn — The Sujan Khadka",
+  "The arithmetic and word problems found in army, police and entrance tests."
+ ],
+ "/learn/fitness": [
+  "Fitness foundations — Learn — The Sujan Khadka",
+  "Train safely for heaves, runs, carries, push-ups and swimming. Pace calculator, BMI check and interval timer included."
+ ],
+ "/learn/interview": [
+  "Interview and safety — Learn — The Sujan Khadka",
+  "Answer interview questions with confidence, and protect yourself from agents and fake promises."
+ ],
+ "/learn/gurkha-uk": [
+  "British Army: Gurkhas — Learn — The Sujan Khadka",
+  "Study guide for each selection phase of the Brigade of Gurkhas, with training plans and test targets."
+ ],
+ "/learn/gurkha-sg": [
+  "Singapore Police: Gurkha Contingent — Learn — The Sujan Khadka",
+  "Study guide for selection into the Gurkha Contingent of the Singapore Police Force (GCSPF), with the team task."
+ ],
+ "/learn/nepal-army": [
+  "Nepal Army — Learn — The Sujan Khadka",
+  "Written exam, physical test, medical and interview preparation for Nepal Army recruitment."
+ ],
+ "/learn/legion": [
+  "French Foreign Legion — Learn — The Sujan Khadka",
+  "What the official recruiting site says about conditions, selection phases and tests, with a training plan and bleep-test trainer."
+ ]
+};
 const OG_NAME = 'The Sujan Khadka';
 const OG_PAGES = {
   '/': ['The Sujan Khadka', 'The Sujan Khadka — fewer sections, better stories.'],
@@ -276,10 +472,10 @@ function ogMeta(o) {
 async function ogRewrite(req, env, res) {
   const u = new URL(req.url), origin = u.origin, p = decodeURIComponent(u.pathname).replace(/\/+$/, '') || '/', icon = origin + '/icon-512.png';
   let o = null, m;
-  if ((m = p.match(/^\/(world|opinion|history|culture)\/([^/]+)$/))) {
-    const a = ((await ogData(env, origin)).articles || []).find(x => x.slug === m[2] && OG_SECT[x.category] === m[1]);
+  if ((m = p.match(/^\/(world|opinion|history|culture|lifestyle)\/([^/]+)$/))) {
+    const a = ((await ogData(env, origin)).articles || []).find(x => x.slug === m[2] && ogSec(x));
     if (a) {
-      const abs = origin + '/' + OG_SECT[a.category] + '/' + a.slug, cover = a.image && /^\/img\/[a-f0-9-]{36}$/.test(a.image) ? origin + a.image : '';
+      const abs = origin + '/' + ogSec(a) + '/' + a.slug, cover = a.image && /^\/img\/[a-f0-9-]{36}$/.test(a.image) ? origin + a.image : '';
       const desc = ogCut(a.seoDesc || a.subtitle || ogPlain(a.body) || OG_PAGES['/'][1], 200), title = ogCut(a.seoTitle || a.title, 110);
       o = { article: 1, title, desc, url: abs, image: cover || icon, cover: !!cover, alt: a.imageCaption || a.title, published: a.date, modified: a.updated || '', section: a.category, author: a.author,
         ld: { '@context': 'https://schema.org', '@type': 'NewsArticle', headline: ogCut(a.title, 110), description: desc, author: { '@type': 'Person', name: a.author || OG_NAME }, datePublished: a.date, dateModified: a.updated || a.date, image: [cover || icon], mainEntityOfPage: abs, publisher: { '@type': 'Organization', name: OG_NAME, logo: { '@type': 'ImageObject', url: icon } } } };
@@ -287,12 +483,14 @@ async function ogRewrite(req, env, res) {
   } else if ((m = p.match(/^\/listen\/([^/]+)$/))) {
     const a = ((await ogData(env, origin)).audios || []).find(x => x.id === m[1]);
     if (a) o = { title: ogCut(a.title, 110), desc: ogCut(a.desc || 'Listen on The Sujan Khadka.', 200), url: origin + '/listen/' + a.id, image: icon };
+  } else if (PAGE_HEADS[p]) {
+    o = { title: PAGE_HEADS[p][0].replace(/ [—|] The Sujan Khadka$/, ''), full: PAGE_HEADS[p][0], desc: PAGE_HEADS[p][1], url: origin + (p === '/' ? '' : p), image: icon };
   } else if (OG_PAGES[p]) {
     o = { title: OG_PAGES[p][0], desc: OG_PAGES[p][1], url: origin + (p === '/' ? '' : p), image: icon };
   }
   if (!o) return res;
   let html = await res.text();
-  const full = o.title === OG_NAME ? OG_NAME : o.title + ' — ' + OG_NAME;
+  const full = o.full || (o.title === OG_NAME ? OG_NAME : o.title + ' — ' + OG_NAME);
   const t1 = '<title>' + ogEsc(full) + '</title>', t2 = '<meta name="description" content="' + ogEsc(o.desc) + '">', t3 = ogMeta(o) + '</head>';
   html = html.replace(/<title>[\s\S]*?<\/title>/i, () => t1) // function replacers: a "$&" in a story title must not be treated as a pattern
     .replace(/<meta name="description" content="[^"]*">/i, () => t2)
@@ -353,12 +551,12 @@ const SM_PAGES = [
   '/learn/nepal-army',
   '/learn/legion',
   '/exercise',
-  '/games.html',
-  '/2048.html',
-  '/memory.html',
-  '/slide.html',
-  '/sudoku.html',
-  '/word.html'
+  '/games',
+  '/2048',
+  '/memory',
+  '/slide',
+  '/sudoku',
+  '/word'
 ];
 const smEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 const smDay = d => { const t = new Date(d); return isNaN(t) ? '' : t.toISOString().slice(0, 10); };
@@ -367,7 +565,7 @@ async function sitemapResponse(req, env) {
   try {
     const d = await ogData(env, new URL(req.url).origin), seen = new Set();
     for (const a of d.articles || []) {
-      const sec = OG_SECT[a.category];
+      const sec = ogSec(a);
       if (!sec || !a.slug) continue;
       const loc = SM_SITE + '/' + sec + '/' + encodeURIComponent(a.slug);
       if (seen.has(loc)) continue;

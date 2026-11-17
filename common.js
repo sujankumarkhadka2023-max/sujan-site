@@ -16,7 +16,7 @@ function home(){
   stopT();$("#game").classList.add("hide");$("#modal").classList.add("hide");
   var h=$("#home");h.classList.remove("hide");
   var nl=nextLevel(),done=Object.keys(S.done).length;
-  h.innerHTML='<div class="top"><a href="/games.html" class="btn" style="text-decoration:none;color:#000">← Games</a><div style="text-align:right"><h1>'+cfg.title+'</h1><div class="sub">'+done+' / '+TOTAL+' levels completed</div></div></div><div class="tabs"></div><div class="lv"></div>';
+  h.innerHTML='<div class="top"><a href="/games" class="btn" style="text-decoration:none;color:#000">← Games</a><div style="text-align:right"><h1>'+cfg.title+'</h1><div class="sub">'+done+' / '+TOTAL+' levels completed</div></div></div><div class="tabs"></div><div class="lv"></div>';
   var t=h.querySelector(".tabs");
   T.forEach(function(x,i){var b=document.createElement("button");b.className="tab"+(i===tab?" on":"");b.textContent=x[0];b.onclick=function(){tab=i;home()};t.appendChild(b)});
   var box=h.querySelector(".lv");

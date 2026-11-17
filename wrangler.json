@@ -26,7 +26,20 @@
       "/history/*",
       "/culture/*",
       "/listen/*",
-      "/tools"
+      "/tools",
+      "/lifestyle",
+      "/lifestyle/*",
+      "/explore",
+      "/tools/*",
+      "/rates",
+      "/calculators",
+      "/calculators/*",
+      "/learn",
+      "/learn/*",
+      "/exercise",
+      "/resume",
+      "/trek-planner",
+      "/p/*"
     ]
   },
   "durable_objects": {
