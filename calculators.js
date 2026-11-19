@@ -1,3 +1,4 @@
+const cpath=id=>["","calculators",id].join("/");
 /* Calculators section: 13 calculators.
    Loaded by index.html when this section is opened. Upload it next to index.html. */
 const CALC=[],CALCI={};
@@ -217,11 +218,11 @@ CALCI['basic'].guide=`<h2>About the basic calculator</h2>
 function calcPg(slug){ccStyle();const x=CALCI[slug];
  if(!x){document.title='Calculators — The Sujan Khadka';
   return `<div class="gx"><header class="gxh"><div class="gxk">Tools</div><h1>Calculators</h1><p>Thirteen calculators for money, health, dates and everyday sums. Everything runs in your browser and nothing you type is sent anywhere.</p></header>${slug?`<p class="gxe gxm">That calculator is not available. Choose one from the list.</p>`:''}
-  <ul class="gxl">${CALC.map(y=>`<li><a href="/calculators/${y.id}"><b>${esc(y.t)}</b><span>${esc(y.d)}</span></a></li>`).join('')}</ul>
+  <ul class="gxl">${CALC.map(y=>`<li><a href="${cpath(y.id)}"><b>${esc(y.t)}</b><span>${esc(y.d)}</span></a></li>`).join('')}</ul>
   <p class="gxn">These calculators give estimates for planning. They are not financial, medical or legal advice.</p></div>`}
  document.title=x.st||(x.t+' — Calculators — The Sujan Khadka');const raw=ccRawDef(x,{}),rel=CALC.filter(y=>y.id!==x.id);
  return `<div class="gx" data-x="${x.id}"><header class="gxh"><a class="gxb" href="/calculators">All calculators</a><div class="gxk">Calculators</div><h1>${esc(x.t)}</h1><p>${esc(x.d)}</p></header>
  <div class="gxw${x.custom?' gxc':''}">${x.custom?`<div class="gxp gxkp">${x.html()}</div>`:`<div class="gxp"><div id="ccf" class="gxfs">${ccFormHtml(x,raw)}</div>${x.swap?'<button type="button" class="gxbt" onclick="ccSwap()">Swap units</button>':''}</div><div class="gxo" id="ccres" aria-live="polite"></div>`}</div>
  ${x.note?`<p class="gxn">${esc(x.note)}</p>`:''}
  ${x.guide?`<section class="gxg">${x.guide}</section>`:''}
- <h2 class="gxh2">More calculators</h2><ul class="gxl gxs">${rel.map(y=>`<li><a href="/calculators/${y.id}"><b>${esc(y.t)}</b></a></li>`).join('')}</ul></div>`}
+ <h2 class="gxh2">More calculators</h2><ul class="gxl gxs">${rel.map(y=>`<li><a href="${cpath(y.id)}"><b>${esc(y.t)}</b></a></li>`).join('')}</ul></div>`}

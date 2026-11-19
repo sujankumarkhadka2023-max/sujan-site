@@ -289,10 +289,6 @@ const PAGE_HEADS = {
   "Calculators — The Sujan Khadka",
   "Thirteen free online calculators: basic, percentage, discount, VAT, income tax, loan EMI, interest, age, date difference, GPA, BMI, unit converter and AD to…"
  ],
- "/learn": [
-  "Learn — The Sujan Khadka",
-  "Free short courses, English and test practice, full mock exams with score history, and step-by-step preparation guides."
- ],
  "/exercise": [
   "Exercises, stretches and yoga with a 3D body guide — The Sujan Khadka",
   "Learn exercises with an animated body guide, follow ready-made home workouts with a timer and voice, and track your progress."
@@ -381,46 +377,6 @@ const PAGE_HEADS = {
   "AD to BS Date Converter — Nepali Date | The Sujan Khadka",
   "Convert any date between AD (English) and BS (Bikram Sambat, Nepali) with the Nepali month name, weekday and days in the month. Covers BS 2000 to 2083. Free…"
  ],
- "/learn/english": [
-  "English Practice — Learn — The Sujan Khadka",
-  "Grammar, vocabulary, reading, writing and speaking. Built for tests, interviews and work abroad."
- ],
- "/learn/ielts": [
-  "IELTS — Learn — The Sujan Khadka",
-  "Format, scoring and strategies for all four parts. Includes a study plan."
- ],
- "/learn/pte": [
-  "PTE Academic — Learn — The Sujan Khadka",
-  "Task types, timing and templates for PTE Academic, with practice routines."
- ],
- "/learn/maths": [
-  "Maths for tests — Learn — The Sujan Khadka",
-  "The arithmetic and word problems found in army, police and entrance tests."
- ],
- "/learn/fitness": [
-  "Fitness foundations — Learn — The Sujan Khadka",
-  "Train safely for heaves, runs, carries, push-ups and swimming. Pace calculator, BMI check and interval timer included."
- ],
- "/learn/interview": [
-  "Interview and safety — Learn — The Sujan Khadka",
-  "Answer interview questions with confidence, and protect yourself from agents and fake promises."
- ],
- "/learn/gurkha-uk": [
-  "British Army: Gurkhas — Learn — The Sujan Khadka",
-  "Study guide for each selection phase of the Brigade of Gurkhas, with training plans and test targets."
- ],
- "/learn/gurkha-sg": [
-  "Singapore Police: Gurkha Contingent — Learn — The Sujan Khadka",
-  "Study guide for selection into the Gurkha Contingent of the Singapore Police Force (GCSPF), with the team task."
- ],
- "/learn/nepal-army": [
-  "Nepal Army — Learn — The Sujan Khadka",
-  "Written exam, physical test, medical and interview preparation for Nepal Army recruitment."
- ],
- "/learn/legion": [
-  "French Foreign Legion — Learn — The Sujan Khadka",
-  "What the official recruiting site says about conditions, selection phases and tests, with a training plan and bleep-test trainer."
- ]
 };
 const OG_NAME = 'The Sujan Khadka';
 const OG_PAGES = {
@@ -518,7 +474,6 @@ const SM_PAGES = [
   '/tools',
   '/rates',
   '/calculators',
-  '/learn',
   '/resume',
   '/trek-planner',
   '/p/about',
@@ -540,16 +495,6 @@ const SM_PAGES = [
   '/calculators/bmi',
   '/calculators/unit-converter',
   '/calculators/ad-to-bs',
-  '/learn/english',
-  '/learn/ielts',
-  '/learn/pte',
-  '/learn/maths',
-  '/learn/fitness',
-  '/learn/interview',
-  '/learn/gurkha-uk',
-  '/learn/gurkha-sg',
-  '/learn/nepal-army',
-  '/learn/legion',
   '/exercise',
   '/games',
   '/2048',
@@ -585,7 +530,11 @@ async function handle({ request: req, env, next }) {
     const c = req.cf || {};
     return J({ city: c.city || '', region: c.region || '', country: c.country || '', lat: c.latitude ?? null, lon: c.longitude ?? null });
   }
+  // Addresses that contain template leftovers such as ${y.id} are never real pages: answer 404 so Google drops them.
+  if (/[${}]|%24|%7B|%7D/i.test(p) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>Page not found</h1><p><a href="/">Go to the home page</a></p></body></html>', { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
+  // The Learn section was removed. Tell search engines the pages are gone for good (410) so they drop them quickly.
+  if ((p === '/learn' || p.startsWith('/learn/')) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This page has been removed — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>This page has been removed</h1><p>The Learn section is no longer part of the site.</p><p><a href="/">Go to the home page</a></p></body></html>', { status: 410, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
   if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
