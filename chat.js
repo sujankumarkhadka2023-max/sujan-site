@@ -89,23 +89,28 @@ window.chatPg=function(){
  if(!document.getElementById('chat-css')){const s=document.createElement('style');s.id='chat-css';s.textContent=CSS;document.head.appendChild(s)}
  return '<div class="ch" id="ch"></div>'};
 const CFG={loaded:false,gid:''};
-const sess=()=>{const u=ls.get('sk_cu',null);if(u&&u.token&&u.exp>Date.now())return u;if(u)ls.del('sk_cu');return null};
+let MEM=null; // the sign-in is also kept in memory and sessionStorage, so it still works when a browser blocks saved site data
+const keepSess=u=>{MEM=u;ls.set('sk_cu',u);try{sessionStorage.setItem('sk_cu',JSON.stringify(u))}catch(e){}};
+const dropSess=()=>{MEM=null;ls.del('sk_cu');try{sessionStorage.removeItem('sk_cu')}catch(e){}};
+const sess=()=>{let u=ls.get('sk_cu',null)||MEM;if(!u){try{u=JSON.parse(sessionStorage.getItem('sk_cu'))}catch(e){}}if(u&&u.token&&u.exp>Date.now())return u;if(u)dropSess();return null};
 const uidLabel=u=>'SK-'+u.uid.slice(1,7).toUpperCase();
 function loadGis(){return new Promise((ok,no)=>{if(window.google&&google.accounts&&google.accounts.id)return ok();const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=()=>ok();s.onerror=()=>no();document.head.appendChild(s)})}
 async function gate(root,msg){
  root.innerHTML=`<div class="chk">Chat</div><h1>Sign in to chat</h1><p class="chd">Sign in with your Google account to use private and group chat.</p>
  <div class="chgate"><b>Why sign in?</b><ol class="chl"><li>You get a personal chat ID, so only real accounts can join.</li><li>Your group limit follows you to every phone and computer.</li><li>Rude or abusive people cannot hide behind a fresh browser.</li></ol>
  ${msg?'<div class="chnote">'+esc(msg)+'</div>':''}<div id="ch-g"><span class="chn">Loading Google sign-in…</span></div>
+ <details class="chn"><summary>Google opens but I come back here?</summary><p class="chn">Allow pop-ups and cookies for this site. In Brave, tap the lion icon and turn Shields off for this site, then try again. Using Chrome also works. Make sure you are not in a private window.</p></details>
  <p class="chn">We keep only a scrambled ID made from your account. We never show or store your email, and your messages stay locked in your browser.</p></div>`;
  try{await loadGis();google.accounts.id.initialize({client_id:CFG.gid,callback:onCred,ux_mode:'popup'});$('ch-g').textContent='';google.accounts.id.renderButton($('ch-g'),{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:280})}
  catch(e){const g=$('ch-g');if(g)g.innerHTML='<div class="chnote">Google sign-in could not load. Check your connection and refresh.</div>'}
 }
 async function onCred(r){
- const root=$('ch');if(!root)return;
- try{const x=await fetch('/api/chat-login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({credential:r.credential})});const j=await x.json();
-  if(!x.ok||!j.token){gate(root,j.error||'Sign-in failed. Please try again.');return}
-  ls.set('sk_cu',{token:j.token,uid:j.uid,name:j.name,exp:j.exp});route()}
- catch(e){gate(root,'Sign-in failed. Please try again.')}
+ const g0=$('ch-g');if(g0)g0.innerHTML='<span class="chn">Signing you in…</span>';
+ try{const x=await fetch('/api/chat-login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({credential:r.credential})});const j=await x.json().catch(()=>({}));
+  if(!x.ok||!j.token){const root=$('ch');if(root)gate(root,j.error||'Sign-in failed ('+x.status+'). Please try again.');return}
+  keepSess({token:j.token,uid:j.uid,name:j.name,exp:j.exp});
+  if($('ch'))route();else location.href='/chat'}
+ catch(e){const root=$('ch');if(root)gate(root,'Sign-in could not be completed. Check your connection and try again.')}
 }
 window.chatInit=function(){
  window.onhashchange=()=>{if($('ch'))route()};
@@ -142,7 +147,7 @@ function hub(root,notice){
  <details class="chq"><summary>What about the limit of ${MAXG} groups?</summary><p>The limit is kept on your device. It stops you joining more than ${MAXG} groups here. Leave a group to free a place.</p></details>
  <details class="chq"><summary>What if someone I do not know sends me a link?</summary><p>You do not have to open it. If someone is rude or threatening, leave the chat and tell us on the Contact page.</p></details>
  <p class="chn">Do not use chat for anything illegal or to harass anyone. Anyone with a link can read that chat, so share links only with people you trust.</p>`;
- {const o=$('ch-out');if(o)o.onclick=()=>{ls.del('sk_cu');try{google.accounts.id.disableAutoSelect()}catch(e){}route()}}
+ {const o=$('ch-out');if(o)o.onclick=()=>{dropSess();try{google.accounts.id.disableAutoSelect()}catch(e){}route()}}
  $('ch-new-p').onclick=()=>{location.hash='#'+rid(16)+'.'+rid(32)};
  $('ch-new-g').onclick=()=>{if(chats().filter(e=>e.k==='g').length>=MAXG){hub(root,'You are already in '+MAXG+' groups, which is the most you can join. Leave one below to make room.');return}
   const n=($('ch-gname').value||'').trim()||'Group chat';location.hash='#g:'+rid(16)+'.'+rid(32)+'.'+nameEnc(n)};
@@ -172,7 +177,7 @@ async function room(root,h){
  <div class="chc" id="ch-comp"><button class="chi" id="ch-att" type="button" aria-label="Send a file" title="Send a file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></svg></button><button class="chi" id="ch-mic" type="button" aria-label="Record a voice message" title="Record a voice message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><textarea id="ch-in" rows="1" maxlength="1000" placeholder="Write a message" aria-label="Message"></textarea><button class="chb" id="ch-send" type="button">Send</button></div><input type="file" id="ch-file" hidden>
  <div class="chbar" style="margin-top:8px"><span class="chn" style="margin:0">Messages, voice notes and files (up to 8 MB) disappear one hour after they are ${isG?'sent':'seen'}.</span><button class="chb r" id="ch-end" type="button">${isG?(ent.owner?'End group':'Leave group'):'End chat'}</button></div>
  <p class="chn">Screenshots cannot be blocked. Chat only with people you trust. To report abuse, leave the chat and write to us on the Contact page.</p>`;
- $('ch-back').onclick=()=>{location.hash=''};{const o=$('ch-out');if(o)o.onclick=()=>{ls.del('sk_cu');route()}}
+ $('ch-back').onclick=()=>{location.hash=''};{const o=$('ch-out');if(o)o.onclick=()=>{dropSess();route()}}
  const link=location.href;$('ch-link').value=link;
  $('ch-copy').onclick=()=>{const b=$('ch-copy');const done=()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy link',1600)};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done,()=>{$('ch-link').select()});else{$('ch-link').select()}};
  const txt=isG?'Join my private group "'+ent.n+'":':'Open this link to chat with me privately:';
@@ -313,7 +318,7 @@ async function onMsg(m){
   else{S.peer=m.peer;S.locked=m.locked;status()}return}
  if(m.t==='n'){S.on=m.on;S.members=m.members;gstatus();return}
  if(m.t==='peer'){S.peer=m.on;if(m.locked)S.locked=true;if(m.on)S.hadPeer=true;status();return}
- if(m.t==='auth'){S.stop=true;ls.del('sk_cu');const r=$('ch');if(r)gate(r,'Please sign in again.');return}
+ if(m.t==='auth'){S.stop=true;dropSess();const r=$('ch');if(r)gate(r,'Please sign in again.');return}
  if(m.t==='limit'){S.stop=true;dropChat(S.room);history.replaceState(null,'','/chat');const r=$('ch');if(r)hub(r,'You are already in '+MAXG+' groups on your account, which is the most you can join. Leave one to make room.');return}
  if(m.t==='full'){finish(S.k==='g'?'This group already has '+GMAX+' people, so you cannot join it.':'This chat already has two people, so you cannot join it.');return}
  if(m.t==='replaced'){finish('This chat was opened in another tab. Close this one.');return}
