@@ -681,7 +681,7 @@ export default {
 };
 
 // ---- CHAT START: private two-person chat. One Durable Object per room. It only relays encrypted text and forgets each message once it has been seen. ----
-const CH_TTL = 6048e5, CH_MAX = 6000, CH_QUEUE = 40;
+const CH_TTL = 15 * 864e5, CH_MAX = 6000, CH_QUEUE = 40;
 // Files and voice messages: the browser cuts an encrypted file into pieces, the server only stores the scrambled pieces for one hour.
 const CH_BLOB = 3e5, CH_FCH = 44, CH_QUOTA = 40e6, CH_HOUR = 36e5, CH_FID = /^[A-Za-z0-9_-]{6,24}$/;
 const chBK = (fid, i) => 'b:' + fid + ':' + String(i).padStart(2, '0');
@@ -991,7 +991,7 @@ export class ChatUser {
     const g = (await st.get('g')) || {};
     for (const k in g) if (g[k] <= now) delete g[k];
     let ok = true;
-    if (u.pathname === '/join') { if (!g[r]) { if (Object.keys(g).length >= 5) ok = false; else g[r] = x || now + 7 * 864e5; } }
+    if (u.pathname === '/join') { if (!g[r]) { if (Object.keys(g).length >= 5) ok = false; else g[r] = x || now + 15 * 864e5; } }
     else if (u.pathname === '/leave') delete g[r];
     await st.put('g', g);
     return new Response(JSON.stringify({ ok, n: Object.keys(g).length }));
