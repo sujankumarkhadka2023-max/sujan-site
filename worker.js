@@ -537,6 +537,7 @@ async function handle({ request: req, env, next }) {
   if ((p === '/learn' || p.startsWith('/learn/')) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This page has been removed — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>This page has been removed</h1><p>The Learn section is no longer part of the site.</p><p><a href="/">Go to the home page</a></p></body></html>', { status: 410, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
   if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
+  if (p === '/api/hit' && r === 'POST') return statsHit(req, env);
   if (p === '/api/push-key' || p === '/api/push-sub' || p === '/api/push-unsub' || p === '/api/notice') return pushRoute(req, env, false);
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
@@ -660,6 +661,7 @@ async function handle({ request: req, env, next }) {
       return J({ url: '/img/' + id });
     }
     if (p === '/api/admin/push-stats' || p === '/api/admin/push-send') return pushRoute(req, env, true);
+    if (p === '/api/admin/stats' && r === 'GET') return statsRead(req, env);
     return J({ error: 'Not found' }, 404);
   } catch (e) {
     return J({ error: String(e.message || e) }, 500);
@@ -1085,3 +1087,81 @@ async function pushRoute(req, env, admin) {
   return J({ error: 'Not found' }, 404);
 }
 // ---- PUSH END ----
+
+// ---- STATS START: private visit counter. No cookies, no stored IP addresses. Only totals per day are kept. ----
+const ST_BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pingdom|uptime|monitor|curl|wget|python|axios|node-fetch|go-http|java\//i;
+const ST_SRC = [[/(^|\.)google\./, 'Google'], [/(^|\.)bing\.com$/, 'Bing'], [/duckduckgo|yahoo\.|yandex|ecosia|baidu|search\.brave/, 'Other search'], [/facebook\.com$|(^|\.)fb\.com$|(^|\.)fb\.me$/, 'Facebook'], [/instagram\.com$/, 'Instagram'], [/(^|\.)t\.co$|twitter\.com$|(^|\.)x\.com$/, 'X / Twitter'], [/linkedin\.com$|lnkd\.in$/, 'LinkedIn'], [/reddit\.com$/, 'Reddit'], [/whatsapp\.com$|wa\.me$/, 'WhatsApp'], [/telegram\.|t\.me$/, 'Telegram'], [/tiktok\.com$/, 'TikTok'], [/youtube\.com$|youtu\.be$/, 'YouTube'], [/pinterest\./, 'Pinterest']];
+const stDay = (t) => new Date(t == null ? Date.now() : t).toISOString().slice(0, 10);
+function stSource(ref, host) {
+  let h = ''; try { h = new URL(ref).hostname.toLowerCase().replace(/^www\./, ''); } catch (e) { return 'Direct or unknown'; }
+  if (!h || h === host || h.endsWith('.' + host)) return '-';
+  for (const [re, n] of ST_SRC) if (re.test(h)) return n;
+  return h.slice(0, 40);
+}
+function stPath(p) {
+  p = String(p || '').split(/[?#]/)[0]; if (p.length > 1) p = p.replace(/\/+$/, '');
+  if (!/^\/[A-Za-z0-9\/_.~%-]{0,119}$/.test(p) || /^\/(developer|api|img|audio|video)(\/|$)/.test(p)) return '';
+  return p;
+}
+async function statsHit(req, env) {
+  const no = () => new Response(null, { status: 204 });
+  try {
+    if (!env.STATS) return no();
+    const u = new URL(req.url), o = req.headers.get('origin'); if (o && o !== u.origin) return no();
+    const ua = req.headers.get('user-agent') || ''; if (!ua || ST_BOT.test(ua)) return no();
+    if (await chHit(req, 'hit', 90)) return no();
+    const t = await req.text(); if (t.length > 700) return no();
+    let b; try { b = JSON.parse(t); } catch (e) { return no(); }
+    const path = stPath(b.path); if (!path) return no();
+    const cf = req.cf || {}, ip = req.headers.get('cf-connecting-ip') || '';
+    const dev = /iPad|Tablet/i.test(ua) ? 'Tablet' : /Mobi|Android|iPhone/i.test(ua) ? 'Phone' : 'Computer';
+    const src = b.first ? stSource(String(b.ref || '').slice(0, 300), u.hostname.replace(/^www\./, '')) : '';
+    const stub = env.STATS.get(env.STATS.idFromName('main'));
+    await stub.fetch(new Request('https://hub/hit', { method: 'POST', body: JSON.stringify({ path, src, first: b.first ? 1 : 0, ctry: String(cf.country || '??').slice(0, 2), dev, raw: ip + '|' + ua }) }));
+  } catch (e) {}
+  return no();
+}
+async function statsRead(req, env) {
+  if (!env.STATS) return J({ error: 'Stats are not set up yet.' }, 503);
+  const n = Math.min(90, Math.max(1, parseInt(new URL(req.url).searchParams.get('days')) || 7));
+  const r = await env.STATS.get(env.STATS.idFromName('main')).fetch(new Request('https://hub/get?days=' + n));
+  return new Response(await r.text(), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
+}
+export class StatsHub {
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  async fetch(req) {
+    const u = new URL(req.url), st = this.ctx.storage, J2 = (o) => new Response(JSON.stringify(o), { headers: { 'content-type': 'application/json' } });
+    if (u.pathname === '/hit') {
+      const b = await req.json().catch(() => null); if (!b) return J2({});
+      const day = stDay();
+      let salt = await st.get('salt'); if (!salt || salt.day !== day) { salt = { day, v: crypto.randomUUID() }; await st.put('salt', salt); await this.prune(day); }
+      const h = chHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt.v + '|' + b.raw))).slice(0, 14);
+      const d = (await st.get('d:' + day)) || { v: 0, u: 0, p: {}, r: {}, c: {}, d: {} };
+      d.v++;
+      const seen = (await st.get('seen')) || [];
+      if (!seen.includes(h) && seen.length < 6000) { seen.push(h); d.u++; await st.put('seen', seen); }
+      const inc = (o, k, cap) => { if (k in o) o[k]++; else if (Object.keys(o).length < cap) o[k] = 1; else o['(other)'] = (o['(other)'] || 0) + 1; };
+      inc(d.p, b.path, 400);
+      if (b.first) { if (b.src !== '-') inc(d.r, b.src || 'Direct or unknown', 60); inc(d.c, b.ctry, 80); inc(d.d, b.dev, 5); }
+      await st.put('d:' + day, d);
+      return J2({ ok: 1 });
+    }
+    if (u.pathname === '/get') {
+      const n = Math.min(90, Math.max(1, parseInt(u.searchParams.get('days')) || 7)), out = { days: [], p: {}, r: {}, c: {}, d: {}, v: 0, u: 0 }, now = Date.now();
+      for (let i = n - 1; i >= 0; i--) {
+        const day = stDay(now - i * 864e5), d = await st.get('d:' + day) || { v: 0, u: 0, p: {}, r: {}, c: {}, d: {} };
+        out.days.push({ day, v: d.v, u: d.u }); out.v += d.v; out.u += d.u;
+        for (const k of ['p', 'r', 'c', 'd']) for (const x in d[k]) out[k][x] = (out[k][x] || 0) + d[k][x];
+      }
+      const top = (o, m) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, m);
+      return J2({ days: out.days, v: out.v, u: out.u, p: top(out.p, 30), r: top(out.r, 12), c: top(out.c, 12), d: top(out.d, 4) });
+    }
+    return new Response('Not found', { status: 404 });
+  }
+  async prune(day) {
+    const st = this.ctx.storage; await st.delete('seen');
+    const keep = stDay(Date.now() - 100 * 864e5), all = await st.list({ prefix: 'd:' });
+    for (const k of all.keys()) if (k.slice(2) < keep) await st.delete(k);
+  }
+}
+// ---- STATS END ----

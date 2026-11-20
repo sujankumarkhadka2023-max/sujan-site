@@ -59,6 +59,10 @@
       {
         "name": "PUSH",
         "class_name": "PushHub"
+      },
+      {
+        "name": "STATS",
+        "class_name": "StatsHub"
       }
     ]
   },
@@ -85,6 +89,12 @@
       "tag": "v4",
       "new_sqlite_classes": [
         "PushHub"
+      ]
+    },
+    {
+      "tag": "v5",
+      "new_sqlite_classes": [
+        "StatsHub"
       ]
     }
   ],
