@@ -942,6 +942,45 @@ article .bym{font:12.5px/1.4 system-ui,-apple-system,'Segoe UI',Roboto,sans-seri
 @media(max-width:400px){nav .ddb,.nb nav>a{font-size:13.5px!important;padding-left:5px!important;padding-right:5px!important}nav .ddb i{display:none}}
 .lsrc{line-height:1.8}.lsrc a{color:var(--ac)}
 @media(max-width:560px){.lfacts{grid-template-columns:1fr}.lfacts dt{border-top:1px solid var(--ln)}.lfacts dd{border-top:0}.lh2{font-size:21px}}
+
+/* ---------- e-paper: every story is laid out like a newspaper page ---------- */
+.paper{position:relative;background:#fffdf8;color:#1a1a1a;border:1px solid #d9d2c0;box-shadow:0 1px 0 #fff inset,0 10px 30px rgba(40,30,10,.14);padding:clamp(14px,3vw,40px);margin:22px 0 10px}
+:root[data-theme=dark] .paper{background:#1c1b18;color:#ececec;border-color:#3a372f}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .paper{background:#1c1b18;color:#ececec;border-color:#3a372f}}
+.paper .mh{border-bottom:3px double currentColor;padding-bottom:10px;margin-bottom:14px;text-align:center}
+.paper .mh1,.paper .mh2{display:flex;justify-content:space-between;gap:12px;font:600 11px/1.4 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6b6556}
+.paper .mh1{border-bottom:1px solid #cfc7b2;padding-bottom:5px}.paper .mh2{border-top:1px solid #cfc7b2;padding-top:5px}
+.paper .mhn{font:700 clamp(26px,6vw,50px)/1.1 Georgia,'Times New Roman',serif;letter-spacing:.01em;padding:8px 0}
+.paper h1{font-family:Georgia,'Times New Roman',serif;font-weight:700;line-height:1.08;letter-spacing:-.01em;margin:6px 0 8px}
+.paper .sub{font-family:Georgia,serif;font-style:italic;color:#4a4639;font-weight:400!important}
+:root[data-theme=dark] .paper .sub{color:#bdb8a8}
+.paper .by{border-top:2px solid currentColor;border-bottom:1px solid #cfc7b2;margin:12px 0 10px}
+.paper .shi,.arw .paper .shi{position:static;width:auto;left:auto;top:auto;bottom:auto;margin:6px 0 14px;display:block}
+.paper .shi>div,.arw .paper .shi>div{position:static;display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;align-items:center}
+.paper .shi .pdfb{display:inline-flex;align-items:center;gap:6px;border:1.5px solid currentColor;background:transparent;color:inherit;border-radius:999px;padding:5px 12px;font:700 13px system-ui,sans-serif;cursor:pointer}
+.arw .paper .shi .pdfb,.paper .shi .pdfb{width:auto!important;min-width:0!important;height:38px!important;padding:0 14px!important;border-radius:999px!important;flex:0 0 auto}
+.paper .shi .pdfb:hover{background:#ffe500;color:#000;border-color:#000}
+.paper .hero img{width:100%}
+.paper .hero figcaption{font:italic 13px/1.4 Georgia,serif;color:#6b6556;border-bottom:1px solid #cfc7b2;padding:6px 0 10px}
+.paper .pcol{margin-top:14px}
+.paper .pcol p,.arw .paper .pcol p{font-family:Georgia,'Times New Roman',serif;font-size:clamp(17px,.5vw + 14px,19px);line-height:1.62;margin:0 0 .9em}
+@media(min-width:760px){.paper .pcol{column-count:2;column-gap:38px;column-rule:1px solid #cfc7b2;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+ .paper .pcol figure{column-span:all;margin:1em 0}.paper .pcol h2,.paper .pcol h3{break-after:avoid}.paper .pcol blockquote{break-inside:avoid}}
+.paper .mf{display:flex;justify-content:space-between;gap:12px;margin-top:22px;padding-top:8px;border-top:3px double currentColor;font:600 11px/1.4 system-ui,sans-serif;letter-spacing:.05em;color:#6b6556;text-transform:uppercase}
+@media print{
+ @page{size:A4;margin:14mm}
+ html,body{background:#fff!important;color:#000!important}
+ .util,.hd,.nb,#mp,footer:not(.mf),.ars,.rel,.shi,.pl,#btt,#cns,.ins,.bnr,.cps,.adbox,.adx,#adm,.cs{display:none!important}
+ .w,.arw,main{display:block!important;padding:0!important;margin:0!important;max-width:none!important}
+ .paper{box-shadow:none!important;border:0!important;padding:0!important;margin:0!important;background:#fff!important;color:#000!important}
+ .paper .pcol{column-count:2!important;column-gap:9mm;column-rule:.3mm solid #999;text-align:justify}
+ .paper .pcol p{font-size:10.5pt!important;line-height:1.5!important;orphans:3;widows:3}
+ .paper h1{font-size:26pt!important}.paper .mhn{font-size:30pt!important}
+ .paper .hero img,.paper figure img{max-height:105mm;object-fit:cover;width:100%}
+ .paper .mf{display:flex!important}
+ .rv{opacity:1!important;transform:none!important;transition:none!important}
+ .paper>div:not([class]){display:none!important}
+ a{color:inherit!important;text-decoration:none!important}}
 </style>
 <style>
 #cns{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
@@ -1127,17 +1166,93 @@ function articlePg(slug){const L=live(),a=L.find(x=>x.slug===slug);if(!a)return 
  tts.text=plain(a);tts.path=location.pathname;
  const tags=a.tags||[],more=L.filter(x=>x.id!==a.id&&x.category===a.category).slice(0,3),
  rel=[...more,...L.filter(x=>x.id!==a.id&&!more.includes(x))].slice(0,3),like=L.filter(x=>x.id!==a.id&&!more.includes(x)).map(x=>({x,s:(x.tags||[]).filter(t=>tags.includes(t)).length})).sort((p,q)=>q.s-p.s).slice(0,3).map(o=>o.x),im=safeImg(a.image);
- return `<div class="arw"><article${seoNe(a.title+' '+a.body)?' lang="ne"':''} class="a-${SL[a.category]||''}"><div class="cat k-${SL[a.category]||''}"><a href="/${SL[a.category]}">${esc(a.category)}</a>${a.subcategory?' · '+esc(a.subcategory):''}</div><h1>${esc(a.title)}</h1>${a.subtitle?`<p class="sub">${esc(a.subtitle)}</p>`:''}
+ const pd=new Date(a.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ return `<div class="arw"><article${seoNe(a.title+' '+a.body)?' lang="ne"':''} class="a-${SL[a.category]||''} paper"><header class="mh" aria-hidden="true"><div class="mh1"><span>${esc(pd)}</span><span>${esc(a.category)}${a.subcategory?' · '+esc(a.subcategory):''}</span></div><div class="mhn">The Sujan Khadka</div><div class="mh2"><span>sujankumarkhadka.com.np</span><span>Independent news from Nepal</span></div></header><div class="cat k-${SL[a.category]||''}"><a href="/${SL[a.category]}">${esc(a.category)}</a>${a.subcategory?' · '+esc(a.subcategory):''}</div><h1>${esc(a.title)}</h1>${a.subtitle?`<p class="sub">${esc(a.subtitle)}</p>`:''}
  <div class="by"><div class="bya"><strong>${esc(a.author)}</strong></div><div class="bym">${fd(a.date)}${a.updated?` · Updated ${fd(a.updated)}`:''} · ${rt(a.body)} min read</div></div>
  ${shareBar()}
  <div class="pl" id="pl" role="group" aria-label="Listen to this story"><span id="pst">Listen to this story</span><span class="pc"><select id="psp" class="psp" onchange="ttsRate(this.value)" aria-label="Listening speed">${[[.75,'0.75×'],[1,'1×'],[1.25,'1.25×'],[1.5,'1.5×'],[2,'2×']].map(s=>`<option value="${s[0]}"${(typeof tts!=='undefined'&&tts.rate===s[0])?' selected':''}>${s[1]}</option>`).join('')}</select><button id="bp" onclick="listen('play')" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button><button id="bz" onclick="listen('pause')" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button><button id="bs" onclick="listen('stop')" aria-label="Stop"><svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg></button></span></div>
  ${im?`<figure class="hero" style="margin:0"><img style="display:block" src="${im}" alt="${esc(a.imageCaption||a.title)}"><figcaption>${esc(a.imageCaption)}</figcaption></figure>`:`<div style="margin:0 0 22px">${art(a,'aspect-ratio:16/7;border-radius:10px')}</div>`}
- ${dcap(body(a.body,(a.images||[]).slice(1)),a)}${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}
+ <div class="pcol">${dcap(body(a.body,(a.images||[]).slice(1)),a)}</div>${tags.length?`<p class="meta">Topics: ${tags.map(esc).join(', ')}</p>`:''}<div class="mf"><span>${esc(a.title.length>60?a.title.slice(0,57)+'…':a.title)}</span><span>${esc(location.origin.replace(/^https?:\/\//,''))}${esc(location.pathname)}</span></div>
 </article>
  <aside class="ars">${cpSlot(cpCtx())}${bnHtml()}${mostV(L,5)}${like.length?`<div class="sec"><h2>You may also like</h2><div class="g">${like.map(card).join('')}</div></div>`:''}</aside></div>${rel.length?`<section class="rel"><div class="sec s-${SL[a.category]||'world'}"><h2>More from ${esc(a.category)}</h2><div class="g">${rel.map((x,i)=>card(x,cvar(i))).join('')}</div></div></section>`:''}`}
 function dcap(t,a){return !seoNe(a.title+' '+a.body)&&rt(a.body)>=2&&t.startsWith('<p>')?t.replace('<p>','<p class="dc">'):t}
 function shareBar(){const u=encodeURIComponent(location.origin+location.pathname),t=encodeURIComponent(document.title),f=p=>`<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">${p}</svg>`,l=(h,n,s)=>`<a href="${h}" target="_blank" rel="noopener" aria-label="${n}" title="${n}">${s}</a>`;
- return `<div class="shi" role="group" aria-label="Share this story"><div>${l('https://www.facebook.com/sharer/sharer.php?u='+u,'Share on Facebook',f('<path d="M13.5 22v-8h2.7l.5-3.3h-3.2V8.6c0-.9.3-1.6 1.7-1.6h1.6V4.1C16.4 4 15.5 4 14.4 4 12 4 10.3 5.5 10.3 8.2v2.5H7.5V14h2.8v8z"/>'))}${l('https://twitter.com/intent/tweet?url='+u+'&text='+t,'Share on X',f('<path d="M18.2 3h3.1l-6.8 7.8L22.5 21h-6.3l-4.9-6.4L5.6 21H2.5l7.3-8.3L2 3h6.4l4.4 5.9zm-1.1 16.2h1.7L7.3 4.7H5.5z"/>'))}${l('https://wa.me/?text='+t+'%20'+u,'Share on WhatsApp',f('<path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.1.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.5.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.2.1.8-.1 1.5z"/>'))}${l('mailto:?subject='+t+'&body='+u,'Share by email','<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg>')}<button type="button" onclick="share()" aria-label="Copy link or share" title="Copy link or share"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.4" fill="currentColor"/><circle cx="19" cy="5" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M7 11 17 6M7 13l10 5"/></svg></button></div></div>`}
+ return `<div class="shi" role="group" aria-label="Share this story"><div>${l('https://www.facebook.com/sharer/sharer.php?u='+u,'Share on Facebook',f('<path d="M13.5 22v-8h2.7l.5-3.3h-3.2V8.6c0-.9.3-1.6 1.7-1.6h1.6V4.1C16.4 4 15.5 4 14.4 4 12 4 10.3 5.5 10.3 8.2v2.5H7.5V14h2.8v8z"/>'))}${l('https://twitter.com/intent/tweet?url='+u+'&text='+t,'Share on X',f('<path d="M18.2 3h3.1l-6.8 7.8L22.5 21h-6.3l-4.9-6.4L5.6 21H2.5l7.3-8.3L2 3h6.4l4.4 5.9zm-1.1 16.2h1.7L7.3 4.7H5.5z"/>'))}${l('https://wa.me/?text='+t+'%20'+u,'Share on WhatsApp',f('<path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.2 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.1.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.5.2.3.7 1.2 1.5 1.9 1 .9 1.9 1.2 2.2 1.3.3.1.4.1.6-.1l.8-1c.2-.2.3-.2.5-.1l1.8.9c.2.1.4.2.4.3.1.2.1.8-.1 1.5z"/>'))}${l('mailto:?subject='+t+'&body='+u,'Share by email','<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg>')}<button type="button" onclick="share()" aria-label="Copy link or share" title="Copy link or share"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.4" fill="currentColor"/><circle cx="19" cy="5" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M7 11 17 6M7 13l10 5"/></svg></button><button type="button" class="pdfb" onclick="paperPdf()" aria-label="Save this story as a PDF" title="Save as PDF"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></svg><span>PDF</span></button></div></div>`}
+/* ---- Share a story as a newspaper-style PDF (drawn on the phone, nothing is uploaded) ---- */
+async function paperPdf(){
+ const btn=document.querySelector('.pdfb span'),say=t=>{if(btn)btn.textContent=t};
+ try{
+  const a=live().find(x=>url(x)===location.pathname);if(!a)throw 0;
+  say('Making…');
+  const bytes=await storyPdf(a),name=(a.slug||'story').slice(0,60)+'.pdf',file=new File([bytes],name,{type:'application/pdf'}),link=location.origin+url(a);
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:a.title,text:a.title+'\n'+link})}catch(e){if(e&&e.name!=='AbortError')throw e}}
+  else{const u=URL.createObjectURL(file),l=document.createElement('a');l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),6e4)}
+  say('PDF');
+ }catch(e){say('PDF');try{window.print()}catch(x){alert('Could not make the PDF. Use your browser menu: Print, then Save as PDF.')}}}
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function storyPdf(a){
+ const W=1240,H=1754,M=90,G=44,FS='"Noto Serif","Noto Serif Devanagari",Georgia,"Times New Roman",serif',SS='system-ui,"Noto Sans","Noto Sans Devanagari",Arial,sans-serif',INK='#1a1a1a',MU='#6b6556',RED='#c70000',PAPER='#fffdf8';
+ const pages=[],mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle=PAPER;x.fillRect(0,0,W,H);x.textBaseline='alphabetic';pages.push(c);return x};
+ const wrap=(x,t,mw)=>{const out=[],words=String(t).split(/\s+/).filter(Boolean);let l='';for(const w of words){const n=l?l+' '+w:w;if(x.measureText(n).width>mw&&l){out.push(l);l=w}else l=n}if(l)out.push(l);return out};
+ const rule=(x,y,t)=>{x.fillStyle=INK;x.fillRect(M,y,W-2*M,t||2)};
+ let x=mk();
+ const clean=s=>String(s||'').replace(/\[([^\]]+)\]\(https?:[^)\s]+\)/g,'$1');
+ const d=new Date(a.date).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+ // masthead
+ x.fillStyle=MU;x.font='600 20px '+SS;x.textAlign='left';x.fillText(d,M,M+14);x.textAlign='right';x.fillText((a.category||'').toUpperCase()+(a.subcategory?' · '+a.subcategory.toUpperCase():''),W-M,M+14);
+ rule(x,M+28,1);x.textAlign='center';x.fillStyle=INK;x.font='700 84px '+FS;x.fillText('The Sujan Khadka',W/2,M+128);
+ rule(x,M+150,1);x.fillStyle=MU;x.font='600 19px '+SS;x.textAlign='left';x.fillText('SUJANKUMARKHADKA.COM.NP',M,M+182);x.textAlign='right';x.fillText('INDEPENDENT NEWS FROM NEPAL',W-M,M+182);
+ rule(x,M+200,3);rule(x,M+208,1);
+ let y=M+262;x.textAlign='left';
+ x.fillStyle=RED;x.font='700 24px '+SS;x.fillText(String(a.category||'').toUpperCase(),M,y);y+=24;
+ x.fillStyle=INK;x.font='700 62px '+FS;for(const l of wrap(x,a.title,W-2*M)){y+=72;x.fillText(l,M,y)}
+ if(a.subtitle){x.fillStyle='#4a4639';x.font='italic 31px '+FS;for(const l of wrap(x,a.subtitle,W-2*M)){y+=44;x.fillText(l,M,y+4)}}
+ y+=26;rule(x,y,3);y+=40;x.fillStyle=RED;x.font='700 26px '+FS;x.fillText(a.author||'',M,y);x.fillStyle=MU;x.font='500 21px '+SS;x.textAlign='right';x.fillText(fd(a.date)+' · '+rt(a.body)+' min read',W-M,y);x.textAlign='left';y+=18;rule(x,y,1);y+=26;
+ // hero image
+ const src=safeImg(a.image||((a.images||[])[0]||{}).url||'');
+ if(src){const im=await loadImg(src);if(im){const w=W-2*M,hh=Math.min(520,Math.round(w*im.naturalHeight/im.naturalWidth)),sw=im.naturalWidth,sh=Math.min(im.naturalHeight,sw*hh/w);x.drawImage(im,0,(im.naturalHeight-sh)*.35,sw,sh,M,y,w,hh);y+=hh+10;
+   if(a.imageCaption){x.fillStyle=MU;x.font='italic 20px '+FS;for(const l of wrap(x,a.imageCaption,w)){y+=26;x.fillText(l,M,y)}y+=6}y+=16}}
+ // body into two columns, page after page
+ const CW=(W-2*M-G)/2,LH=40,BOT=H-M-40;
+ x.font='26px '+FS;
+ const lines=[];
+ String(a.body||'').split(/\n\s*\n/).forEach((p,pi)=>{p=p.trim();if(!p)return;
+  if(/^(https?:\/\/\S+)$/.test(p))return;
+  let st='n',t=p;if(/^## /.test(p)){st='h';t=p.slice(3)}else if(/^> /.test(p)){st='q';t=p.replace(/^>\s?/gm,'')}
+  t=clean(t).replace(/\s*\n\s*/g,' ');
+  x.font=(st==='h'?'700 28px ':st==='q'?'italic 26px ':'26px ')+FS;
+  const ws=wrap(x,t,CW-(st==='q'?24:0));ws.forEach((l,i)=>lines.push({t:l,st,first:i===0&&st==='n'&&pi===0}));lines.push({gap:true})});
+ let col=0,cy=y,top=y;
+ const header=px=>{px.fillStyle=MU;px.font='600 18px '+SS;px.textAlign='left';px.fillText('THE SUJAN KHADKA',M,M-20);px.textAlign='right';px.fillText(a.title.length>70?a.title.slice(0,67)+'…':a.title,W-M,M-20);px.fillRect(M,M-8,W-2*M,1)};
+ const colX=()=>M+col*(CW+G);
+ for(let i=0;i<lines.length;i++){const L=lines[i];
+  if(L.gap){cy+=16;continue}
+  if(cy+LH>BOT){if(col===0){col=1;cy=top;x.fillStyle='#cfc7b2';x.fillRect(M+CW+G/2,top-24,1,BOT-top+30)}else{x=mk();header(x);col=0;top=M+50;cy=top}}
+  cy+=LH;x.textAlign='left';x.fillStyle=L.st==='q'?'#4a4639':INK;x.font=(L.st==='h'?'700 28px ':L.st==='q'?'italic 26px ':'26px ')+FS;
+  const cx=colX()+(L.st==='q'?24:0);
+  if(L.first&&!/[ऀ-ॿ]/.test(L.t)){x.fillStyle=RED;x.font='700 78px '+FS;x.fillText(L.t[0],cx,cy+14);const w=x.measureText(L.t[0]).width;x.fillStyle=INK;x.font='26px '+FS;x.fillText(L.t.slice(1),cx+w+4,cy)}
+  else x.fillText(L.t,cx,cy)}
+ // page footers
+ pages.forEach((c,i)=>{const p=c.getContext('2d');p.fillStyle=INK;p.fillRect(M,H-M+6,W-2*M,2);p.fillStyle=MU;p.font='600 18px '+SS;p.textAlign='left';p.fillText(location.origin.replace(/^https?:\/\//,'')+url(a),M,H-M+34);p.textAlign='right';p.fillText('Page '+(i+1)+' of '+pages.length,W-M,H-M+34)});
+ const jpgs=pages.map(c=>{const b=atob(c.toDataURL('image/jpeg',.86).split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u});
+ return makePdf(jpgs,W,H)}
+function makePdf(jpgs,w,h){
+ const enc=new TextEncoder(),parts=[],offs=[];let len=0;
+ const add=v=>{const b=typeof v==='string'?enc.encode(v):v;parts.push(b);len+=b.length};
+ const n=jpgs.length,PWD=595.28,PHT=841.89;
+ add('%PDF-1.4\n');
+ const obj=(i,s,stream)=>{offs[i]=len;add(i+' 0 obj\n'+s);if(stream){add('\nstream\n');add(stream);add('\nendstream')}add('\nendobj\n')};
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+ obj(2,'<< /Type /Pages /Kids ['+jpgs.map((_,i)=>(5+i*3)+' 0 R').join(' ')+'] /Count '+n+' >>');
+ jpgs.forEach((j,i)=>{const im=3+i*3,ct=4+i*3,pg=5+i*3,cs='q '+PWD+' 0 0 '+PHT+' 0 0 cm /Im0 Do Q';
+  obj(im,'<< /Type /XObject /Subtype /Image /Width '+w+' /Height '+h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+j.length+' >>',j);
+  obj(ct,'<< /Length '+cs.length+' >>',cs);
+  obj(pg,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+PWD+' '+PHT+'] /Resources << /XObject << /Im0 '+im+' 0 R >> >> /Contents '+ct+' 0 R >>')});
+ const xr=len,tot=3+n*3;
+ add('xref\n0 '+tot+'\n0000000000 65535 f \n');
+ for(let i=1;i<tot;i++)add(String(offs[i]).padStart(10,'0')+' 00000 n \n');
+ add('trailer\n<< /Size '+tot+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+ const out=new Uint8Array(len);let p=0;for(const b of parts){out.set(b,p);p+=b.length}return out}
 const DEF={about:'Hello, I\'m Sujan Kumar Khadka.\n\nI\'m a student and lifelong learner committed to personal growth, continuous learning, and professional development. I enjoy exploring new ideas, developing my skills, and discovering opportunities to grow both personally and professionally.\n\nThis website is my personal space on the internet, where I share news, opinion, and culture and lifestyle.\n\nI believe that consistency, curiosity, and a willingness to learn are essential for long-term success.\n\nMy goal is simple: to keep learning, keep improving, and create something meaningful along the way.\n\nThank you for visiting my website.\n\nLearning today. Building for tomorrow.',contact:'We would be glad to hear from you. Whether you have a question, a news tip, feedback or a correction, please write to us by email.\n\nEmail: sujankumarkhadka56@gmail.com\n\nWHAT YOU CAN WRITE TO US ABOUT\nNews tips and story ideas\nCorrections and feedback on our stories\nQuestions about the website\nPrivacy enquiries\n\nWHEN YOU WRITE\nPlease include a clear subject line and, if you are writing about a story, the link or headline. We read every message and reply as soon as we can.\n\nWe use your email address and message only to reply to you.',support:'The Sujan Khadka is independent, free to read and free of advertising. Your support helps us keep it that way. There are simple ways to help, and every one of them matters.\n\nREAD AND SHARE\nShare stories you value with friends, family and on social media. Word of mouth is the strongest support an independent site can have.\n\nTELL US WHAT YOU THINK\nHonest feedback makes our stories better. Tell us what you liked, what we missed and what you would like to read next.\n\nSEND A TIP OR A CORRECTION\nIf you know about a story we should cover, or you spot a mistake, please write to us. Our Contact page has the details.\n\nINSTALL THE APP\nAdd the site to your home screen from the footer of any page. Recent stories open even with a weak internet connection.\n\nThank you for reading and for being part of The Sujan Khadka.',privacy:"The Sujan Khadka respects your privacy. This page explains what information is handled when you use this website.\n\nWHAT WE COLLECT\nReaders do not need an account to read the site, and the site does not ask for your name, email or other personal details. If you email us, we use your email address and message only to reply.\n\nTECHNICAL DATA\nOur hosting provider, Cloudflare, processes technical data such as IP address and browser type to deliver the site and keep it secure. We do not use this data to identify individual readers.\n\nPRIVATE CHAT\nThe Private chat and Group chat tools encrypt messages in your browser. The key stays in the link and is never sent to us. Our server only passes on scrambled text. Messages, voice messages and files (up to 8 MB) are locked in the same way and disappear one hour after they are seen, and chat links expire after 7 days. To use chat you may be asked to sign in with Google. We then keep only a scrambled ID made from your account, never your email or name, and we use it to count your groups and stop abuse. We cannot read it.\n\nADVERTISING AND TRACKING\nThis site does not run advertising or third-party tracking scripts.\n\nEXTERNAL LINKS\nStories may link to other websites. We are not responsible for their privacy practices.\n\nQUESTIONS\nFor privacy questions, contact: sujankumarkhadka56@gmail.com\n\nWe may update this page from time to time. The latest version is always published here.",cookies:"This website does not use cookies to track readers.\n\nLOCAL STORAGE\nTo load faster, your browser may keep a copy of recently published stories on your device. This contains only public stories and no personal information. You can clear it at any time in your browser settings.\n\nSIGN-IN COOKIE\nA secure sign-in cookie is used only by the site developer to manage content. Readers never receive it.\n\nOTHER WEBSITES\nSites we link to may use their own cookies, which we do not control.\n\nQUESTIONS\nContact: sujankumarkhadka56@gmail.com",terms:"By using The Sujan Khadka you agree to these terms.\n\nCONTENT\nStories, text and images published here belong to The Sujan Khadka unless stated otherwise. You may share links and quote short extracts with credit and a link back. Please do not republish full stories or images without written permission.\n\nOPINION AND ACCURACY\nWe aim to be accurate and fair. Opinion pieces reflect the views of their authors. Content is for general information and is not professional advice. If you find an error, please email us.\n\nUSE OF THE SITE\nPlease do not misuse the site, try to disrupt it, or try to reach areas that are not public.\n\nLINKS\nWe may link to other websites and are not responsible for their content.\n\nCHANGES\nWe may update these terms or the site at any time.\n\nCONTACT\nsujankumarkhadka56@gmail.com"};
 const link=t=>esc(t).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g,m=>`<a href="mailto:${m}">${m}</a>`);
 const FX={
@@ -1194,7 +1309,7 @@ function editor(){const a=ed,c=a.category||'World',multi=MULTI.includes(c),max=m
  ${imgs.map((m,i)=>`<div class="row"><img src="${safeImg(m.thumb||m.url)}" style="width:90px;height:60px;object-fit:cover" alt=""><input class="ic" data-i="${i}" style="flex:1;margin:0" placeholder="Caption (optional)" value="${esc(m.caption)}"><button class="bt d" onclick="rmImg(${i})">Remove</button></div>`).join('')}
  ${imgs.length<max?`<input type="file" accept="image/*" ${multi?'multiple':''} onchange="addImgs(this.files)">`:'<p class="meta">Maximum reached.</p>'}
  <label>Body — blank line between paragraphs; "## " subheading; "> " pull quote; [text](https://link); a YouTube, Vimeo or .mp4 link alone on its own line becomes a video</label>
- <div class="pdfbar"><label class="bt o" style="cursor:pointer">Import from PDF<input type="file" accept="application/pdf,.pdf" hidden onchange="pdfImport(this.files[0]);this.value=''"></label><button type="button" class="bt o" onclick="copyBody()">Copy all text</button><span id="pdfst" class="meta"></span></div>
+ <div class="pdfbar"><label class="bt o" style="cursor:pointer">Import from PDF<input type="file" accept="application/pdf,.pdf" hidden onchange="pdfImport(this.files[0]);this.value=''"></label><button type="button" class="bt o" onclick="copyBody()">Copy all text</button><button type="button" class="bt o" onclick="pdfTemplate()">PDF template</button><span id="pdfst" class="meta"></span></div>
  <textarea id="e_b" oninput="bodyStat()">${esc(a.body)}</textarea>
  <div class="meta" id="bstat"></div><div class="cap"><i id="capb"></i></div><div class="meta" id="capt"></div>
  <label>Publication date/time (future = scheduled)</label><input id="e_d" type="datetime-local" value="${dt}">
@@ -1667,6 +1782,15 @@ function pdfPageParas(tc){const lines=[];let cur=null,py=0;
  ls.forEach((l,i)=>{const d=i?ls[i-1].y-l.y:0;const brk=i>0&&g&&(d>g*1.5||d<0);
   if(!p)p=l.t;else if(brk){paras.push(p);p=l.t}else if(/[-‐]$/.test(p)&&/^[a-z]/.test(l.t))p=p.slice(0,-1)+l.t;else p+=' '+l.t});
  if(p)paras.push(p);return paras}
+function pdfFields(paras){
+ const D='\\s*[:：\\-–]\\s*',LB=[['seot',new RegExp('^(?:seo\\s*title|meta\\s*title)'+D,'i')],['seod',new RegExp('^(?:seo\\s*description|meta\\s*description|seo\\s*desc)'+D,'i')],['sub',new RegExp('^(?:sub\\s?-?\\s?(?:head\\s?line|heading|title)|standfirst|summary)'+D,'i')],['title',new RegExp('^(?:head\\s?line|heading|title)'+D,'i')],['author',new RegExp('^(?:author|byline|by)'+D,'i')],['tags',new RegExp('^(?:tags?|keywords?|topics?)'+D,'i')],['body',new RegExp('^(?:body|story|article|text|content)'+D,'i')]];
+ const F={};let cur=null,found=0;
+ for(const p of paras){let hit=null;for(const [k,re] of LB){const m=p.match(re);if(m){hit=[k,p.slice(m[0].length)];break}}
+  if(hit){cur=hit[0];found++;F[cur]=F[cur]?F[cur]+(cur==='body'?'\n\n':' ')+hit[1]:hit[1]}
+  else if(cur){F[cur]=(F[cur]?F[cur]+(cur==='body'?'\n\n':' '):'')+p}}
+ if(!found)return null;for(const k in F)F[k]=F[k].trim();return F}
+function pdfTemplate(){const t='Heading: Your headline here\nSubheading: One sentence that explains the story\nAuthor: Your name\nTags: nepal, travel\nSEO title: Short title for Google (up to 60 characters)\nSEO description: One or two sentences for Google (120 to 155 characters)\nBody:\nWrite the first paragraph here.\n\nWrite the second paragraph here. Leave a blank line between paragraphs.\n';
+ const u=URL.createObjectURL(new Blob([t],{type:'text/plain'})),l=document.createElement('a');l.href=u;l.download='story-template.txt';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),6e4)}
 const nWords=t=>{let w=0,inw=false;for(let i=0;i<t.length;i++){const c=t.charCodeAt(i),sp=c<=32||c===160;if(!sp&&!inw){w++;inw=true}else if(sp)inw=false}return w};
 async function pdfImport(f){if(!f)return;const st=$('#pdfst');
  try{st.textContent='Loading PDF reader…';const lib=await pdfLib();st.textContent='Opening PDF…';
@@ -1676,11 +1800,13 @@ async function pdfImport(f){if(!f)return;const st=$('#pdfst');
    if(out.length){const last=out[out.length-1],first=ps[0];if(!/[.!?:;"”’)\]\u0964]$/.test(last)&&/^[a-z]/.test(first)){out[out.length-1]=(/[-‐]$/.test(last)?last.slice(0,-1):last+' ')+first;ps.shift()}}
    out.push(...ps);if(n%10===0)await new Promise(r=>setTimeout(r))}
   if(chars<doc.numPages*15){st.textContent='';return alert('No readable text was found. This PDF is probably scanned pictures of pages, which need OCR. This importer reads real text only.')}
-  const text=out.join('\n\n'),ta=$('#e_b');let add=false;
+  const F=pdfFields(out),text=F&&F.body?F.body:out.join('\n\n'),ta=$('#e_b');let add=false;
   if(ta.value.trim()&&!confirm('Replace the current text with the text from the PDF?\n\nOK = replace\nCancel = add it to the end'))add=true;
   ta.value=add?ta.value.replace(/\s+$/,'')+'\n\n'+text:text;
   try{const m=await doc.getMetadata(),t=m&&m.info&&m.info.Title;if(t&&!$('#e_t').value.trim())$('#e_t').value=String(t).trim()}catch(e){}
-  bodyStat(true);st.textContent='Imported '+doc.numPages+' pages · '+nWords(text).toLocaleString()+' words. Check it, then save.'}
+  if(F){const set=(id,v)=>{if(v&&$(id))$(id).value=v};set('#e_t',F.title);set('#e_s',F.sub);set('#e_st',F.seot);set('#e_sd',F.seod);set('#e_a',F.author);set('#e_g',F.tags);try{sync()}catch(e){}}
+  bodyStat(true);const got=F?['headline','subheading','SEO title','SEO description','author','tags'].filter((n,i)=>F[['title','sub','seot','seod','author','tags'][i]]):[];
+  st.textContent='Imported '+doc.numPages+' pages · '+nWords(text).toLocaleString()+' words'+(got.length?'. Filled: '+got.join(', ')+'.':'.')+' Check everything, then save.'}
  catch(e){st.textContent='';alert('Could not read this PDF. '+(navigator.onLine?'Try another file.':'Please check your internet connection and try again.'))}}
 async function copyBody(){const ta=$('#e_b'),t=ta.value;if(!t)return alert('There is no text to copy.');
  try{await navigator.clipboard.writeText(t);alert('Copied the full text: '+nWords(t).toLocaleString()+' words.')}
@@ -1887,7 +2013,7 @@ function motion(){
  document.querySelectorAll('main .stats').forEach(st=>{st.querySelectorAll('[data-n]').forEach(n=>n.textContent='0');st.classList.add('rv');io.observe(st)});
  document.querySelectorAll('main .sec').forEach(sec=>{sec.classList.add('rv');io.observe(sec);
   sec.querySelectorAll('.card').forEach((c,i)=>{c.classList.add('rv');c.style.setProperty('--d',(i%4)*.09+'s');io.observe(c)})});
- document.querySelectorAll('main .lead>*, main article>*, main .pg>:not(h1)').forEach((c,i)=>{c.classList.add('rv');c.style.setProperty('--d',Math.min(i,6)*.07+'s');io.observe(c)})}
+ document.querySelectorAll('main .lead>*, main article>*:not(.pcol), main .pg>:not(h1)').forEach((c,i)=>{c.classList.add('rv');c.style.setProperty('--d',Math.min(i,6)*.07+'s');io.observe(c)})}
 /* theme toggle */
 function effTheme(){return document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
 function thUi(){const b=$('#thm');if(b)b.textContent=effTheme()==='dark'?'☀ Light':'☾ Dark'}
