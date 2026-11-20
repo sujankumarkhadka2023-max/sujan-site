@@ -6,6 +6,7 @@ self.addEventListener('fetch',e=>{
  const r=e.request,u=new URL(r.url);
  if(r.method!=='GET'||u.origin!==location.origin)return;
  if(r.headers.has('range')||r.destination==='audio'||r.destination==='video')return;
+ if(u.pathname.startsWith('/api/push')||u.pathname==='/api/notice')return;
  if(u.pathname.startsWith('/api/admin')||u.pathname.startsWith('/api/login')||u.pathname.startsWith('/api/logout')||u.pathname.startsWith('/api/view')||u.pathname.startsWith('/developer'))return;
  // stories data: network first, cached copy when offline
  if(u.pathname==='/api/data'){e.respondWith(fetch(r).then(x=>put(r,x)).catch(()=>caches.match(r)));return}
@@ -16,3 +17,9 @@ self.addEventListener('fetch',e=>{
  // other static files (games, css)
  e.respondWith(fetch(r).then(x=>put(r,x)).catch(()=>caches.match(r)));
 });
+self.addEventListener('push',e=>{e.waitUntil((async()=>{
+ let n={title:'The Sujan Khadka',body:'There is something new on the site.',url:'/'};
+ try{const r=await fetch('/api/notice',{cache:'no-store'});if(r.ok){const j=await r.json();if(j&&j.title)n=j}}catch(x){}
+ await self.registration.showNotification(n.title,{body:n.body||'',icon:'/icon-192.png',badge:'/icon-192.png',data:{url:n.url||'/'},tag:'sk-news',renotify:true})})())});
+self.addEventListener('notificationclick',e=>{e.notification.close();const u=(e.notification.data&&e.notification.data.url)||'/';
+ e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(l=>{for(const c of l){if('focus' in c){try{c.navigate(u)}catch(x){}return c.focus()}}return clients.openWindow(u)}))});

@@ -55,6 +55,10 @@
       {
         "name": "USER",
         "class_name": "ChatUser"
+      },
+      {
+        "name": "PUSH",
+        "class_name": "PushHub"
       }
     ]
   },
@@ -75,6 +79,12 @@
       "tag": "v3",
       "new_sqlite_classes": [
         "ChatUser"
+      ]
+    },
+    {
+      "tag": "v4",
+      "new_sqlite_classes": [
+        "PushHub"
       ]
     }
   ],

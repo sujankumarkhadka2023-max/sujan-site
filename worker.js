@@ -537,6 +537,7 @@ async function handle({ request: req, env, next }) {
   if ((p === '/learn' || p.startsWith('/learn/')) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This page has been removed — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>This page has been removed</h1><p>The Learn section is no longer part of the site.</p><p><a href="/">Go to the home page</a></p></body></html>', { status: 410, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
   if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
+  if (p === '/api/push-key' || p === '/api/push-sub' || p === '/api/push-unsub' || p === '/api/notice') return pushRoute(req, env, false);
   if (p === '/api/rates' && r === 'GET') { try { return await ratesResponse(req); } catch (e) { return J({ error: 'Rates are unavailable right now.' }, 503); } }
   const isApi = p.startsWith('/api/'), isImg = p.startsWith('/img/'), isAud = p.startsWith('/audio/'), isVid = p.startsWith('/video/');
   if (!isApi && !isImg && !isAud && !isVid) {
@@ -658,6 +659,7 @@ async function handle({ request: req, env, next }) {
       if (!w.ok) return J({ error: 'GitHub upload ' + w.status }, 502);
       return J({ url: '/img/' + id });
     }
+    if (p === '/api/admin/push-stats' || p === '/api/admin/push-send') return pushRoute(req, env, true);
     return J({ error: 'Not found' }, 404);
   } catch (e) {
     return J({ error: String(e.message || e) }, 500);
@@ -994,3 +996,92 @@ export class ChatUser {
   }
 }
 // ---- GROUP END ----
+
+// ---- PUSH START ----
+// "Notify me": readers allow alerts once. We keep only the anonymous address their browser gives us (no name, no email).
+// When a story or announcement is sent, the hub wakes each phone with an empty push, and the phone then reads the latest notice from /api/notice.
+const PUSH_HOSTS = /^(fcm\.googleapis\.com|android\.googleapis\.com|updates\.push\.services\.mozilla\.com|web\.push\.apple\.com|[a-z0-9.-]+\.push\.apple\.com|[a-z0-9.-]+\.notify\.windows\.com)$/;
+const PUSH_MAX = 50000, PUSH_BATCH = 40;
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const pushOk = u => { try { const x = new URL(u); return x.protocol === 'https:' && u.length < 1200 && PUSH_HOSTS.test(x.hostname); } catch (e) { return false; } };
+export class PushHub {
+  constructor(ctx, env) { this.ctx = ctx; this.env = env; }
+  async keys() {
+    const st = this.ctx.storage; let k = await st.get('vapid');
+    if (!k) {
+      const kp = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+      k = { pub: b64u(await crypto.subtle.exportKey('raw', kp.publicKey)), priv: await crypto.subtle.exportKey('jwk', kp.privateKey) };
+      await st.put('vapid', k);
+    }
+    return k;
+  }
+  async jwt(aud, k) {
+    const h = b64u(new TextEncoder().encode(JSON.stringify({ typ: 'JWT', alg: 'ES256' }))), c = b64u(new TextEncoder().encode(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: 'https://sujankumarkhadka.com.np' })));
+    const key = await crypto.subtle.importKey('jwk', k.priv, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+    return h + '.' + c + '.' + b64u(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, new TextEncoder().encode(h + '.' + c)));
+  }
+  async hash(e) { return chHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(e))).slice(0, 32); }
+  async count() { return (await this.ctx.storage.list({ prefix: 's:' })).size; }
+  async fetch(req) {
+    const u = new URL(req.url), st = this.ctx.storage, J2 = (o, s) => new Response(JSON.stringify(o), { status: s || 200, headers: { 'content-type': 'application/json' } });
+    if (u.pathname === '/key') return J2({ key: (await this.keys()).pub });
+    if (u.pathname === '/notice') return J2((await st.get('notice')) || {});
+    if (u.pathname === '/stats') return J2({ subs: await this.count(), last: (await st.get('notice')) || null, sending: !!(await st.get('q')) });
+    const b = await req.json().catch(() => ({}));
+    if (u.pathname === '/sub') {
+      if (!pushOk(b.endpoint)) return J2({ error: 'bad endpoint' }, 400);
+      if ((await this.count()) >= PUSH_MAX) return J2({ error: 'full' }, 507);
+      await st.put('s:' + await this.hash(b.endpoint), { e: b.endpoint, t: Date.now() });
+      return J2({ ok: 1 });
+    }
+    if (u.pathname === '/unsub') { if (typeof b.endpoint === 'string') await st.delete('s:' + await this.hash(b.endpoint)); return J2({ ok: 1 }); }
+    if (u.pathname === '/send') {
+      const title = String(b.title || '').trim().slice(0, 90), body = String(b.body || '').trim().slice(0, 160);
+      let link = String(b.url || '/').trim().slice(0, 300); if (!/^\/[^/\\]/.test(link) && link !== '/') link = '/';
+      if (!title) return J2({ error: 'A title is needed.' }, 400);
+      const last = await st.get('notice');
+      if (last && Date.now() - last.t < 60000) return J2({ error: 'Wait a minute before sending another alert.' }, 429);
+      await st.put('notice', { title, body, url: link, t: Date.now() });
+      await st.put('q', { after: '', sent: 0, gone: 0 }); await this.keys();
+      await st.setAlarm(Date.now() + 200);
+      return J2({ ok: 1, subs: await this.count() });
+    }
+    return J2({ error: 'Not found' }, 404);
+  }
+  async alarm() {
+    const st = this.ctx.storage, q = await st.get('q'); if (!q) return;
+    const k = await this.keys(), opts = { prefix: 's:', limit: PUSH_BATCH }; if (q.after) opts.startAfter = q.after;
+    const rows = await st.list(opts); let lastKey = q.after;
+    for (const [key, v] of rows) {
+      lastKey = key;
+      try {
+        const aud = new URL(v.e).origin, r = await fetch(v.e, { method: 'POST', headers: { TTL: '86400', Urgency: 'normal', Authorization: 'vapid t=' + await this.jwt(aud, k) + ', k=' + k.pub} });
+        if (r.status === 404 || r.status === 410) { await st.delete(key); q.gone++; } else if (r.ok) q.sent++;
+      } catch (e) {}
+    }
+    if (rows.size < PUSH_BATCH) { q.done = Date.now(); await st.delete('q'); await st.put('lastrun', q); }
+    else { q.after = lastKey; await st.put('q', q); await st.setAlarm(Date.now() + 700); }
+  }
+}
+async function pushRoute(req, env, admin) {
+  if (!env.PUSH) return J({ error: 'Alerts are not set up yet.' }, 503);
+  const u = new URL(req.url), p = u.pathname, hub = env.PUSH.get(env.PUSH.idFromName('main')), call = (path, body) => hub.fetch(new Request('https://hub' + path, body ? { method: 'POST', body: JSON.stringify(body) } : {}));
+  if (p === '/api/push-key' && req.method === 'GET') return new Response(await (await call('/key')).text(), { headers: { 'content-type': 'application/json', 'cache-control': 'public,max-age=86400' } });
+  if (p === '/api/notice' && req.method === 'GET') return new Response(await (await call('/notice')).text(), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
+  if ((p === '/api/push-sub' || p === '/api/push-unsub') && req.method === 'POST') {
+    if (await chHit(req, 'push', 12)) return J({ error: 'Too many requests. Wait a minute.' }, 429);
+    const t = await req.text(); if (t.length > 3000) return J({ error: 'Too large' }, 413);
+    let b; try { b = JSON.parse(t); } catch (e) { return J({ error: 'Bad JSON' }, 400); }
+    const o = req.headers.get('origin'); if (o && o !== u.origin) return J({ error: 'Forbidden' }, 403);
+    const r = await call(p === '/api/push-sub' ? '/sub' : '/unsub', { endpoint: b.endpoint });
+    return new Response(await r.text(), { status: r.status, headers: { 'content-type': 'application/json' } });
+  }
+  if (admin && p === '/api/admin/push-stats') return new Response(await (await call('/stats')).text(), { headers: { 'content-type': 'application/json' } });
+  if (admin && p === '/api/admin/push-send' && req.method === 'POST') {
+    const b = await req.json().catch(() => ({}));
+    const r = await call('/send', { title: b.title, body: b.body, url: b.url });
+    return new Response(await r.text(), { status: r.status, headers: { 'content-type': 'application/json' } });
+  }
+  return J({ error: 'Not found' }, 404);
+}
+// ---- PUSH END ----
