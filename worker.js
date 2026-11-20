@@ -535,6 +535,7 @@ async function handle({ request: req, env, next }) {
   if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
   // The Learn section was removed. Tell search engines the pages are gone for good (410) so they drop them quickly.
   if ((p === '/learn' || p.startsWith('/learn/')) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This page has been removed — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>This page has been removed</h1><p>The Learn section is no longer part of the site.</p><p><a href="/">Go to the home page</a></p></body></html>', { status: 410, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+  if (p === '/api/turn' && r === 'GET') return turnRoute(req, env);
   if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
   if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
   if (p === '/api/hit' && r === 'POST') return statsHit(req, env);
@@ -796,7 +797,7 @@ export class ChatRoom {
     // at most 30 messages in 10 seconds per connection
     let w = at.w || now, n = at.n || 0;
     if (now - w > 1e4) { w = now; n = 0; }
-    n += (m.t === 'blob' || m.t === 'get') ? 0.25 : 1;
+    n += (m.t === 'blob' || m.t === 'get' || m.t === 'sig') ? 0.25 : 1;
     if (n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
     at.w = w; at.n = n; ws.serializeAttachment(at);
     if (m.t === 'hello') {
@@ -848,6 +849,11 @@ export class ChatRoom {
       chSend(ws, row ? { t: 'blob', fid: m.fid, i: m.i, iv: row.iv, ct: row.ct } : { t: 'nob', fid: m.fid });
     } else if (m.t === 'typing') {
       for (const s of this.peers(other)) chSend(s, { t: 'typing' });
+    } else if (m.t === 'sig') {
+      // Call set-up notes between the two phones. They are locked with the chat key, so the server cannot read them, and nothing is stored.
+      const iv = String(m.iv || ''), ct = String(m.ct || '');
+      if (!iv || iv.length > 40 || !ct || ct.length > 4200) return;
+      for (const s of this.peers(other)) chSend(s, { t: 'sig', iv, ct });
     } else if (m.t === 'end') {
       await this.wipe('ended');
     }
@@ -918,7 +924,7 @@ export class GroupRoom {
     const st = this.ctx.storage, now = Date.now(), at = ws.deserializeAttachment() || {};
     let w = at.w || now, n = at.n || 0;
     if (now - w > 1e4) { w = now; n = 0; }
-    n += (m.t === 'blob' || m.t === 'get') ? 0.25 : 1;
+    n += (m.t === 'blob' || m.t === 'get' || m.t === 'sig') ? 0.25 : 1;
     if (n > 30) { chSend(ws, { t: 'err', e: 'slow' }); return; }
     at.w = w; at.n = n; ws.serializeAttachment(at);
     if (m.t === 'hello') {
@@ -965,6 +971,10 @@ export class GroupRoom {
       chSend(ws, row ? { t: 'blob', fid: m.fid, i: m.i, iv: row.iv, ct: row.ct } : { t: 'nob', fid: m.fid });
     } else if (m.t === 'typing') {
       for (const s of this.online()) if (s !== ws) chSend(s, { t: 'typing' });
+    } else if (m.t === 'sig') {
+      const iv = String(m.iv || ''), ct = String(m.ct || '');
+      if (!iv || iv.length > 40 || !ct || ct.length > 4200) return;
+      for (const s of this.online()) if (s !== ws) chSend(s, { t: 'sig', iv, ct });
     } else if (m.t === 'leave') {
       const room = await st.get('room');
       if (room) { room.m = room.m.filter(x => x !== at.cid); await st.put('room', room); await this.reg(at.cid, 'leave', 0); }
@@ -1088,6 +1098,16 @@ async function pushRoute(req, env, admin) {
 }
 // ---- PUSH END ----
 
+// Free public servers help two phones find each other. If a Cloudflare TURN key is set, it is added so calls also work on strict mobile networks.
+async function turnRoute(req, env) {
+  const stun = [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }];
+  if (!env.TURN_KEY_ID || !env.TURN_API_TOKEN || (await chHit(req, 'turn', 8))) return J({ iceServers: stun }, 200, { 'cache-control': 'no-store' });
+  try {
+    const r = await fetch('https://rtc.live.cloudflare.com/v1/turn/keys/' + encodeURIComponent(env.TURN_KEY_ID) + '/credentials/generate-ice-servers', { method: 'POST', headers: { authorization: 'Bearer ' + env.TURN_API_TOKEN, 'content-type': 'application/json' }, body: JSON.stringify({ ttl: 14400 }) });
+    if (r.ok) { const j = await r.json(); if (j && Array.isArray(j.iceServers) && j.iceServers.length) return J({ iceServers: j.iceServers }, 200, { 'cache-control': 'no-store' }); }
+  } catch (e) {}
+  return J({ iceServers: stun }, 200, { 'cache-control': 'no-store' });
+}
 // ---- STATS START: private visit counter. No cookies, no stored IP addresses. Only totals per day are kept. ----
 const ST_BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pingdom|uptime|monitor|curl|wget|python|axios|node-fetch|go-http|java\//i;
 const ST_SRC = [[/(^|\.)google\./, 'Google'], [/(^|\.)bing\.com$/, 'Bing'], [/duckduckgo|yahoo\.|yandex|ecosia|baidu|search\.brave/, 'Other search'], [/facebook\.com$|(^|\.)fb\.com$|(^|\.)fb\.me$/, 'Facebook'], [/instagram\.com$/, 'Instagram'], [/(^|\.)t\.co$|twitter\.com$|(^|\.)x\.com$/, 'X / Twitter'], [/linkedin\.com$|lnkd\.in$/, 'LinkedIn'], [/reddit\.com$/, 'Reddit'], [/whatsapp\.com$|wa\.me$/, 'WhatsApp'], [/telegram\.|t\.me$/, 'Telegram'], [/tiktok\.com$/, 'TikTok'], [/youtube\.com$|youtu\.be$/, 'YouTube'], [/pinterest\./, 'Pinterest']];

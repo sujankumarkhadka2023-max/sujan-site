@@ -12,6 +12,7 @@ const CSS=`
 .ch h2{font:700 22px Georgia,serif;margin:30px 0 4px;padding-top:12px;border-top:1px solid var(--ln)}
 .ch h2 small{font:600 14px system-ui,sans-serif;color:var(--mu);margin-left:8px}
 .ch button,.ch select,.ch textarea,.ch input{font:inherit}
+.chcall{margin:10px 0}.cin{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--ln);border-radius:10px}.cin>span:nth-child(2){flex:1;min-width:140px}.cdot{width:11px;height:11px;border-radius:50%;background:#c58a00;flex:none}.cdot.on{background:#1b7f3b}.cdot.ring{background:#c70000;animation:cpulse 1s infinite}@keyframes cpulse{50%{transform:scale(1.6);opacity:.5}}
 .chcodeb{border-top:1px solid var(--ln);margin-top:14px}.chcin{display:flex;gap:8px;margin-top:10px}.chcin input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);color:var(--tx);font-size:16px}.chcodebox{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px}.chcodebox b{font:700 19px ui-monospace,Menlo,monospace;word-break:break-all}
 .chb{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--nv);color:#fff;border:1px solid var(--nv);border-radius:999px;padding:11px 22px;font:700 15px system-ui,sans-serif;cursor:pointer;text-decoration:none}
 .chb:hover{background:#ffd900;border-color:#ffd900;color:#052962}
@@ -86,7 +87,7 @@ function chats(){const now=Date.now();const a=ls.get('sk_chats',[]).filter(e=>e&
 function saveChat(e){const a=chats().filter(x=>x.r!==e.r);a.unshift(e);ls.set('sk_chats',a)}
 function dropChat(r){ls.set('sk_chats',chats().filter(x=>x.r!==r));ls.del('skm_'+r);ls.del('sk_code_'+r)}
 let S=null,tick=0;
-function dispose(){if(S){if(S.rec){try{S.rec.rc.stop();S.rec.st.getTracks().forEach(t=>t.stop())}catch(e){}clearInterval(S.rec.tm)}for(const m of S.msgs.values())if(m.url)URL.revokeObjectURL(m.url);S.stop=true;try{S.ws&&S.ws.close()}catch(e){}}S=null;if(tick){clearInterval(tick);tick=0}}
+function dispose(){try{callEnd(1)}catch(e){}RING=null;if(S){if(S.rec){try{S.rec.rc.stop();S.rec.st.getTracks().forEach(t=>t.stop())}catch(e){}clearInterval(S.rec.tm)}for(const m of S.msgs.values())if(m.url)URL.revokeObjectURL(m.url);S.stop=true;try{S.ws&&S.ws.close()}catch(e){}}S=null;if(tick){clearInterval(tick);tick=0}}
 function left(ms){const s=Math.max(0,Math.ceil(ms/1000));if(s>=3600)return Math.ceil(s/3600)+' h';if(s>=60)return Math.ceil(s/60)+' min';return s+' s'}
 function days(ms){const d=Math.max(0,Math.ceil(ms/864e5));return d+(d===1?' day':' days')}
 
@@ -147,9 +148,10 @@ function hub(root,notice){
  <h2>Your private chats<small>${ps.length}</small></h2>${ps.length?ps.map(row).join(''):'<p class="chn">No private chats yet.</p>'}
  <h2>Your groups<small>${gs.length} of ${MAXG}</small></h2>${gs.length?gs.map(row).join(''):'<p class="chn">You are not in any group yet.</p>'}
  <h2 id="ch-how">How it works</h2>
- <ol class="chl"><li>Start a chat or create a group. You get a private link or code that works for 15 days.</li><li>Send the link to your friend or your group on WhatsApp, Messenger, email or any app. For a private chat you can also tap <b>Make a code</b> and tell your friend the code (it starts with thesujankhadka). They type it under <b>Join</b>.</li><li>A private chat locks to the two of you. A group takes up to ${GMAX} people.</li><li>Every message disappears one hour after it is seen. After 15 days the link or code expires and you make a new one.</li></ol>
+ <ol class="chl"><li>Start a chat or create a group. You get a private link or code that works for 15 days.</li><li>Send the link to your friend or your group on WhatsApp, Messenger, email or any app. For a private chat you can also tap <b>Make a code</b> and tell your friend the code (it starts with thesujankhadka). They type it under <b>Join</b>.</li><li>A private chat locks to the two of you. A group takes up to ${GMAX} people.</li><li>Inside a chat, tap <b>📞 Voice call</b> to talk. Your friend gets a ring and taps <b>Answer</b>. A group call takes up to 4 people.</li><li>Every message disappears one hour after it is seen. After 15 days the link or code expires and you make a new one.</li></ol>
  <h2>Good to know</h2>
  <details class="chq"><summary>Can you read my messages?</summary><p>No. Messages are locked in your browser with a key that lives only in the link, after the # sign. The server never receives the key, so it only passes on scrambled text.</p></details>
+ <details class="chq"><summary>Is a voice call private?</summary><p>Yes. The sound goes directly from phone to phone and is scrambled on the way. The call set-up notes are locked with the chat key, so our server cannot read them. Nothing is recorded or saved. Both people need the chat page open, and calls can fail on a few strict mobile networks.</p></details>
  <details class="chq"><summary>Can someone take a screenshot?</summary><p>Yes. No website can stop a screenshot or a photo of the screen. Only chat with people you trust.</p></details>
  <details class="chq"><summary>What about the limit of ${MAXG} groups?</summary><p>The limit is kept on your device. It stops you joining more than ${MAXG} groups here. Leave a group to free a place.</p></details>
  <details class="chq"><summary>What if someone I do not know sends me a link?</summary><p>You do not have to open it. If someone is rude or threatening, leave the chat and tell us on the Contact page.</p></details>
@@ -182,6 +184,7 @@ async function room(root,h){
  root.innerHTML=`<div class="chbar"><button class="chb g" id="ch-back" type="button">← All chats</button><span class="chbadge">${isG?'Group · up to '+GMAX:'Two people'}</span></div>
  <div class="chk">${isG?'Group chat':'Private chat'}</div><h1 style="font-size:32px">${title}</h1>${who()}
  <div class="chst wait" id="ch-st"><i></i><span>Connecting…</span></div>
+ <div class="chcall" id="ch-call"></div><div id="ch-aud" style="position:absolute;width:0;height:0;overflow:hidden"></div>
  <div class="chbox" id="ch-share"${isG?'':' hidden'}><b>${isG?'Invite people to this group':'Send this link to one person only'}</b><p class="chn" style="margin:4px 0 8px">${isG?'Anyone with this link can join and read the group, up to '+GMAX+' people. ':'It locks when your friend opens it. Anyone who has this link can read the chat. '}<b id="ch-exp"></b></p>${!isG&&ls.get('sk_code_'+h.room,'')?'<div class="chcodebox"><span class="chn" style="margin:0">Or tell your friend this code:</span><b id="ch-code-t">'+esc(ls.get('sk_code_'+h.room,''))+'</b><button class="chb g" id="ch-code-c" type="button">Copy code</button></div>':''}<input id="ch-link" readonly aria-label="Chat link"><div class="chs"><button class="chb" id="ch-copy" type="button">Copy link</button><button class="chb g" id="ch-share-b" type="button">Share…</button></div><div class="shi" role="group" aria-label="Share this chat link"><div id="ch-icons"></div></div></div>
  ${isG?'<label class="chnick">Your name in this group <input id="ch-nick" maxlength="20" placeholder="For example Sujan"></label>':''}
  <div class="chlog" id="ch-log" aria-live="polite"></div><div class="chn" id="ch-ty" style="min-height:18px"></div>
@@ -198,7 +201,7 @@ async function room(root,h){
  {const u=encodeURIComponent(link),t=encodeURIComponent(txt),f=p=>'<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true">'+p+'</svg>',l=(h,n,i)=>'<a href="'+h+'" target="_blank" rel="noopener" aria-label="'+n+'" title="'+n+'">'+i+'</a>';
   $('ch-icons').innerHTML=l('https://www.facebook.com/sharer/sharer.php?u='+u,'Share on Facebook',f(SH.fb))+l('https://twitter.com/intent/tweet?url='+u+'&text='+t,'Share on X',f(SH.x))+l('https://wa.me/?text='+t+'%20'+u,'Share on WhatsApp',f(SH.wa))+l('mailto:?subject='+encodeURIComponent(isG?ent.n:'Private chat')+'&body='+t+'%20'+u,'Share by email','<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 7 9 6 9-6"/></svg>')}
  if(isG){const ni=$('ch-nick');ni.value=S.nick;ni.onchange=()=>{S.nick=ni.value.trim().slice(0,20);ls.set('sk_nick',S.nick)}}
- $('ch-send').onclick=send;
+ $('ch-send').onclick=send;callUi();
  $('ch-att').onclick=()=>$('ch-file').click();$('ch-file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)sendFile(f,{})};
  $('ch-mic').onclick=recStart;$('ch-rcx').onclick=()=>recStop(false);$('ch-rsd').onclick=()=>recStop(true);
  $('ch-in').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!/Android|iPhone|iPad/i.test(navigator.userAgent)){e.preventDefault();send()}};
@@ -313,8 +316,61 @@ async function encObj(o){const iv=crypto.getRandomValues(new Uint8Array(12));con
 const enc=text=>encObj({m:text,n:S.k==='g'?S.nick||'Guest':undefined});
 async function dec(iv,ct){try{const p=await crypto.subtle.decrypt({name:'AES-GCM',iv:UB64(iv)},S.key,UB64(ct));return JSON.parse(new TextDecoder().decode(p))}catch(e){return null}}
 function setSt(txt,cls){const e=$('ch-st');if(!e)return;e.className='chst '+(cls||'');e.lastChild.textContent=txt}
-function finish(txt,renew){if(!S)return;S.stop=true;const isP=S.k!=='g',r=S.room;S.msgs.clear();dropChat(r);const sh=$('ch-share');if(sh)sh.hidden=true;setSt(txt);const i=$('ch-in'),b=$('ch-send');if(i)i.disabled=true;if(b)b.disabled=true;try{S.ws&&S.ws.close()}catch(e){}
+function finish(txt,renew){if(!S)return;callEnd(1);S.stop=true;const isP=S.k!=='g',r=S.room;S.msgs.clear();dropChat(r);const sh=$('ch-share');if(sh)sh.hidden=true;setSt(txt);const i=$('ch-in'),b=$('ch-send');if(i)i.disabled=true;if(b)b.disabled=true;try{S.ws&&S.ws.close()}catch(e){}
  const l=$('ch-log');if(l){l.innerHTML='<div class="e">'+txt+'<br><br>'+(renew&&isP?'<button class="chb" type="button" id="ch-renew">Make a new code</button> ':'')+'<button class="chb g" type="button" id="ch-again">Back to all chats</button></div>';$('ch-again').onclick=()=>{location.hash=''};const rn=$('ch-renew');if(rn)rn.onclick=async()=>{rn.disabled=true;rn.textContent='One moment…';try{const c=codeNew(),k=await codeKeys(c);ls.set('sk_code_'+k.room,c);location.hash='#'+k.room+'.'+k.key}catch(e){rn.disabled=false;rn.textContent='Make a new code'}}}}
+/* ---------------- voice call: the sound goes straight between phones; the set-up notes are locked with the chat key ---------------- */
+let C=null,RING=null;
+const callMsg=x=>{const t=$('ch-ty');if(t){t.textContent=x;setTimeout(()=>{if(t.textContent===x)t.textContent=''},6000)}};
+function callClock(){if(!C||!C.t0)return'0:00';const s=Math.floor((Date.now()-C.t0)/1e3),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s%60).padStart(2,'0')}
+function callTick(){const e=$('ch-ctm');if(e)e.textContent=callClock()}
+function callUi(){const b=$('ch-call');if(!b||!S)return;const g=S.k==='g';
+ if(C){const n=C.peers.size,live=[...C.peers.values()].some(p=>p.pc.connectionState==='connected'),st=live?(g?(n+1)+' people in the call':'Connected'):(n?'Connecting…':(g?'Calling the group…':'Calling your friend…'));
+  b.innerHTML='<div class="cin"><span class="cdot'+(live?' on':'')+'"></span><span>'+st+' · <b id="ch-ctm">'+callClock()+'</b></span><button class="chb g" id="ch-cmute" type="button">'+(C.muted?'Unmute':'Mute')+'</button><button class="chb r" id="ch-cend" type="button">Hang up</button></div><p class="chn" style="margin:6px 0 0">Keep this page open and the screen on. Your voice goes directly to the other phone.</p>';
+  $('ch-cmute').onclick=callMute;$('ch-cend').onclick=()=>callEnd()}
+ else if(RING){b.innerHTML='<div class="cin"><span class="cdot ring"></span><span><b>'+esc(RING.n||(g?'Someone':'Your friend'))+'</b> is calling</span><button class="chb" id="ch-cjoin" type="button">Answer</button><button class="chb g" id="ch-cno" type="button">Not now</button></div>';$('ch-cjoin').onclick=callJoin;$('ch-cno').onclick=()=>{clearTimeout(RING&&RING.x);RING=null;callUi()}}
+ else{b.innerHTML='<button class="chb g" id="ch-cstart" type="button">📞 Voice call</button>';$('ch-cstart').onclick=callJoin}}
+async function callSend(o){if(!S||!S.ws||S.ws.readyState!==1)return;o.t=Date.now();const e=await encObj(o);try{S.ws.send(JSON.stringify({t:'sig',iv:e.iv,ct:e.ct}))}catch(x){}}
+const callHi=reply=>{if(C)callSend({c:'hi',p:C.pid,n:S.k==='g'?(S.nick||'Guest'):'',r:reply?1:0})};
+function ringTone(){try{navigator.vibrate&&navigator.vibrate([300,150,300,150,300])}catch(e){}try{const ac=new (window.AudioContext||window.webkitAudioContext)();[0,.5,1].forEach(t=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+t);o.stop(ac.currentTime+t+.25)});setTimeout(()=>ac.close(),2000)}catch(e){}}
+async function callJoin(){if(C||!S)return;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.RTCPeerConnection){callMsg('This browser cannot make calls.');return}
+ let ms;try{ms=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}catch(e){callMsg('Allow the microphone to make a call.');return}
+ let ice=[{urls:['stun:stun.cloudflare.com:3478','stun:stun.l.google.com:19302']}];
+ try{const j=await(await fetch('/api/turn')).json();if(j&&Array.isArray(j.iceServers))ice=j.iceServers}catch(e){}
+ if(!S||C){ms.getTracks().forEach(t=>t.stop());return}
+ clearTimeout(RING&&RING.x);RING=null;
+ C={pid:rid(9),ms,ice,peers:new Map(),muted:false,t0:0,wl:null};C.tm=setInterval(callTick,1000);C.hi=setInterval(()=>{if(C&&!C.peers.size)callHi()},10000);
+ try{if(navigator.wakeLock)navigator.wakeLock.request('screen').then(w=>{if(C)C.wl=w;else w.release()},()=>{})}catch(e){}
+ callUi();callHi()}
+function callPeer(pid,name){const pc=new RTCPeerConnection({iceServers:C.ice}),P={pid,pc,q:[],a:null,n:name||''};C.peers.set(pid,P);
+ C.ms.getTracks().forEach(t=>pc.addTrack(t,C.ms));
+ pc.onicecandidate=e=>{if(e.candidate)callSend({c:'ice',p:C.pid,to:pid,d:e.candidate.toJSON()})};
+ pc.ontrack=e=>{if(!P.a){P.a=document.createElement('audio');P.a.autoplay=true;P.a.setAttribute('playsinline','');($('ch-aud')||document.body).appendChild(P.a)}P.a.srcObject=e.streams[0];P.a.play().catch(()=>{})};
+ pc.onconnectionstatechange=()=>{if(!C||C.peers.get(pid)!==P)return;const s=pc.connectionState;
+  if(s==='connected'){if(!C.t0)C.t0=Date.now();callUi()}
+  else if(s==='failed'){callDrop(pid);callMsg('The call could not connect. Check both phones have internet, then try again.');if(S.k!=='g'&&!C.peers.size)callEnd(1)}
+  else if(s==='disconnected'){setTimeout(()=>{if(C&&C.peers.get(pid)===P&&pc.connectionState==='disconnected'){callDrop(pid);callMsg('The call was cut off.');if(S.k!=='g'&&!C.peers.size)callEnd(1)}},8000)}};
+ if(C.pid<pid)pc.createOffer().then(o=>pc.setLocalDescription(o).then(()=>callSend({c:'off',p:C.pid,to:pid,s:o.sdp,n:S.k==='g'?(S.nick||'Guest'):''}))).catch(()=>{});
+ callUi();return P}
+function callDrop(pid){if(!C)return;const P=C.peers.get(pid);if(!P)return;try{P.pc.close()}catch(e){}if(P.a){P.a.srcObject=null;P.a.remove()}C.peers.delete(pid);callUi()}
+function callMute(){if(!C)return;C.muted=!C.muted;C.ms.getAudioTracks().forEach(t=>t.enabled=!C.muted);callUi()}
+function callEnd(quiet,msg){if(!C)return;callSend({c:'bye',p:C.pid});clearInterval(C.tm);clearInterval(C.hi);try{C.wl&&C.wl.release()}catch(e){}try{C.ms.getTracks().forEach(t=>t.stop())}catch(e){}
+ for(const p of [...C.peers.values()]){try{p.pc.close()}catch(e){}if(p.a){p.a.srcObject=null;p.a.remove()}}C=null;callUi();if(msg)callMsg(msg)}
+async function callSig(m){const o=await dec(m.iv,m.ct);if(!o||typeof o.c!=='string'||typeof o.p!=='string'||Math.abs(Date.now()-o.t)>6e4)return;
+ if(C&&o.p===C.pid)return;
+ if(o.c==='hi'){
+  if(!C){const first=!RING;clearTimeout(RING&&RING.x);RING={p:o.p,n:String(o.n||'').slice(0,20)};RING.x=setTimeout(()=>{RING=null;callUi()},25000);if(first)ringTone();callUi();return}
+  if(!C.peers.has(o.p)){if(C.peers.size>=3){callSend({c:'full',p:C.pid,to:o.p});return}callPeer(o.p,o.n)}
+  if(!o.r)callHi(true);return}
+ if(o.c==='bye'){if(RING&&RING.p===o.p){clearTimeout(RING.x);RING=null;callUi()}if(C&&C.peers.has(o.p)){callDrop(o.p);if(S.k!=='g'&&!C.peers.size)callEnd(1,'Your friend ended the call.')}return}
+ if(!C||o.to!==C.pid)return;
+ if(o.c==='full'){callMsg('The call is full. A call has up to 4 people.');callEnd(1);return}
+ let P=C.peers.get(o.p);
+ try{
+  if(o.c==='off'){if(!P)P=callPeer(o.p,o.n);await P.pc.setRemoteDescription({type:'offer',sdp:String(o.s)});P.q.splice(0).forEach(d=>P.pc.addIceCandidate(d).catch(()=>{}));const a=await P.pc.createAnswer();await P.pc.setLocalDescription(a);callSend({c:'ans',p:C.pid,to:o.p,s:a.sdp})}
+  else if(o.c==='ans'&&P){await P.pc.setRemoteDescription({type:'answer',sdp:String(o.s)});P.q.splice(0).forEach(d=>P.pc.addIceCandidate(d).catch(()=>{}))}
+  else if(o.c==='ice'&&P&&o.d){if(P.pc.remoteDescription)P.pc.addIceCandidate(o.d).catch(()=>{});else if(P.q.length<60)P.q.push(o.d)}
+ }catch(e){}}
 function connect(){
  if(!S||S.stop)return;
  const ws=new WebSocket((location.protocol==='https:'?'wss:':'ws:')+'//'+location.host+'/api/'+(S.k==='g'?'group':'chat')+'/'+S.room);S.ws=ws;
@@ -330,7 +386,7 @@ async function onMsg(m){
   if(S.k==='g'){S.owner=!!m.owner;if(S.owner){S.ent.owner=1;saveChat(S.ent);const b=$('ch-end');if(b)b.textContent='End group'}gstatus()}
   else{S.peer=m.peer;S.locked=m.locked;status()}return}
  if(m.t==='n'){S.on=m.on;S.members=m.members;gstatus();return}
- if(m.t==='peer'){S.peer=m.on;if(m.locked)S.locked=true;if(m.on)S.hadPeer=true;status();return}
+ if(m.t==='peer'){S.peer=m.on;if(m.locked)S.locked=true;if(m.on){S.hadPeer=true;if(C)setTimeout(()=>callHi(),600)}status();return}
  if(m.t==='auth'){S.stop=true;dropSess();const r=$('ch');if(r)gate(r,'Please sign in again.');return}
  if(m.t==='limit'){S.stop=true;dropChat(S.room);history.replaceState(null,'','/chat');const r=$('ch');if(r)hub(r,'You are already in '+MAXG+' groups on your account, which is the most you can join. Leave one to make room.');return}
  if(m.t==='full'){finish(S.k==='g'?'This group already has '+GMAX+' people, so you cannot join it.':'This chat already has two people, so you cannot join it.');return}
@@ -338,6 +394,7 @@ async function onMsg(m){
  if(m.t==='ended'){finish(m.why==='expired'?'This link or code has expired. They work for 15 days. Make a new one below.':'Chat ended and deleted.',m.why==='expired');return}
  if(m.t==='sent'){const x=S.msgs.get(m.id);if(x){x.state='sent';if(S.k==='g'){x.ts=m.ts;x.until=m.ts+HOUR}persist();draw()}return}
  if(m.t==='seen'){const x=S.msgs.get(m.id);if(x)startSeen(x);return}
+ if(m.t==='sig'){callSig(m);return}
  if(m.t==='typing'){const t=$('ch-ty');if(t){t.textContent=S.k==='g'?'Someone is typing…':'Your friend is typing…';clearTimeout(S.tt);S.tt=setTimeout(()=>{const y=$('ch-ty');if(y)y.textContent=''},2500)}return}
  if(m.t==='bok'){const w=S.w.get('u:'+m.fid+':'+m.i);if(w)w.res();return}
  if(m.t==='blob'){const w=S.w.get('g:'+m.fid+':'+m.i);if(w)w.res(m);return}
