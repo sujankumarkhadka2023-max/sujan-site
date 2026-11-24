@@ -378,6 +378,20 @@ const PAGE_HEADS = {
   "Convert any date between AD (English) and BS (Bikram Sambat, Nepali) with the Nepali month name, weekday and days in the month. Covers BS 2000 to 2083. Free…"
  ],
 };
+// ---- Learn section: titles and descriptions for every Learn address (also used for the sitemap) ----
+const LN_W = [['british-army', 'British Army'], ['french-foreign-legion', 'French Foreign Legion'], ['singapore-police-force', 'Singapore Police Force']];
+const LN_WC = [['verbal-reasoning', 'Verbal reasoning', 'Words, meaning and clear English'], ['numerical-reasoning', 'Numerical reasoning', 'Speed, time, percentages and totals'], ['logical-reasoning', 'Logical reasoning', 'Number sequences and comparisons'], ['judgement-and-fitness', 'Judgement and fitness', 'Situations, fitness knowledge and preparation']];
+const LN_PATHS = ['/learn'];
+PAGE_HEADS['/learn'] = ['Selection Practice Tests and Requirements — The Sujan Khadka', 'Free practice questions with answers and clear requirements for British Army, French Foreign Legion and Singapore Police Force selection.'];
+for (const [id, n] of LN_W) {
+  LN_PATHS.push('/learn/' + id, '/learn/' + id + '/practice');
+  PAGE_HEADS['/learn/' + id] = [n + ' Requirements and Selection Stages — The Sujan Khadka', 'Who can apply, age, medical and fitness rules, selection stages and how to prepare for ' + n + ' selection. Plain language, free to read.'];
+  PAGE_HEADS['/learn/' + id + '/practice'] = [n + ' Practice Test: Free Questions and Answers — The Sujan Khadka', 'Free ' + n + ' selection practice questions with answers and explanations: verbal, numerical and logical reasoning, judgement and fitness. About 1,300 questions.'];
+  for (const [c, cn, cd] of LN_WC) {
+    LN_PATHS.push('/learn/' + id + '/practice/' + c);
+    PAGE_HEADS['/learn/' + id + '/practice/' + c] = [n + ' ' + cn + ' Practice Questions — The Sujan Khadka', 'Practise ' + n + ' ' + cn.toLowerCase() + ' questions with instant answers and explanations. ' + cd + '.'];
+  }
+}
 const OG_NAME = 'The Sujan Khadka';
 const OG_PAGES = {
   '/': ['The Sujan Khadka', 'The Sujan Khadka — fewer sections, better stories.'],
@@ -503,6 +517,7 @@ const SM_PAGES = [
   '/sudoku',
   '/word'
 ];
+SM_PAGES.push(...LN_PATHS);
 const smEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 const smDay = d => { const t = new Date(d); return isNaN(t) ? '' : t.toISOString().slice(0, 10); };
 async function sitemapResponse(req, env) {
@@ -533,8 +548,6 @@ async function handle({ request: req, env, next }) {
   // Addresses that contain template leftovers such as ${y.id} are never real pages: answer 404 so Google drops them.
   if (/[${}]|%24|%7B|%7D/i.test(p) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>Page not found</h1><p><a href="/">Go to the home page</a></p></body></html>', { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
-  // The Learn section was removed. Tell search engines the pages are gone for good (410) so they drop them quickly.
-  if ((p === '/learn' || p.startsWith('/learn/')) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This page has been removed — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>This page has been removed</h1><p>The Learn section is no longer part of the site.</p><p><a href="/">Go to the home page</a></p></body></html>', { status: 410, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (p === '/api/turn' && r === 'GET') return turnRoute(req, env);
   if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
   if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
