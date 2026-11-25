@@ -434,37 +434,94 @@ function ogMeta(o) {
     `<meta property="og:site_name" content="${OG_NAME}"><meta property="og:type" content="${o.article ? 'article' : 'website'}">` +
     `<meta property="og:title" content="${t}"><meta property="og:description" content="${d}"><meta property="og:url" content="${u}">` +
     `<meta property="og:image" content="${im}"><meta property="og:image:alt" content="${ogEsc(o.alt || o.title)}">` +
-    `<meta name="twitter:card" content="${o.cover ? 'summary_large_image' : 'summary'}"><meta name="twitter:title" content="${t}"><meta name="twitter:description" content="${d}"><meta name="twitter:image" content="${im}">`;
+    `<meta name="twitter:card" content="${o.cover || /\/og\.jpg$/.test(o.image) ? 'summary_large_image' : 'summary'}"><meta name="twitter:title" content="${t}"><meta name="twitter:description" content="${d}"><meta name="twitter:image" content="${im}">`;
   if (o.article) h += `<meta property="article:published_time" content="${ogEsc(o.published)}">${o.modified ? `<meta property="article:modified_time" content="${ogEsc(o.modified)}">` : ''}<meta property="article:section" content="${ogEsc(o.section)}">${o.author ? `<meta property="article:author" content="${ogEsc(o.author)}">` : ''}`;
+  if (/\/og\.jpg$/.test(o.image)) h += '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">';
+  h += '<link rel="alternate" type="application/rss+xml" title="' + OG_NAME + '" href="' + ogEsc(o.origin || '') + '/feed.xml">';
+  if (o.site) h += `<script id="ld-site" type="application/ld+json">${JSON.stringify(o.site).replace(/</g, '\\u003c')}</script>`;
+  if (o.bc && o.bc.length > 1) h += `<script id="ld-bc" type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: o.bc.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c[0], item: (o.origin || '') + c[1] })) }).replace(/</g, '\\u003c')}</script>`;
   if (o.ld) h += `<script id="ld" type="application/ld+json">${JSON.stringify(o.ld).replace(/</g, '\\u003c')}</script>`;
   return h;
 }
+// ---- crawler-readable copy of each page: it sits inside #app and is replaced as soon as the page loads, so readers never see it ----
+const SSR_NAV = [['Home', '/'], ['World', '/world'], ['History', '/history'], ['Opinion', '/opinion'], ['Culture', '/culture'], ['Lifestyle', '/lifestyle'], ['Audio', '/audio'], ['Video', '/videos'], ['Weather', '/weather'], ['Horoscope', '/horoscope'], ['Games', '/games'], ['Resume builder', '/resume'], ['Calculators', '/calculators'], ['Trek planner', '/trek-planner'], ["Today's rates", '/rates'], ['Exercise', '/exercise'], ['Learn', '/learn'], ['About', '/p/about'], ['Contact', '/p/contact']];
+function ssrMd(b) {
+  const out = [];
+  for (const para of String(b || '').split(/\n{2,}/)) {
+    const t = para.trim();
+    if (!t || /^(\[\[|!\[|<)/.test(t) || /^https?:\/\//.test(t)) continue;
+    if (/^##\s/.test(t)) { out.push('<h2>' + ogEsc(t.replace(/^#+\s*/, '')) + '</h2>'); continue; }
+    if (t[0] === '>') { out.push('<blockquote><p>' + ogEsc(t.replace(/^>\s?/gm, '')) + '</p></blockquote>'); continue; }
+    out.push('<p>' + ogEsc(t.replace(/[*_`]+/g, '')) + '</p>');
+  }
+  return out.join('').slice(0, 60000);
+}
+async function ssrFor(p, o, env, origin) {
+  const d = await ogData(env, origin);
+  const arts = (d.articles || []).filter(a => ogSec(a) && a.slug).sort((x, y) => Date.parse(y.date) - Date.parse(x.date));
+  const link = a => '/' + ogSec(a) + '/' + encodeURIComponent(a.slug);
+  const li = a => '<li><h3><a href="' + ogEsc(link(a)) + '">' + ogEsc(a.title) + '</a></h3><p>' + ogEsc(ogCut(a.subtitle || ogPlain(a.body), 200)) + '</p></li>';
+  const nav = '<nav><ul>' + SSR_NAV.map(([n, u]) => '<li><a href="' + u + '">' + ogEsc(n) + '</a></li>').join('') + '</ul></nav>';
+  let m, h = '';
+  if ((m = p.match(/^\/(world|opinion|history|culture|lifestyle)\/([^/]+)$/))) {
+    const a = arts.find(x => x.slug === m[2] && ogSec(x) === m[1]);
+    if (!a) return '';
+    const more = arts.filter(x => x !== a && ogSec(x) === m[1]).slice(0, 6);
+    h = '<article><h1>' + ogEsc(a.title) + '</h1>' + (a.subtitle ? '<p><strong>' + ogEsc(a.subtitle) + '</strong></p>' : '') + '<p>' + ogEsc([a.author, String(a.date || '').slice(0, 10), a.category].filter(Boolean).join(' · ')) + '</p>' + ssrMd(a.body) + '</article>' + (more.length ? '<h2>More from ' + ogEsc(a.category) + '</h2><ul>' + more.map(li).join('') + '</ul>' : '');
+  } else if ((m = p.match(/^\/(world|opinion|history|culture|lifestyle)$/))) {
+    const list = arts.filter(x => ogSec(x) === m[1]).slice(0, 40);
+    h = '<h1>' + ogEsc(o.title) + '</h1><p>' + ogEsc(o.desc) + '</p><ul>' + list.map(li).join('') + '</ul>';
+  } else if (p === '/') {
+    h = '<h1>' + ogEsc(OG_NAME) + '</h1><p>' + ogEsc(o.desc) + '</p><h2>Latest stories</h2><ul>' + arts.slice(0, 20).map(li).join('') + '</ul>';
+  } else {
+    h = '<h1>' + ogEsc(o.title) + '</h1><p>' + ogEsc(o.desc) + '</p>';
+    if (p === '/learn' || p.startsWith('/learn/')) h += '<ul>' + LN_PATHS.filter(x => x !== p && x.startsWith(p === '/learn' ? '/learn' : p + '/')).slice(0, 40).map(x => '<li><a href="' + x + '">' + ogEsc((PAGE_HEADS[x] || [x])[0].replace(/ [—|] The Sujan Khadka$/, '')) + '</a></li>').join('') + '</ul>';
+  }
+  return '<div id="ssr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"><main>' + h + '</main>' + nav + '</div>';
+}
 async function ogRewrite(req, env, res) {
-  const u = new URL(req.url), origin = u.origin, p = decodeURIComponent(u.pathname).replace(/\/+$/, '') || '/', icon = origin + '/icon-512.png';
-  let o = null, m;
+  const u = new URL(req.url), origin = u.origin, p = decodeURIComponent(u.pathname).replace(/\/+$/, '') || '/', icon = origin + '/icon-512.png', ogImg = origin + '/og.jpg';
+  let o = null, m, ssr = '', gone = false, bc = [['Home', '/']];
   if ((m = p.match(/^\/(world|opinion|history|culture|lifestyle)\/([^/]+)$/))) {
     const a = ((await ogData(env, origin)).articles || []).find(x => x.slug === m[2] && ogSec(x));
     if (a) {
       const abs = origin + '/' + ogSec(a) + '/' + a.slug, cover = a.image && /^\/img\/[a-f0-9-]{36}$/.test(a.image) ? origin + a.image : '';
       const desc = ogCut(a.seoDesc || a.subtitle || ogPlain(a.body) || OG_PAGES['/'][1], 200), title = ogCut(a.seoTitle || a.title, 110);
-      o = { article: 1, title, desc, url: abs, image: cover || icon, cover: !!cover, alt: a.imageCaption || a.title, published: a.date, modified: a.updated || '', section: a.category, author: a.author,
-        ld: { '@context': 'https://schema.org', '@type': 'NewsArticle', headline: ogCut(a.title, 110), description: desc, author: { '@type': 'Person', name: a.author || OG_NAME }, datePublished: a.date, dateModified: a.updated || a.date, image: [cover || icon], mainEntityOfPage: abs, publisher: { '@type': 'Organization', name: OG_NAME, logo: { '@type': 'ImageObject', url: icon } } } };
-    }
+      o = { article: 1, title, desc, url: abs, image: cover || ogImg, cover: !!cover, alt: a.imageCaption || a.title, published: a.date, modified: a.updated || '', section: a.category, author: a.author,
+        ld: { '@context': 'https://schema.org', '@type': 'NewsArticle', headline: ogCut(a.title, 110), description: desc, author: { '@type': 'Person', name: a.author || OG_NAME, url: origin + '/p/about' }, datePublished: a.date, dateModified: a.updated || a.date, image: [cover || ogImg], inLanguage: 'en', isAccessibleForFree: true, articleSection: a.category, mainEntityOfPage: abs, publisher: { '@type': 'Organization', name: OG_NAME, logo: { '@type': 'ImageObject', url: icon } } } };
+    } else gone = true;
   } else if ((m = p.match(/^\/listen\/([^/]+)$/))) {
     const a = ((await ogData(env, origin)).audios || []).find(x => x.id === m[1]);
-    if (a) o = { title: ogCut(a.title, 110), desc: ogCut(a.desc || 'Listen on The Sujan Khadka.', 200), url: origin + '/listen/' + a.id, image: icon };
+    if (a) o = { title: ogCut(a.title, 110), desc: ogCut(a.desc || 'Listen on The Sujan Khadka.', 200), url: origin + '/listen/' + a.id, image: ogImg }; else gone = true;
   } else if (PAGE_HEADS[p]) {
-    o = { title: PAGE_HEADS[p][0].replace(/ [—|] The Sujan Khadka$/, ''), full: PAGE_HEADS[p][0], desc: PAGE_HEADS[p][1], url: origin + (p === '/' ? '' : p), image: icon };
+    o = { title: PAGE_HEADS[p][0].replace(/ [—|] The Sujan Khadka$/, ''), full: PAGE_HEADS[p][0], desc: PAGE_HEADS[p][1], url: origin + (p === '/' ? '' : p), image: ogImg };
   } else if (OG_PAGES[p]) {
-    o = { title: OG_PAGES[p][0], desc: OG_PAGES[p][1], url: origin + (p === '/' ? '' : p), image: icon };
+    o = { title: OG_PAGES[p][0], desc: OG_PAGES[p][1], url: origin + (p === '/' ? '' : p), image: ogImg };
   }
-  if (!o) return res;
+  if (!o) {
+    if (gone) { // a story or audio address that does not exist: a real 404, not an empty page that looks fine
+      const h = new Headers(res.headers); ['content-length', 'content-encoding', 'etag'].forEach(k => h.delete(k)); h.set('cache-control', 'public, max-age=0, must-revalidate');
+      return new Response(await res.text(), { status: 404, headers: h });
+    }
+    return res;
+  }
+  o.origin = origin;
+  if (p === '/') o.site = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebSite', '@id': origin + '/#website', name: OG_NAME, url: origin + '/', inLanguage: 'en', publisher: { '@id': origin + '/#org' } }, { '@type': 'Organization', '@id': origin + '/#org', name: OG_NAME, url: origin + '/', logo: { '@type': 'ImageObject', url: icon } }] };
+  else {
+    const segs = p.split('/').filter(Boolean);
+    if (o.article) { const sec = segs[0]; bc.push([(OG_PAGES['/' + sec] || [sec])[0], '/' + sec], [o.title, '/' + segs.join('/')]); }
+    else { let acc = ''; for (const sg of segs) { acc += '/' + sg; const hd = PAGE_HEADS[acc] || OG_PAGES[acc]; bc.push([hd ? hd[0].split(/ [—|] /)[0] : sg.replace(/-/g, ' '), acc]); } }
+    o.bc = bc;
+  }
+  try { ssr = await ssrFor(p, o, env, origin); } catch (e) { ssr = ''; }
   let html = await res.text();
+  html = html.replace(/<meta (?:property="og:|name="twitter:)[^>]*>/gi, '').replace(/<link rel="canonical"[^>]*>/gi, ''); // the page file carries generic copies; keep only this page's own
   const full = o.full || (o.title === OG_NAME ? OG_NAME : o.title + ' — ' + OG_NAME);
   const t1 = '<title>' + ogEsc(full) + '</title>', t2 = '<meta name="description" content="' + ogEsc(o.desc) + '">', t3 = ogMeta(o) + '</head>';
   html = html.replace(/<title>[\s\S]*?<\/title>/i, () => t1) // function replacers: a "$&" in a story title must not be treated as a pattern
     .replace(/<meta name="description" content="[^"]*">/i, () => t2)
     .replace(/<\/head>/i, () => t3);
+  if (ssr) html = html.replace('<div id="app"></div>', () => '<div id="app">' + ssr + '</div>');
   const h = new Headers(res.headers);
   ['content-length', 'content-encoding', 'etag'].forEach(k => h.delete(k));
   h.set('cache-control', 'public, max-age=0, must-revalidate');
@@ -520,10 +577,24 @@ const SM_PAGES = [
 SM_PAGES.push(...LN_PATHS);
 const smEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 const smDay = d => { const t = new Date(d); return isNaN(t) ? '' : t.toISOString().slice(0, 10); };
+// ---- /feed.xml: RSS of the latest stories (helps search engines, news readers and sharing sites find new stories) ----
+async function feedResponse(req, env) {
+  const origin = new URL(req.url).origin;
+  let arts = [];
+  try { arts = ((await ogData(env, origin)).articles || []).filter(a => ogSec(a) && a.slug).sort((x, y) => Date.parse(y.date) - Date.parse(x.date)).slice(0, 30); } catch (e) { /* an empty feed is better than an error */ }
+  const x = s => ogEsc(String(s == null ? '' : s));
+  const items = arts.map(a => { const u = origin + '/' + ogSec(a) + '/' + encodeURIComponent(a.slug); return '<item><title>' + x(a.title) + '</title><link>' + x(u) + '</link><guid isPermaLink="true">' + x(u) + '</guid><pubDate>' + new Date(a.date).toUTCString() + '</pubDate><category>' + x(a.category) + '</category><dc:creator>' + x(a.author || OG_NAME) + '</dc:creator><description>' + x(ogCut(a.subtitle || ogPlain(a.body), 300)) + '</description></item>'; }).join('');
+  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>' + OG_NAME + '</title><link>' + origin + '/</link><description>World news, history, opinion, culture and lifestyle from The Sujan Khadka.</description><language>en</language><atom:link href="' + origin + '/feed.xml" rel="self" type="application/rss+xml"/>' + items + '</channel></rss>\n';
+  return new Response(req.method === 'HEAD' ? null : xml, { headers: { 'content-type': 'application/rss+xml; charset=utf-8', 'cache-control': 'public, max-age=900' } });
+}
 async function sitemapResponse(req, env) {
   const rows = SM_PAGES.map(p => [SM_SITE + p, '']);
   try {
     const d = await ogData(env, new URL(req.url).origin), seen = new Set();
+    const lm = {}; // newest story date for the home page and each story section
+    for (const a of d.articles || []) { const sec = ogSec(a), t = smDay(a.updated || a.date); if (!sec || !t) continue; if (!lm['/' + sec] || t > lm['/' + sec]) lm['/' + sec] = t; if (!lm['/'] || t > lm['/']) lm['/'] = t; }
+    for (const r of rows) if (lm[r[0].slice(SM_SITE.length) || '/']) r[1] = lm[r[0].slice(SM_SITE.length) || '/'];
+    for (const au of d.audios || []) { if (au.id) rows.push([SM_SITE + '/listen/' + encodeURIComponent(au.id), smDay(au.updated || au.date)]); }
     for (const a of d.articles || []) {
       const sec = ogSec(a);
       if (!sec || !a.slug) continue;
@@ -548,6 +619,9 @@ async function handle({ request: req, env, next }) {
   // Addresses that contain template leftovers such as ${y.id} are never real pages: answer 404 so Google drops them.
   if (/[${}]|%24|%7B|%7D/i.test(p) && (r === 'GET' || r === 'HEAD')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Page not found — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>Page not found</h1><p><a href="/">Go to the home page</a></p></body></html>', { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   if (p === '/sitemap.xml' && (r === 'GET' || r === 'HEAD')) return sitemapResponse(req, env);
+  if (p === '/feed.xml' && (r === 'GET' || r === 'HEAD')) return feedResponse(req, env);
+  // Old Learn addresses from the first version of the section no longer exist: 410 tells search engines to drop them.
+  if ((p === '/learn' || p.startsWith('/learn/')) && (r === 'GET' || r === 'HEAD') && !LN_PATHS.includes((decodeURIComponent(p).replace(/\/+$/, '')) || '/')) return new Response(r === 'HEAD' ? null : '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This page has been removed — The Sujan Khadka</title><meta name="robots" content="noindex"></head><body style="font-family:system-ui,sans-serif;max-width:560px;margin:60px auto;padding:0 16px"><h1>This page has been removed</h1><p><a href="/learn">See the Learn section</a> or <a href="/">go to the home page</a>.</p></body></html>', { status: 410, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
   if (p === '/api/turn' && r === 'GET') return turnRoute(req, env);
   if (p === '/api/chat-config' || p === '/api/chat-login') return chatAuthRoute(req, env);
   if (p.startsWith('/api/chat/') || p.startsWith('/api/group/')) return chatRoute(req, env);
@@ -695,7 +769,7 @@ export default {
 };
 
 // ---- CHAT START: private two-person chat. One Durable Object per room. It only relays encrypted text and forgets each message once it has been seen. ----
-const CH_TTL = 15 * 864e5, CH_MAX = 6000, CH_QUEUE = 40;
+const CH_TTL = 36500 * 864e5, CH_MAX = 6000, CH_QUEUE = 40;
 // Files and voice messages: the browser cuts an encrypted file into pieces, the server only stores the scrambled pieces for one hour.
 const CH_BLOB = 3e5, CH_FCH = 44, CH_QUOTA = 40e6, CH_HOUR = 36e5, CH_FID = /^[A-Za-z0-9_-]{6,24}$/;
 const chBK = (fid, i) => 'b:' + fid + ':' + String(i).padStart(2, '0');
@@ -794,7 +868,7 @@ export class ChatRoom {
   }
   async plan() {
     const st = this.ctx.storage, room = await st.get('room'); if (!room) return;
-    let next = room.c + CH_TTL; const bx = await blobNext(st); if (bx) next = Math.min(next, bx + 500);
+    let next = Date.now() + 30 * 864e5; const bx = await blobNext(st); if (bx) next = Math.min(next, bx + 500);
     await st.setAlarm(next);
   }
   async alarm() {
@@ -917,7 +991,7 @@ export class GroupRoom {
   }
   async plan() {
     const st = this.ctx.storage, room = await st.get('room'); if (!room) return;
-    const end = room.c + CH_TTL, old = await st.list({ prefix: 'g:', limit: 1 });
+    const end = Date.now() + 30 * 864e5, old = await st.list({ prefix: 'g:', limit: 1 });
     let next = end;
     for (const [, v] of old) next = Math.min(end, v.ts + GR_KEEP + 1000);
     const bx = await blobNext(st); if (bx) next = Math.min(next, bx + 500);
@@ -1014,7 +1088,7 @@ export class ChatUser {
     const g = (await st.get('g')) || {};
     for (const k in g) if (g[k] <= now) delete g[k];
     let ok = true;
-    if (u.pathname === '/join') { if (!g[r]) { if (Object.keys(g).length >= 5) ok = false; else g[r] = x || now + 15 * 864e5; } }
+    if (u.pathname === '/join') { if (!g[r]) { if (Object.keys(g).length >= 5) ok = false; else g[r] = x || now + 36500 * 864e5; } }
     else if (u.pathname === '/leave') delete g[r];
     await st.put('g', g);
     return new Response(JSON.stringify({ ok, n: Object.keys(g).length }));

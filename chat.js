@@ -1,4 +1,4 @@
-/* Private and group chat. Encrypted in the browser, deleted after one hour, links and codes last 15 days.
+/* Private and group chat. Encrypted in the browser, deleted after one hour, links and codes never expire.
    Loaded by index.html when /chat is opened. Upload it next to index.html. */
 (function(){
 'use strict';
@@ -83,7 +83,7 @@ const CP='thesujankhadka',CA='abcdefghjkmnpqrstuvwxyz23456789';
 function codeNew(){let o='';while(o.length<10){const r=crypto.getRandomValues(new Uint8Array(16));for(const n of r){if(n<248&&o.length<10)o+=CA[n%31]}}return CP+'-'+o.slice(0,5)+'-'+o.slice(5)}
 function codeNorm(t){t=String(t||'').toLowerCase().replace(/[^a-z0-9]/g,'');if(t.slice(0,CP.length)!==CP)return null;const r=t.slice(CP.length);if(r.length!==10||![...r].every(c=>CA.includes(c)))return null;return CP+'-'+r.slice(0,5)+'-'+r.slice(5)}
 async function codeKeys(c){const b=await crypto.subtle.importKey('raw',new TextEncoder().encode(c),'PBKDF2',false,['deriveBits']);const o=new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:new TextEncoder().encode('sk-chat-code-v1'),iterations:300000},b,384));return{room:B64(o.slice(0,16)),key:B64(o.slice(16))}}
-function chats(){const now=Date.now();const a=ls.get('sk_chats',[]).filter(e=>e&&e.r&&e.key&&e.x>now);ls.set('sk_chats',a);return a}
+function chats(){const now=Date.now();const a=ls.get('sk_chats',[]).filter(e=>e&&e.r&&e.key);ls.set('sk_chats',a);return a}
 function saveChat(e){const a=chats().filter(x=>x.r!==e.r);a.unshift(e);ls.set('sk_chats',a)}
 function dropChat(r){ls.set('sk_chats',chats().filter(x=>x.r!==r));ls.del('skm_'+r);ls.del('sk_code_'+r)}
 let S=null,tick=0;
@@ -135,7 +135,7 @@ async function route(){
 function who(){const u=CFG.gid&&sess();return u?`<div class="chwho"><span>Signed in${u.name?' as <b>'+esc(u.name)+'</b>':''} · Your chat ID <code>${uidLabel(u)}</code></span><button class="chb g" id="ch-out" type="button">Sign out</button></div>`:''}
 function hub(root,notice){
  const all=chats(),gs=all.filter(e=>e.k==='g'),ps=all.filter(e=>e.k==='p'),now=Date.now();
- const row=e=>`<div class="chrow"><div class="t"><b>${esc(e.n||(e.k==='g'?'Group':'Private chat'))}</b><span>${e.k==='g'?'Group':'Private'} · expires in ${days(e.x-now)}</span></div><button class="chb g" data-open="${e.r}" type="button">Open</button><button class="chb r" data-rm="${e.r}" type="button">${e.k==='g'?'Leave':'Remove'}</button></div>`;
+ const row=e=>`<div class="chrow"><div class="t"><b>${esc(e.n||(e.k==='g'?'Group':'Private chat'))}</b><span>${e.k==='g'?'Group':'Private'}</span></div><button class="chb g" data-open="${e.r}" type="button">Open</button><button class="chb r" data-rm="${e.r}" type="button">${e.k==='g'?'Leave':'Remove'}</button></div>`;
  root.innerHTML=`<div class="chk">Chat</div><h1>Private and group chat</h1>
  <p class="chd">Talk with one person or a small group. Messages are locked in your browser and disappear after one hour.</p>
  ${who()}
@@ -148,7 +148,7 @@ function hub(root,notice){
  <h2>Your private chats<small>${ps.length}</small></h2>${ps.length?ps.map(row).join(''):'<p class="chn">No private chats yet.</p>'}
  <h2>Your groups<small>${gs.length} of ${MAXG}</small></h2>${gs.length?gs.map(row).join(''):'<p class="chn">You are not in any group yet.</p>'}
  <h2 id="ch-how">How it works</h2>
- <ol class="chl"><li>Start a chat or create a group. You get a private link or code that works for 15 days.</li><li>Send the link to your friend or your group on WhatsApp, Messenger, email or any app. For a private chat you can also tap <b>Make a code</b> and tell your friend the code (it starts with thesujankhadka). They type it under <b>Join</b>.</li><li>A private chat locks to the two of you. A group takes up to ${GMAX} people.</li><li>Inside a chat, tap <b>📞 Voice call</b> to talk. Your friend gets a ring and taps <b>Answer</b>. A group call takes up to 4 people.</li><li>Every message disappears one hour after it is seen. After 15 days the link or code expires and you make a new one.</li></ol>
+ <ol class="chl"><li>Start a chat or create a group. You get a private link or code that never expires.</li><li>Send the link to your friend or your group on WhatsApp, Messenger, email or any app. For a private chat you can also tap <b>Make a code</b> and tell your friend the code (it starts with thesujankhadka). They type it under <b>Join</b>.</li><li>A private chat locks to the two of you. A group takes up to ${GMAX} people.</li><li>Inside a chat, tap <b>📞 Voice call</b> to talk. Your friend gets a ring and taps <b>Answer</b>. A group call takes up to 4 people.</li><li>Every message disappears one hour after it is seen. After 15 days the link or code expires and you make a new one.</li></ol>
  <h2>Good to know</h2>
  <details class="chq"><summary>Can you read my messages?</summary><p>No. Messages are locked in your browser with a key that lives only in the link, after the # sign. The server never receives the key, so it only passes on scrambled text.</p></details>
  <details class="chq"><summary>Is a voice call private?</summary><p>Yes. The sound goes directly from phone to phone and is scrambled on the way. The call set-up notes are locked with the chat key, so our server cannot read them. Nothing is recorded or saved. Both people need the chat page open, and calls can fail on a few strict mobile networks.</p></details>
@@ -176,7 +176,7 @@ function leaveRemote(e){try{const ws=new WebSocket((location.protocol==='https:'
 async function room(root,h){
  const isG=h.k==='g';let ent=chats().find(x=>x.r===h.room);
  if(!ent){const gs=chats().filter(e=>e.k==='g');if(isG&&gs.length>=MAXG){hub(root,'You are already in '+MAXG+' groups, which is the most you can join. Leave one below, then open the link again.');history.replaceState(null,'','/chat');return}
-  ent={k:h.k,r:h.room,key:h.key,n:isG?h.name:'Private chat',c:Date.now(),x:Date.now()+15*864e5};saveChat(ent)}
+  ent={k:h.k,r:h.room,key:h.key,n:isG?h.name:'Private chat',c:Date.now(),x:Date.now()+36500*864e5};saveChat(ent)}
  let key;try{key=await crypto.subtle.importKey('raw',UB64(h.key),'AES-GCM',false,['encrypt','decrypt'])}catch(e){root.innerHTML='<div class="chnote">This link is not valid.</div><button class="chb" onclick="location.hash=\'\'">All chats</button>';return}
  let cid=ls.get('skc_'+h.room,null);if(!cid){cid=rid(18);ls.set('skc_'+h.room,cid)}
  S={k:h.k,room:h.room,key,cid,msgs:new Map(),w:new Map(),nodes:new Map(),ws:null,tries:0,stop:false,peer:false,locked:false,hadPeer:false,ent,link:location.href,owner:false,on:0,members:0,nick:ls.get('sk_nick','')};
@@ -386,7 +386,7 @@ function connect(){
 async function onMsg(m){
  if(!S)return;
  if(m.t==='joined'){
-  if(m.exp){const e=$('ch-exp');if(e)e.textContent='This link expires on '+new Date(m.exp).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})+'.';S.ent.x=m.exp;saveChat(S.ent)}
+  if(m.exp){const e=$('ch-exp');if(e)e.textContent='This link never expires.';S.ent.x=Date.now()+36500*864e5;saveChat(S.ent)}
   if(S.k==='g'){S.owner=!!m.owner;if(S.owner){S.ent.owner=1;saveChat(S.ent);const b=$('ch-end');if(b)b.textContent='End group'}gstatus()}
   else{S.peer=m.peer;S.locked=m.locked;status()}return}
  if(m.t==='n'){S.on=m.on;S.members=m.members;gstatus();return}
@@ -395,7 +395,7 @@ async function onMsg(m){
  if(m.t==='limit'){S.stop=true;dropChat(S.room);history.replaceState(null,'','/chat');const r=$('ch');if(r)hub(r,'You are already in '+MAXG+' groups on your account, which is the most you can join. Leave one to make room.');return}
  if(m.t==='full'){finish(S.k==='g'?'This group already has '+GMAX+' people, so you cannot join it.':'This chat already has two people, so you cannot join it.');return}
  if(m.t==='replaced'){finish('This chat was opened in another tab. Close this one.');return}
- if(m.t==='ended'){finish(m.why==='expired'?'This link or code has expired. They work for 15 days. Make a new one below.':'Chat ended and deleted.',m.why==='expired');return}
+ if(m.t==='ended'){finish(m.why==='expired'?'This chat was ended and deleted. Make a new one below.':'Chat ended and deleted.',m.why==='expired');return}
  if(m.t==='sent'){const x=S.msgs.get(m.id);if(x){x.state='sent';if(S.k==='g'){x.ts=m.ts;x.until=m.ts+HOUR}persist();draw()}return}
  if(m.t==='seen'){const x=S.msgs.get(m.id);if(x)startSeen(x);return}
  if(m.t==='sig'){callSig(m);return}

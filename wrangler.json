@@ -13,6 +13,7 @@
       "/video/*",
       "/",
       "/sitemap.xml",
+      "/feed.xml",
       "/world",
       "/opinion",
       "/history",
