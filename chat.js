@@ -319,27 +319,31 @@ function setSt(txt,cls){const e=$('ch-st');if(!e)return;e.className='chst '+(cls
 function finish(txt,renew){if(!S)return;callEnd(1);S.stop=true;const isP=S.k!=='g',r=S.room;S.msgs.clear();dropChat(r);const sh=$('ch-share');if(sh)sh.hidden=true;setSt(txt);const i=$('ch-in'),b=$('ch-send');if(i)i.disabled=true;if(b)b.disabled=true;try{S.ws&&S.ws.close()}catch(e){}
  const l=$('ch-log');if(l){l.innerHTML='<div class="e">'+txt+'<br><br>'+(renew&&isP?'<button class="chb" type="button" id="ch-renew">Make a new code</button> ':'')+'<button class="chb g" type="button" id="ch-again">Back to all chats</button></div>';$('ch-again').onclick=()=>{location.hash=''};const rn=$('ch-renew');if(rn)rn.onclick=async()=>{rn.disabled=true;rn.textContent='One moment…';try{const c=codeNew(),k=await codeKeys(c);ls.set('sk_code_'+k.room,c);location.hash='#'+k.room+'.'+k.key}catch(e){rn.disabled=false;rn.textContent='Make a new code'}}}}
 /* ---------------- voice call: the sound goes straight between phones; the set-up notes are locked with the chat key ---------------- */
-let C=null,RING=null;
+let C=null,RING=null,MICB=false;
 const callMsg=x=>{const t=$('ch-ty');if(t){t.textContent=x;setTimeout(()=>{if(t.textContent===x)t.textContent=''},6000)}};
 function callClock(){if(!C||!C.t0)return'0:00';const s=Math.floor((Date.now()-C.t0)/1e3),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return(h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s%60).padStart(2,'0')}
-function callTick(){const e=$('ch-ctm');if(e)e.textContent=callClock()}
+function callTick(){const e=$('ch-ctm');if(e)e.textContent=callClock();if(C&&!C.t0&&!C.hint&&C.peers.size&&Date.now()-C.c0>25000){C.hint=1;callUi()}}
 function callUi(){const b=$('ch-call');if(!b||!S)return;const g=S.k==='g';
  if(C){const n=C.peers.size,live=[...C.peers.values()].some(p=>p.pc.connectionState==='connected'),st=live?(g?(n+1)+' people in the call':'Connected'):(n?'Connecting…':(g?'Calling the group…':'Calling your friend…'));
-  b.innerHTML='<div class="cin"><span class="cdot'+(live?' on':'')+'"></span><span>'+st+' · <b id="ch-ctm">'+callClock()+'</b></span><button class="chb g" id="ch-cmute" type="button">'+(C.muted?'Unmute':'Mute')+'</button><button class="chb r" id="ch-cend" type="button">Hang up</button></div><p class="chn" style="margin:6px 0 0">Keep this page open and the screen on. Your voice goes directly to the other phone.</p>';
-  $('ch-cmute').onclick=callMute;$('ch-cend').onclick=()=>callEnd()}
- else if(RING){b.innerHTML='<div class="cin"><span class="cdot ring"></span><span><b>'+esc(RING.n||(g?'Someone':'Your friend'))+'</b> is calling</span><button class="chb" id="ch-cjoin" type="button">Answer</button><button class="chb g" id="ch-cno" type="button">Not now</button></div>';$('ch-cjoin').onclick=callJoin;$('ch-cno').onclick=()=>{clearTimeout(RING&&RING.x);RING=null;callUi()}}
- else{b.innerHTML='<button class="chb g" id="ch-cstart" type="button">📞 Voice call</button>';$('ch-cstart').onclick=callJoin}}
+  b.innerHTML='<div class="cin"><span class="cdot'+(live?' on':'')+'"></span><span>'+st+' · <b id="ch-ctm">'+callClock()+'</b></span>'+(C.nomic?'<button class="chb" id="ch-cmic" type="button">Turn on microphone</button>':'<button class="chb g" id="ch-cmute" type="button">'+(C.muted?'Unmute':'Mute')+'</button>')+'<button class="chb r" id="ch-cend" type="button">Hang up</button></div>'+(C.nomic?'<p class="chn" style="margin:6px 0 0"><b>The other person cannot hear you.</b> '+(C.micErr?'The microphone is blocked. Tap the lock icon next to the web address, open Permissions, set Microphone to Allow, then press Turn on microphone.':'Press Turn on microphone so they can hear you.')+'</p>':'')+(C.hint&&!live?'<p class="chn" style="margin:6px 0 0">Still connecting. Check that both phones have internet and that the other person has pressed Answer. If one phone is on mobile data and the other on Wi-Fi, try the same network.</p>':'')+'<p class="chn" style="margin:6px 0 0">Keep this page open and the screen on. Your voice goes directly to the other phone.</p>';
+  if(C.nomic)$('ch-cmic').onclick=callMicOn;else $('ch-cmute').onclick=callMute;$('ch-cend').onclick=()=>callEnd()}
+ else if(MICB){b.innerHTML='<div class="cin"><span><b>The microphone is blocked.</b></span></div><p class="chn" style="margin:6px 0 8px">Without it the other person cannot hear you. Tap the lock icon next to the web address, open Permissions, set Microphone to Allow, then press Try again.</p><div class="cin"><button class="chb" id="ch-cretry" type="button">Try again</button><button class="chb g" id="ch-cskip" type="button">Continue without microphone</button><button class="chb g" id="ch-ccan" type="button">Cancel</button></div>';$('ch-cretry').onclick=()=>callJoin();$('ch-cskip').onclick=()=>callJoin(1);$('ch-ccan').onclick=()=>{MICB=false;callUi()}}
+ else if(RING){b.innerHTML='<div class="cin"><span class="cdot ring"></span><span><b>'+esc(RING.n||(g?'Someone':'Your friend'))+'</b> is calling</span><button class="chb" id="ch-cjoin" type="button">Answer</button><button class="chb g" id="ch-cno" type="button">Not now</button></div>';$('ch-cjoin').onclick=()=>callJoin();$('ch-cno').onclick=()=>{clearTimeout(RING&&RING.x);RING=null;callUi()}}
+ else{b.innerHTML='<button class="chb g" id="ch-cstart" type="button">📞 Voice call</button>';$('ch-cstart').onclick=()=>callJoin()}}
 async function callSend(o){if(!S||!S.ws||S.ws.readyState!==1)return;o.t=Date.now();const e=await encObj(o);try{S.ws.send(JSON.stringify({t:'sig',iv:e.iv,ct:e.ct}))}catch(x){}}
 const callHi=reply=>{if(C)callSend({c:'hi',p:C.pid,n:S.k==='g'?(S.nick||'Guest'):'',r:reply?1:0})};
 function ringTone(){try{navigator.vibrate&&navigator.vibrate([300,150,300,150,300])}catch(e){}try{const ac=new (window.AudioContext||window.webkitAudioContext)();[0,.5,1].forEach(t=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+t);o.stop(ac.currentTime+t+.25)});setTimeout(()=>ac.close(),2000)}catch(e){}}
-async function callJoin(){if(C||!S)return;
+async function callMic(){try{return await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}catch(e){return null}}
+function callSilent(){try{const ac=new (window.AudioContext||window.webkitAudioContext)(),d=ac.createMediaStreamDestination();return{ms:d.stream,ac}}catch(e){return null}}
+async function callMicOn(){if(!C||!C.nomic)return;const ms=await callMic();if(!C)return;if(!ms){C.micErr=1;callUi();return}const tk=ms.getAudioTracks()[0];for(const P of C.peers.values()){const sd=P.pc.getSenders().find(x=>x.track&&x.track.kind==='audio');if(sd)sd.replaceTrack(tk).catch(()=>{})}try{C.ms.getTracks().forEach(t=>t.stop())}catch(e){}try{C.ac&&C.ac.close()}catch(e){}C.ac=null;C.ms=ms;C.nomic=false;C.micErr=0;C.muted=false;callUi()}
+async function callJoin(skip){if(C||!S)return;
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.RTCPeerConnection){callMsg('This browser cannot make calls.');return}
- let ms;try{ms=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}catch(e){callMsg('Allow the microphone to make a call.');return}
+ let ms=null,ac=null,nomic=false;if(skip){const q=callSilent();if(!q){callMsg('This browser cannot make calls.');return}ms=q.ms;ac=q.ac;nomic=true}else{ms=await callMic();if(!ms){MICB=true;callUi();return}}
  let ice=[{urls:['stun:stun.cloudflare.com:3478','stun:stun.l.google.com:19302']}];
  try{const j=await(await fetch('/api/turn')).json();if(j&&Array.isArray(j.iceServers))ice=j.iceServers}catch(e){}
- if(!S||C){ms.getTracks().forEach(t=>t.stop());return}
- clearTimeout(RING&&RING.x);RING=null;
- C={pid:rid(9),ms,ice,peers:new Map(),muted:false,t0:0,wl:null};C.tm=setInterval(callTick,1000);C.hi=setInterval(()=>{if(C&&!C.peers.size)callHi()},10000);
+ if(!S||C){ms.getTracks().forEach(t=>t.stop());try{ac&&ac.close()}catch(e){}return}
+ MICB=false;clearTimeout(RING&&RING.x);RING=null;
+ C={pid:rid(9),ms,ac,nomic,ice,peers:new Map(),muted:false,t0:0,wl:null,c0:Date.now()};C.tm=setInterval(callTick,1000);C.hi=setInterval(()=>{if(C&&!C.peers.size)callHi()},10000);
  try{if(navigator.wakeLock)navigator.wakeLock.request('screen').then(w=>{if(C)C.wl=w;else w.release()},()=>{})}catch(e){}
  callUi();callHi()}
 function callPeer(pid,name){const pc=new RTCPeerConnection({iceServers:C.ice}),P={pid,pc,q:[],a:null,n:name||''};C.peers.set(pid,P);
@@ -354,7 +358,7 @@ function callPeer(pid,name){const pc=new RTCPeerConnection({iceServers:C.ice}),P
  callUi();return P}
 function callDrop(pid){if(!C)return;const P=C.peers.get(pid);if(!P)return;try{P.pc.close()}catch(e){}if(P.a){P.a.srcObject=null;P.a.remove()}C.peers.delete(pid);callUi()}
 function callMute(){if(!C)return;C.muted=!C.muted;C.ms.getAudioTracks().forEach(t=>t.enabled=!C.muted);callUi()}
-function callEnd(quiet,msg){if(!C)return;callSend({c:'bye',p:C.pid});clearInterval(C.tm);clearInterval(C.hi);try{C.wl&&C.wl.release()}catch(e){}try{C.ms.getTracks().forEach(t=>t.stop())}catch(e){}
+function callEnd(quiet,msg){if(!C)return;callSend({c:'bye',p:C.pid});clearInterval(C.tm);clearInterval(C.hi);try{C.wl&&C.wl.release()}catch(e){}try{C.ms.getTracks().forEach(t=>t.stop())}catch(e){}try{C.ac&&C.ac.close()}catch(e){}
  for(const p of [...C.peers.values()]){try{p.pc.close()}catch(e){}if(p.a){p.a.srcObject=null;p.a.remove()}}C=null;callUi();if(msg)callMsg(msg)}
 async function callSig(m){const o=await dec(m.iv,m.ct);if(!o||typeof o.c!=='string'||typeof o.p!=='string'||Math.abs(Date.now()-o.t)>6e4)return;
  if(C&&o.p===C.pid)return;

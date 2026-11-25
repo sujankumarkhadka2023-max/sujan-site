@@ -380,13 +380,13 @@ const PAGE_HEADS = {
 };
 // ---- Learn section: titles and descriptions for every Learn address (also used for the sitemap) ----
 const LN_W = [['british-army', 'British Army'], ['french-foreign-legion', 'French Foreign Legion'], ['singapore-police-force', 'Singapore Police Force']];
-const LN_WC = [['verbal-reasoning', 'Verbal reasoning', 'Words, meaning and clear English'], ['numerical-reasoning', 'Numerical reasoning', 'Speed, time, percentages and totals'], ['logical-reasoning', 'Logical reasoning', 'Number sequences and comparisons'], ['judgement-and-fitness', 'Judgement and fitness', 'Situations, fitness knowledge and preparation']];
+const LN_WC = [['verbal-reasoning', 'Verbal reasoning', 'Words, meaning and clear English'], ['numerical-reasoning', 'Numerical reasoning', 'Speed, time, percentages and totals'], ['logical-reasoning', 'Logical reasoning', 'Number sequences and comparisons'], ['judgement-and-fitness', 'Judgement and fitness', 'Situations, fitness knowledge and preparation'], ['visual-reasoning', 'Visual reasoning', 'Cubes, dice, folded paper, shapes, patterns and number grids']];
 const LN_PATHS = ['/learn'];
 PAGE_HEADS['/learn'] = ['Selection Practice Tests and Requirements — The Sujan Khadka', 'Free practice questions with answers and clear requirements for British Army, French Foreign Legion and Singapore Police Force selection.'];
 for (const [id, n] of LN_W) {
   LN_PATHS.push('/learn/' + id, '/learn/' + id + '/practice');
   PAGE_HEADS['/learn/' + id] = [n + ' Requirements and Selection Stages — The Sujan Khadka', 'Who can apply, age, medical and fitness rules, selection stages and how to prepare for ' + n + ' selection. Plain language, free to read.'];
-  PAGE_HEADS['/learn/' + id + '/practice'] = [n + ' Practice Test: Free Questions and Answers — The Sujan Khadka', 'Free ' + n + ' selection practice questions with answers and explanations: verbal, numerical and logical reasoning, judgement and fitness. About 1,300 questions.'];
+  PAGE_HEADS['/learn/' + id + '/practice'] = [n + ' Practice Test: Free Questions and Answers — The Sujan Khadka', 'Free ' + n + ' selection practice questions with answers and explanations: verbal, numerical, logical and visual reasoning, judgement and fitness. New questions every time.'];
   for (const [c, cn, cd] of LN_WC) {
     LN_PATHS.push('/learn/' + id + '/practice/' + c);
     PAGE_HEADS['/learn/' + id + '/practice/' + c] = [n + ' ' + cn + ' Practice Questions — The Sujan Khadka', 'Practise ' + n + ' ' + cn.toLowerCase() + ' questions with instant answers and explanations. ' + cd + '.'];
